@@ -4,7 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link,Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -151,7 +151,12 @@ function DashboardLayout() {
 
         {/* Page Content */}
         
-        <PageContent/>
+        <div className="p-6">
+          {/* This is where your nested route components will be rendered */}
+          <Outlet /> {/* Render the content of the active nested route */}
+        </div>
+
+        
       </main>
     </div>
   );

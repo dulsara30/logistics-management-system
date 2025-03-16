@@ -13,6 +13,7 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
+import VehicleRegistrationForm from './pages/DeliveryAndVehicleFleet/VehicleRegistration.jsx'
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
           {path:"suppliers", element:<SupplierManagement/>,},
           {path:"return&damage", element:<ReturnDamageHandling/>,},
           {path:"help", element:<Help/>,},
+          {path:"fleet/vehicleRegistration", element:<VehicleRegistrationForm />,}
         ]
       }
     ]

@@ -3,7 +3,7 @@ export default function DeliveryManagement(){
 
         <div className="p-16">
         <h1>DeliveryManagement</h1>
-   </div>
+        </div>
     )
 }
 
