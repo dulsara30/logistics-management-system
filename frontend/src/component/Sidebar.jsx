@@ -4,6 +4,7 @@ import { FaBars } from "react-icons/fa";
 import SidebarItem from "./SidebarItem";
 import Header from "./Header";
 
+
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
