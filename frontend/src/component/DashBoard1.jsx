@@ -4,7 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -68,13 +68,14 @@ function DashboardLayout() {
         lg:translate-x-0 lg:w-74 w-72
       `}>
         {/* Logo */}
+        <Link to={"/"}>
         <div className="flex items-center justify-center h-20 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <img src={logo} className='w-20 h-20'/>
             <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
           </div>
         </div>
-
+        </Link>
         {/* Navigation */}
         <nav className="p-4 space-y-2">
 
