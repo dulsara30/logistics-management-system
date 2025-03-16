@@ -24,12 +24,12 @@ function Sidebar() {
       <nav className="mt-5 space-y-2">
         <SidebarItem to="/" icon="🏠" label="Home" isOpen={isOpen} />
         <SidebarItem to="/warehouse-management" icon="🏢" label="Warehouse" isOpen={isOpen} />
-        <SidebarItem to="/vehicle-fleet" icon="🚚" label="Vehicle Fleet" isOpen={isOpen} />
-        <SidebarItem to="/delivery-management" icon="📦" label="Delivery" isOpen={isOpen} />
-        <SidebarItem to="/inventory-management" icon="📊" label="Inventory" isOpen={isOpen} />
-        <SidebarItem to="/staff-management" icon="👥" label="Staff" isOpen={isOpen} />
-        <SidebarItem to="/supplier-management" icon="📜" label="Suppliers" isOpen={isOpen} />
-        <SidebarItem to="/return-damage" icon="🔄" label="Returns & Damage" isOpen={isOpen} />
+        <SidebarItem to="/fleet" icon="🚚" label="Vehicle Fleet" isOpen={isOpen} />
+        <SidebarItem to="/delivery" icon="📦" label="Delivery" isOpen={isOpen} />
+        <SidebarItem to="/inventory" icon="📊" label="Inventory" isOpen={isOpen} />
+        <SidebarItem to="/staff" icon="👥" label="Staff" isOpen={isOpen} />
+        <SidebarItem to="/suppliers" icon="📜" label="Suppliers" isOpen={isOpen} />
+        <SidebarItem to="/return&damage" icon="🔄" label="Returns & Damage" isOpen={isOpen} />
         <SidebarItem to="/help" icon="❓" label="Help" isOpen={isOpen} />
       </nav>
     </div>

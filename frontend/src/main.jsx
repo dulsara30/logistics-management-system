@@ -14,6 +14,8 @@ import StaffManagement from './pages/StaffManagement.jsx'
 import SupplierManagement from './pages/SupplierManagement.jsx'
 import ReturnDamageHandling from './pages/ReturnDamageHandling.jsx'
 import Help from './pages/Help.jsx'
+import { DashboardLayout } from '@toolpad/core/DashboardLayout'
+import DashboardLayoutBasic from './component/DashBoard.jsx'
 
 const router = createBrowserRouter([
 
@@ -22,18 +24,31 @@ const router = createBrowserRouter([
     element: <RootLayout/>,
     children:[
       {
-        element: <MainLayout/>,
+        element: <DashboardLayoutBasic/>,
         children:[
-          {path:"/", element:<Home/>, },
-          {path:"/warehouse-management", element:<WarehouseManagement/>, },
-          {path:"/vehicle-fleet", element:<VehicleFleetManagement/>,},
-          {path:"/delivery-management", element:<DeliveryManagement/>,},
-          {path:"/inventory-management", element:<InventoryManagement/>,},
-          {path:"/staff-management", element:<StaffManagement/>,},
-          {path:"/supplier-management", element:<SupplierManagement/>,},
-          {path:"/return-damage", element:<ReturnDamageHandling/>,},
-          {path:"/help", element:<Help/>,},
+          {path:"/*", element:<Home/>, },
+          {path:"warehouse-management", element:<WarehouseManagement/>, },
+          {path:"fleet-management", element:<VehicleFleetManagement/>,},
+          {path:"delivery", element:<DeliveryManagement/>,},
+          {path:"inventory", element:<InventoryManagement/>,},
+          {path:"staff", element:<StaffManagement/>,},
+          {path:"suppliers", element:<SupplierManagement/>,},
+          {path:"return&damage", element:<ReturnDamageHandling/>,},
+          {path:"help", element:<Help/>,},
         ]
+
+          /*element:<MainLayout/>,
+          children:[
+            {path:"", element:<Home/>, },
+            {path:"warehouse-management", element:<WarehouseManagement/>, },
+            {path:"fleet", element:<VehicleFleetManagement/>,},
+            {path:"delivery", element:<DeliveryManagement/>,},
+            {path:"inventory", element:<InventoryManagement/>,},
+            {path:"staff", element:<StaffManagement/>,},
+            {path:"suppliers", element:<SupplierManagement/>,},
+            {path:"return&damage", element:<ReturnDamageHandling/>,},
+            {path:"help", element:<Help/>,},
+          ]*/
       },
     ]
 
