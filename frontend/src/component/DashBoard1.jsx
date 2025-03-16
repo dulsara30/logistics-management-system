@@ -4,7 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -30,7 +30,8 @@ import ReturnDamageHandling from '../pages/Return&DamageHandling/ReturnDamageHan
 import Help from '../pages/Help/Help';
 import logo from '../assets/Picture1.png';
 import PageContent from './PageContent';
-
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 
 const NAVIGATION = [
@@ -64,45 +65,67 @@ function DashboardLayout() {
       <aside className={`
         fixed top-0 left-0 h-full bg-white shadow-xl transition-transform duration-300 z-40
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:w-64 w-72
+        lg:translate-x-0 lg:w-74 w-72
       `}>
         {/* Logo */}
+        <Link to={"/"}>
         <div className="flex items-center justify-center h-20 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <img src={logo} className='w-20 h-20'/>
             <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
           </div>
         </div>
-
+        </Link>
         {/* Navigation */}
         <nav className="p-4 space-y-2">
-          {NAVIGATION.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`
-                  w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                  ${isActive 
-                    ? 'bg-blue-50 text-blue-600' 
-                    : 'text-gray-600 hover:bg-gray-50'
-                  }
-                `}
-              >
-                <Icon size={24} />
-                <span className="font-medium">{item.title}</span>
-              </button>
-            );
-          })}
+
+         
+
+            {NAVIGATION.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`
+                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
+                    ${isActive 
+                      ? 'bg-blue-50 text-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50'
+                    }
+                  `}
+                >
+
+              
+                 <Box display="flex" alignItems="flex-start" gap={2}>  
+                      <Icon size={28} color={isActive ? "#1976d2" : "#6b7280"} />
+
+                      <Typography 
+                        variant="subtitle1" 
+                        fontWeight={isActive ? 'bold' : 'medium'} 
+                        color={isActive ? 'primary' : 'text.secondary'}
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {item.title}
+                      </Typography>
+
+                 
+                  </Box>
+               
+                </button>
+              );
+            })}
+
+          
         </nav>
       </aside>
 
       {/* Main Content */}
       <main className={`
         transition-all duration-300
-        ${isSidebarOpen ? 'lg:ml-64' : 'ml-0'}
+        ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
         {/* Header */}
@@ -127,6 +150,7 @@ function DashboardLayout() {
         </header>
 
         {/* Page Content */}
+        
         <PageContent/>
       </main>
     </div>
