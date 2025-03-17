@@ -152,8 +152,8 @@ function DashboardLayout() {
         {/* Page Content */}
         
         <div className="p-6">
-          {/* This is where your nested route components will be rendered */}
-          <Outlet /> {/* Render the content of the active nested route */}
+         
+          <Outlet /> 
         </div>
 
         
