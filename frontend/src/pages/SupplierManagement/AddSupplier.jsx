@@ -81,7 +81,7 @@ function AddSupplier() {
 
           <button
             type="submit"
-            className="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition"
           >
             Submit
           </button>

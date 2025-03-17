@@ -4,7 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -149,9 +149,7 @@ function DashboardLayout() {
           </div>
         </header>
 
-        {/* Page Content */}
-        
-        <PageContent/>
+        <Outlet/>
       </main>
     </div>
   );

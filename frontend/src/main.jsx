@@ -13,6 +13,7 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
+import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx'
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
           {path:"delivery", element:<DeliveryManagement/>,},
           {path:"inventory", element:<InventoryManagement/>,},
           {path:"staff", element:<StaffManagement/>,},
-          {path:"suppliers", element:<SupplierManagement/>,},
+          {path:"suppliers", element:<SupplierManagement/>,
+            children:[
+              {path:"Add-Supplier", element:<AddSupplier/>}
+            ]
+          },
           {path:"return&damage", element:<ReturnDamageHandling/>,},
           {path:"help", element:<Help/>,},
         ]
