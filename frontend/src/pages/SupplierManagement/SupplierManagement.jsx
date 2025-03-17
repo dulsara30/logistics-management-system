@@ -1,10 +1,30 @@
-export default function SupplierManagement(){
-    return(
-        <div className="p-16">
-        <h1 className="">Supplier Management</h1>
+import AddSupplier from "./AddSupplier.jsx";
+import { useState } from "react";
 
-        <input type="text" placeholder="Name"></input>
 
-   </div>
-    )
+function SupplierManagement() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    productCategory: "",
+    description: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form Data Submitted:", formData);
+  };
+
+  return (
+
+            <AddSupplier/>
+
+  );
 }
+
+export default SupplierManagement;
