@@ -3,11 +3,12 @@ import { useState } from "react";
 
 function AddSupplier() {
   const [formData, setFormData] = useState({
+    supplierId: "",
     name: "",
-    email: "",
-    contact: "",
-    productCategory: "",
-    description: "",
+    itemsName: "",
+    quantity: "",
+    unitPrice: "",
+    date: "",
   });
 
   const handleChange = (e) => {
@@ -24,60 +25,64 @@ function AddSupplier() {
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-4 text-center">Supplier Management</h1>
         <form onSubmit={handleSubmit}>
-          <label className="block font-medium">Supplier Name</label>
+          <label className="block font-medium">Supplier Id</label>
           <input
             type="text"
-            name="name"
+            name="Supplier Id"
+            value={formData.supplierId}
+            onChange={handleChange}
+            className="w-full border p-2 rounded mt-1"
+            required
+          />
+
+          <label className="block mt-2 font-medium">Name</label>
+          <input
+            type="text"
+            name="Name"
             value={formData.name}
             onChange={handleChange}
             className="w-full border p-2 rounded mt-1"
             required
           />
 
-          <label className="block mt-2 font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          />
-
-          <label className="block mt-2 font-medium">Contact</label>
+          <label className="block mt-2 font-medium">Items Name</label>
           <input
             type="text"
-            name="contact"
-            value={formData.contact}
+            name="Items Name"
+            value={formData.itemsName}
             onChange={handleChange}
             className="w-full border p-2 rounded mt-1"
             required
           />
 
-          <label className="block mt-2 font-medium">Product Category</label>
-          <select
-            name="productCategory"
-            value={formData.productCategory}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          >
-            <option value="">Select Product Category</option>
-            <option value="electronics">Electronics</option>
-            <option value="furniture">Furniture</option>
-            <option value="groceries">Groceries</option>
-            <option value="clothing">Clothing</option>
-            <option value="pharmaceutical">Pharmaceutical</option>
-          </select>
-
-          <label className="block mt-2 font-medium">Description</label>
+          <label className="block mt-2 font-medium">Quantity</label>
           <input
             type="text"
-            name="description"
-            value={formData.description}
+            name="Quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            className="w-full border p-2 rounded mt-1"
+            required
+          />
+
+          <label className="block mt-2 font-medium">Unit Price</label>
+          <input
+            type="text"
+            name="Unit Price"
+            value={formData.unitPrice}
             onChange={handleChange}
             className="w-full border p-2 rounded mt-1"
           />
+
+            <label className="block mt-2 font-medium">Date</label>
+          <input
+            type="text"
+            name="Date"
+            value={formData.date}
+            onChange={handleChange}
+            className="w-full border p-2 rounded mt-1"
+          />
+
 
           <button
             type="submit"

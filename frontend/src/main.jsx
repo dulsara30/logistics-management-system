@@ -14,6 +14,10 @@ import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHand
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
 import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx'
+import ItemsList from './pages/Return&DamageHandling/ItemList.jsx'
+import ReturnList from './pages/Return&DamageHandling/ReturnList.jsx'
+import ReturnForm from './pages/Return&DamageHandling/ReturnList.jsx'
+import DamageForm from './pages/Return&DamageHandling/DamageForm.jsx'
 
 const router = createBrowserRouter([
   {
@@ -22,7 +26,7 @@ const router = createBrowserRouter([
       {
         element: <DashboardLayout/>,
         children:[
-          {path:"/*", element:<Home/>, },
+          {path:"/", element:<Home/>, },
           {path:"warehouse", element:<WarehouseManagement/>, },
           {path:"fleet", element:<VehicleFleetManagement/>,},
           {path:"delivery", element:<DeliveryManagement/>,},
@@ -33,7 +37,17 @@ const router = createBrowserRouter([
               {path:"Add-Supplier", element:<AddSupplier/>}
             ]
           },
-          {path:"return&damage", element:<ReturnDamageHandling/>,},
+          {path:"returns/", element:<ReturnDamageHandling/>,
+                children:[
+                  {path:"Damage-Form",element:<DamageForm/> ,},
+                  {path:"item-list/*",element:<ItemsList/> ,
+                    children: [
+                      {path:"Return-Form",element:<ReturnForm/> ,},
+                    ]
+                  }, 
+                ],
+
+          },     
           {path:"help", element:<Help/>,},
         ]
       }

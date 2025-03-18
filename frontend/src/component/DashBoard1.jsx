@@ -132,7 +132,7 @@ function DashboardLayout() {
         <header className="h-20 bg-white shadow-sm flex items-center px-6 justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">
-              {NAVIGATION.find(item => item.path === location.pathname)?.title || 'Dashboard'}
+              {NAVIGATION.find(item => item.path === location.pathname)?.title}
             </h1>
           </div>
 

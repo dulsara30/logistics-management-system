@@ -58,7 +58,7 @@ import { ClassNames } from "@emotion/react";
         />
         <div className="space-x-3">
 
-          <button className="bg-indigo-400 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">
+          <button className="bg-indigo-400 text-white px-4 py-3 rounded-lg hover:bg-indigo-600">
             Download Report
           </button>
         
