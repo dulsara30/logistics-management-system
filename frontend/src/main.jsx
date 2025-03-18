@@ -13,6 +13,13 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
+import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx'
+import AddStaff from './pages/StaffManagement/SubPages/AddStaff.jsx'
+import AssignTask from './pages/StaffManagement/SubPages/AssignTask.jsx'
+import LeaveReq from './pages/StaffManagement/SubPages/LeaveReq.jsx'
+import ManageSalary from './pages/StaffManagement/SubPages/ManageSalary.jsx'
+import Concerns from './pages/StaffManagement/SubPages/Concerns.jsx'
+import AttendanceTracking from './pages/StaffManagement/SubPages/AttendanceTracking.jsx'
 
 const router = createBrowserRouter([
   {
@@ -21,14 +28,24 @@ const router = createBrowserRouter([
       {
         element: <DashboardLayout/>,
         children:[
-          {path:"/*", element:<Home/>, },
+          {path:"/", element:<Home/>, },
           {path:"warehouse", element:<WarehouseManagement/>, },
           {path:"fleet", element:<VehicleFleetManagement/>,},
           {path:"delivery", element:<DeliveryManagement/>,},
           {path:"inventory", element:<InventoryManagement/>,},
-          {path:"staff", element:<StaffManagement/>,},
+          {path:"staff/", element:<StaffManagement/>,
+            children:[
+              {path:"manage-staff", element:<ManageStaff/>},
+              {path:"add-staff", element:<AddStaff/>},
+              {path:"assign-tasks", element:<AssignTask/>},
+              {path:"leave-requests", element:<LeaveReq/>},
+              {path:"manage-salary", element:<ManageSalary/>},
+              {path:"concerns", element:<Concerns/>},
+              {path:"Attendance-Tracking", element:<AttendanceTracking/>}
+            ],
+          },
           {path:"suppliers", element:<SupplierManagement/>,},
-          {path:"return&damage", element:<ReturnDamageHandling/>,},
+          {path:"returns", element:<ReturnDamageHandling/>,},
           {path:"help", element:<Help/>,},
         ]
       }
