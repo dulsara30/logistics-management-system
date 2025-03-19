@@ -21,8 +21,8 @@ import {
 import { useState } from 'react';
 import Home from '../pages/Home/Home.jsx';
 import WarehouseManagement from '../pages/WarehouseManagement/WarehouseManagement';
-import VehicleFleetManagement from '../pages/DeliveryAndVehicleFleet/VehicleFleetManagement';
-import DeliveryManagement from '../pages/DeliveryAndVehicleFleet/DeliveryManagement';
+import VehicleFleetManagement from '../pages/VehicleFleet/VehicleFleetManagement.jsx';
+import DeliveryManagement from '../pages/DeliveryScheduling/DeliveryManagement.jsx';
 import InventoryManagement from '../pages/InventoryManagement/InventoryManagement';
 import StaffManagement from '../pages/StaffManagement/StaffManagement';
 import SupplierManagement from '../pages/SupplierManagement/SupplierManagement';
@@ -43,7 +43,9 @@ const NAVIGATION = [
   { path: '/staff', title: 'Staff Management', icon: Users },
   { path: '/suppliers', title: 'Supplier Management', icon: Factory },
   { path: '/returns', title: 'Return & Damage Handling', icon: RotateCcw },
-  { path: '/help', title: 'Help', icon: HelpCircle }
+  { path: '/help', title: 'Help', icon: HelpCircle },
+ // {path: '/fleet/vehicleRegistration', title:'Vehicle Registration',icon: HelpCircle},
+ 
 ];
 
 function DashboardLayout() {
@@ -76,10 +78,11 @@ function DashboardLayout() {
           </div>
         </div>
         </Link>
-        {/* Navigation */}
-        <nav className="p-4 space-y-2">
 
-         
+
+        {/* Navigation */}
+
+        <nav className="p-4 space-y-2">
 
             {NAVIGATION.map((item) => {
               const Icon = item.icon;

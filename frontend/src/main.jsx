@@ -5,15 +5,19 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import RootLayout from './layouts/root.layout.jsx'
 import Home from './pages/Home/Home.jsx'
 import WarehouseManagement from './pages/WarehouseManagement/WarehouseManagement.jsx'
-import VehicleFleetManagement from './pages/DeliveryAndVehicleFleet/VehicleFleetManagement.jsx'
-import DeliveryManagement from './pages/DeliveryAndVehicleFleet/DeliveryManagement.jsx'
+import VehicleFleetManagement from './pages/VehicleFleet/VehicleFleetManagement.jsx'
+import DeliveryManagement from './pages/DeliveryScheduling/DeliveryManagement.jsx'
 import InventoryManagement from './pages/InventoryManagement/InventoryManagement.jsx'
 import StaffManagement from './pages/StaffManagement/StaffManagement.jsx'
 import SupplierManagement from './pages/SupplierManagement/SupplierManagement.jsx'
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
-import VehicleRegistrationForm from './pages/DeliveryAndVehicleFleet/VehicleRegistration.jsx'
+import VehicleRegistrationForm from './pages/VehicleFleet/VehicleRegistration.jsx'
+import Vehicleprofile from './pages/VehicleFleet/VehicleProfile.jsx'
+import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx'
+import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx'
+import "leaflet/dist/leaflet.css";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +35,11 @@ const router = createBrowserRouter([
           {path:"suppliers", element:<SupplierManagement/>,},
           {path:"return&damage", element:<ReturnDamageHandling/>,},
           {path:"help", element:<Help/>,},
-          {path:"fleet/vehicleRegistration", element:<VehicleRegistrationForm />,}
+          {path:"fleet/vehicleRegistration", element:<VehicleRegistrationForm />,},
+          {path:"fleet/VehicleProfile", element:<Vehicleprofile />,},
+          {path:"delivery/NewDeliveryScheduling", element:<NewDeliverySchedule />,},
+          {path:"delivery/DeliveryProfile", element:<DeliveryScheduleProfile />,},
+          
         ]
       }
     ]
