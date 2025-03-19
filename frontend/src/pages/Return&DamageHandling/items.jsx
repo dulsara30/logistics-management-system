@@ -31,6 +31,7 @@ function Items({ items, type }) {
   const statusLabel = type === "returns" ? "condition" : "damageType";
 
   return (
+    
     <div className="p-4 bg-white shadow rounded-lg">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
       {displayItems.length === 0 ? (
@@ -81,6 +82,7 @@ function Items({ items, type }) {
         </div>
       )}
     </div>
+    
   );
 }
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 function AddSupplier() {
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -21,76 +20,138 @@ function AddSupplier() {
   };
 
   return (
-    <main className="p-6 bg-gray-100 min-h-screen flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-        <h1 className="text-2xl font-bold mb-4 text-center">Supplier Management</h1>
-        <form onSubmit={handleSubmit}>
-          <label className="block font-medium">Supplier Id</label>
-          <input
-            type="text"
-            name="Supplier Id"
-            value={formData.supplierId}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          />
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-semibold text-gray-800">
+              Supplier Management
+            </h2>
+            <div className="h-0.5 w-24 mx-auto mt-4 bg-blue-600"></div>
+            <p className="mt-4 text-gray-600 text-sm">Enter supplier information below</p>
+          </div>
 
-          <label className="block mt-2 font-medium">Name</label>
-          <input
-            type="text"
-            name="Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Supplier ID & Name Group */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Supplier ID
+                </label>
+                <input
+                  type="text"
+                  name="supplierId"
+                  value={formData.supplierId}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                    focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                  placeholder="Enter supplier ID"
+                  required
+                />
+              </div>
 
-          <label className="block mt-2 font-medium">Items Name</label>
-          <input
-            type="text"
-            name="Items Name"
-            value={formData.itemsName}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          />
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                    focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                  placeholder="Enter supplier name"
+                  required
+                />
+              </div>
+            </div>
 
-          <label className="block mt-2 font-medium">Quantity</label>
-          <input
-            type="text"
-            name="Quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-            required
-          />
+            {/* Items Name & Quantity Group */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Items Name
+                </label>
+                <input
+                  type="text"
+                  name="itemsName"
+                  value={formData.itemsName}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                    focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                  placeholder="Enter items name"
+                  required
+                />
+              </div>
 
-          <label className="block mt-2 font-medium">Unit Price</label>
-          <input
-            type="text"
-            name="Unit Price"
-            value={formData.unitPrice}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-          />
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                    focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                  placeholder="Enter quantity"
+                  required
+                />
+              </div>
+            </div>
 
-            <label className="block mt-2 font-medium">Date</label>
-          <input
-            type="text"
-            name="Date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full border p-2 rounded mt-1"
-          />
+            {/* Unit Price & Date Group */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Unit Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    name="unitPrice"
+                    value={formData.unitPrice}
+                    onChange={handleChange}
+                    className="w-full pl-8 pr-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                      focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+              </div>
 
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 text-gray-800 placeholder-gray-400
+                    focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition"
-          >
-            Submit
-          </button>
-        </form>
+            {/* Submit Button */}
+            <div className="pt-6">
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded-md bg-blue-600 text-white font-medium text-sm
+                  hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+                  transition-colors duration-200"
+              >
+                Add Supplier
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </main>
   );
