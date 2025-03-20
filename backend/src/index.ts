@@ -1,6 +1,18 @@
 import express from "express";
+import { Request, Response } from "express";
+import { connectDB } from "./Infrastructure/db";
+import staffRouter from "./API/StaffManagement/staff";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
-app.listen(8000, () => console.log("Server is listening on port 8000."));
+connectDB();
+
+app.use("/staff", staffRouter);
+
+const PORT = 8000
+
+app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+

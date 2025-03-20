@@ -15,6 +15,8 @@ const attendanceData = [
 
 function AttendanceTracking(){
 
+  
+
     const navigate = useNavigate();
 
     return(
