@@ -18,25 +18,25 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 function App() {
   const [count, setCount] = useState(0)
 
-  return (
-   <Router>
-      <div className="flex">
-        <Sidebar />
-       <main className="flex-1 p-6">
-          <Routes>
-          <Route path="/" element={<Home />} />
-        <Route path="/warehouse-management" element={<WarehouseManagement />} />
-        <Route path="/vehicle-fleet" element={<VehicleFleetManagement />} />
-        <Route path="/delivery-management" element={<DeliveryManagement />} />
-        <Route path="/inventory-management" element={<InventoryManagement />} />
-        <Route path="/staff-management" element={<StaffManagement />} />
-        <Route path="/supplier-management" element={<SupplierManagement />} />
-        <Route path="/return-damage" element={<ReturnDamageHandling />} />
-        <Route path="/help" element={<Help />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+  return (  
+    <Router>
+        <div className="flex">
+          <Sidebar />
+        <main className="flex-1 p-6">
+            <Routes>
+            <Route path="/" element={<Home />} />
+          <Route path="/warehouse-management" element={<WarehouseManagement />} />
+          <Route path="/vehicle-fleet" element={<VehicleFleetManagement />} />
+          <Route path="/delivery-management" element={<DeliveryManagement />} />
+          <Route path="/inventory-management" element={<InventoryManagement />} />
+          <Route path="/staff-management" element={<StaffManagement />} />
+          <Route path="/supplier-management" element={<SupplierManagement />} />
+          <Route path="/return-damage" element={<ReturnDamageHandling />} />
+          <Route path="/help" element={<Help />} />          
+            </Routes>
+          </main>
+        </div>
+      </Router>
 
        /* <div className="h-screen flex items-center justify-center bg-gray-900 text-white text-3xl">
           Tailwind CSS is Working! 🚀
