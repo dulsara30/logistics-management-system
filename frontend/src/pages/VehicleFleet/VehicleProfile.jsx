@@ -166,7 +166,13 @@ export default function VehicleProfile() {
       <Box mt={4}>
         {!editMode ? (
             /* If condition true*/
-          <Button variant="contained" onClick={handleEditToggle}>Edit Profile</Button>
+          <Button variant="contained" onClick={handleEditToggle}  sx={{
+            background: "linear-gradient(to right, #8e2de2, #4a00e0)",
+            color: "white",
+            "&:hover": {
+              background: "linear-gradient(to right, #4a00e0, #8e2de2)",
+            },
+          }}>Edit Profile</Button>
 
         ) : ( /* if condtion flase */
 

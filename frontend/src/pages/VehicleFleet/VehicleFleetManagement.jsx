@@ -1,6 +1,5 @@
-import { Button, Box, Typography} from "@mui/material";
-
-import { useNavigate   } from "react-router-dom";
+import { Button, Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
@@ -11,99 +10,103 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-const StyledTableCell = styled(TableCell) (({ theme }) => ({
 
-            [`&.${tableCellClasses.head}`]: {
-                backgroundColor: theme.palette.info.main,
-                color: theme.palette.common.white,
-                fontSize: 18,
-                
-            },
-            [`&.${tableCellClasses.body}`]: {
-                fontSize: 16,
-                
-            },
 
-        })
-    );
+const StyledTableHead = styled(TableHead)(() => ({
+  backgroundColor: '#f0f0f0',
+ 
+}));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.info.dark.hover
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0,
+const StyledTableCell = styled(TableCell)(() => ({
+  color: '#333333',
+  fontWeight: 'bold',
+  fontSize: 15,
+}));
+
+const StyledTableRow = styled(TableRow)(() => ({
+  '&:hover': {
+    backgroundColor: '#f5f5f5',
+    cursor: 'pointer',
   },
 }));
 
 
 
-function createData(Number,Type,Brand, Owner, Drivers,Availability) {
-  return { Number,Type,Brand, Owner, Drivers,Availability };
+// Dummy Data
+function createData(Number, Type, Brand, Owner, Drivers, Availability) {
+  return { Number, Type, Brand, Owner, Drivers, Availability };
 }
 
 const rows = [
-  createData('PQ-3536', 159, 6.0, 24, 4.0,'yes'),
-  createData('AQ-3530', 237, 9.0, 37, 4.3,'yes'),
-  createData('KQ-3567', 262, 16.0, 24, 6.0,'yes'),
-  createData('PL-8536', 305, 3.7, 67, 4.3,'yes'),
-  createData('PT-3596', 356, 16.0, 49, 3.9,'yes'),
+  createData('PQ-3536', 'Lorry', 'TATA', 'Kamal Perera', 'Amal Silva', 'Yes'),
+  createData('AQ-3530', 'Van', 'Toyota', 'Nimal Rathnayake', 'Sunil Kumara', 'Yes'),
+  createData('KQ-3567', 'Truck', 'Ashok Leyland', 'Lal Wickramasinghe', 'Nuwan', 'Yes'),
+  createData('PL-8536', 'Bike', 'Bajaj', 'Ruwan Dias', 'Gihan', 'Yes'),
+  createData('PT-3596', 'Car', 'Suzuki', 'Tharindu', 'Kasun', 'Yes'),
 ];
 
+export default function VehicleFleetManagement() {
+  const navi = useNavigate();
 
+  return (
+    <Box sx={{ p: 4, bgcolor: '#FFFFFF', minHeight: '100vh' }}>
+      
+      <Typography variant="h5" gutterBottom sx={{ color: '#2E2E2E', fontWeight: 'bold', mb: 2 }}>
+        Registered Vehicles
+      </Typography>
 
-export default function VehicleFleetManagement(){
+      <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+       
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <StyledTableHead>
+            <TableRow>
+              <StyledTableCell>Vehicle Registration Number</StyledTableCell>
+              <StyledTableCell align="right">Vehicle Type</StyledTableCell>
+              <StyledTableCell align="right">Vehicle Brand</StyledTableCell>
+              <StyledTableCell align="right">Owner's Name</StyledTableCell>
+              <StyledTableCell align="right">Driver's Name</StyledTableCell>
+            </TableRow>
+          </StyledTableHead>
 
-    const navi = useNavigate();
+          <TableBody>
+            {rows.map((row) => (
+              <StyledTableRow
+                key={row.Number}
+                onClick={() => navi('VehicleProfile')}
+              >
+                <TableCell component="th" scope="row">
+                  {row.Number}
+                </TableCell>
+                <TableCell align="right">{row.Type}</TableCell>
+                <TableCell align="right">{row.Brand}</TableCell>
+                <TableCell align="right">{row.Owner}</TableCell>
+                <TableCell align="right">{row.Drivers}</TableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-    return(
-
-        <div className="p-16">
-          
-
-          <Box sx={{mb:2}}>
-            <Button variant="contained" onClick={()=>navi('vehicleRegistration')} > New vehicle registration </Button>
-          </Box>
-          
-
-          <TableContainer component={Paper}>
-
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Vehicle Registration Number</StyledTableCell>
-                <StyledTableCell align="right">Vehicle Type</StyledTableCell>
-                <StyledTableCell align="right">Vehicle Brand</StyledTableCell>
-                <StyledTableCell align="right">Owners Name</StyledTableCell>
-                <StyledTableCell align="right">Drivers Name</StyledTableCell>
-
-              </TableRow>
-            </TableHead>
-
-
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.Number} 
-                hover
-                onClick={()=>navi('VehicleProfile') } 
-                style={{ cursor: 'pointer' }}>
-
-                  <StyledTableCell component="th" scope="row">{row.Number}</StyledTableCell>
-                  <StyledTableCell align="right">{row.Type}</StyledTableCell>
-                  <StyledTableCell align="right">{row.Brand}</StyledTableCell>
-                  <StyledTableCell align="right">{row.Owner}</StyledTableCell>
-                  <StyledTableCell align="right">{row.Drivers}</StyledTableCell>
- 
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-    
-    
-        </div>
-    )
+      <Box sx={{ mt: 3, textAlign: 'right' }}>
+        <Button
+          variant="contained"
+          onClick={() => navi('vehicleRegistration')}
+          sx={{
+            background: 'linear-gradient(to right, #8e2de2, #4a00e0)',
+            color: '#FFFFFF',
+            fontWeight: 'bold',
+            borderRadius: '12px',
+            paddingX: 3,
+            paddingY: 1,
+            textTransform: 'none',
+            '&:hover': {
+              background: 'linear-gradient(to right, #7b1fa2, #311b92)',
+            },
+          }}
+        >
+          + New Vehicle Registration
+        </Button>
+      </Box>
+    </Box>
+  );
 }
-
