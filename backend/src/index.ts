@@ -6,6 +6,7 @@ import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use('/upload', express.static('upload'));
 app.use(cors());
 
 connectDB();

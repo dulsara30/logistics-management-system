@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, X, ArrowLeft, Calendar } from 'lucide-react';
+import { Upload, X, ArrowLeft, Calendar, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 const roles = ["Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
@@ -24,6 +24,7 @@ function AddStaff() {
   });
   const [profileImage, setProfileImage] = useState(null);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   // Calculate max date for DOB (18 years ago from today)
   const calculateMaxDate = () => {
@@ -36,8 +37,8 @@ function AddStaff() {
     setStaff({ ...staff, [e.target.id]: e.target.value });
     
     // Clear error when field is being edited
-    if (errors[id]) {
-      setErrors({...errors, [id]: null});
+    if (errors[e.target.id]) {
+      setErrors({...errors, [e.target.id]: null});
     }
   };
 
@@ -118,24 +119,66 @@ function AddStaff() {
     e.preventDefault();
     
     if (validateForm()) {
+       setLoading(true); 
+        const formData = new FormData();
+        formData.append("fullName", staff.fullName);
+        formData.append("email", staff.email);
+        formData.append("phoneNo", staff.phoneNo);
+        formData.append("DOB", staff.DOB);
+        formData.append("gender", staff.gender);
+        formData.append("address", staff.address);
+        formData.append("dateJoined", staff.dateJoined);
+        formData.append("warehouseAssigned", staff.warehouseAssigned);
+        formData.append("status", staff.status);
+        formData.append("role", staff.role);
 
-      
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        //profile image converion (convert data URL to blob)
+        if(profileImage){
+          const response = await fetch(profileImage);
+          const blob = await response.blob();
+          formData.append("profilePic", blob, "profile.jpg");
+        }
+
+      try{
+        const res = await fetch("http://localhost:8000/staff/add-staff", {
+          method: "POST",
+          body: formData,
+        });
+
+        if(!res.ok){
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to add staff member");
+        }
+
+        alert(`Employee: ${staff.fullName} added successfully!`);
+        
+          // Reset after submission
+          setStaff({
+            fullName: '',
+            email: '',
+            phoneNo: '',
+            DOB: '',
+            gender: '',
+            address: '',
+            dateJoined: new Date().toISOString().split('T')[0],
+            warehouseAssigned: '',
+            status: 'Active',
+            role: '',
+          });
+          setProfileImage(null);
+
+      }catch(err){
+          console.error("Error adding employee:", err);
+          setErrors({ submit: err.message }); //store errors in object form here 
+      }finally{
+        setLoading(false);
+      }
       console.log('Submitting form data:', { ...staff, profilePic: profileImage });
-      // Reset after submission
-      setStaff({
-        fullName: '',
-        email: '',
-        phoneNo: '',
-        DOB: '',
-        gender: '',
-        address: '',
-        dateJoined: new Date().toISOString().split('T')[0],
-        warehouseAssigned: '',
-        status: 'Active',
-        role: '',
-      });
-      setProfileImage(null);
-      alert('Staff member added successfully!');
+
     } else {
       console.log('Form validation failed', errors);
     }
@@ -191,7 +234,7 @@ function AddStaff() {
               id="phoneNo"
               value={staff.phoneNo}
               onChange={handleInputChange}
-              placeholder="0123456789"
+              placeholder="07* **** ***"
               required
               pattern="^0\d{9}$"
               className={`w-full border ${errors.phoneNo ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
@@ -347,19 +390,30 @@ function AddStaff() {
               <div className="flex flex-col items-center text-center">
                 <Upload className="h-10 w-10 text-gray-400 mb-2" />
                 <p className="text-sm font-medium text-gray-600">Drag & drop or click to upload</p>
-                <p className="text-xs text-gray-400">JPG, JPEG or PNG (max. 2MB)</p>
+                <p className="text-xs text-gray-400">JPG, JPEG or PNG (max. 5MB)</p>
               </div>
             </div>
           )}
           {errors.profilePic && <p className="text-red-500 text-xs mt-1">{errors.profilePic}</p>}
         </div>
-
+        {errors.submit && <p className="text-red-500 text-sm mt-2">{errors.submit}</p>}
         <div className="flex justify-end">
-          <button
+          <button 
             type="submit"
-            className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition"
+            disabled={loading}
+            className={`flex items-center bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Add Staff Member
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin h-5 w-5 mr-2"/>
+                Adding...
+              </>
+            ) : (
+              "Add Staff Member"
+            )}
+           
           </button>
         </div>
       </form>

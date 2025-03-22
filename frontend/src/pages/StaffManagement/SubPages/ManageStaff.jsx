@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function ManageStaff() {
   const navigate = useNavigate();
+  //useState is a box with value and a function to change it [value, function]
   const [searchTerm, setSearchTerm] = useState('');
   const [warehouseFilter, setWarehouseFilter] = useState('');
   const [status, setStatus] = useState('');
@@ -23,9 +24,11 @@ function ManageStaff() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   // Fetch data from backend
+  /*useEffect is like worker in the app that says, "hey, when the app starts,
+  i will go get the list of employee from the server and put in to boxes made with useState*/
   useEffect(() => {
     const getStaff = async () => {
-      setIsLoading(true);
+      setIsLoading(true);//function from useState that change the isLoading box(value)
       setError(null);
       try {
         const res = await fetch("http://localhost:8000/staff/manage-staff", {
@@ -40,6 +43,8 @@ function ManageStaff() {
         }
 
         const data = await res.json();
+
+        console.log("Fetch staff Data:", data );
         setEmployees(data);
         setFilteredEmployees(data); // Set initial filtered data
       } catch (err) {
@@ -112,7 +117,7 @@ function ManageStaff() {
 
   const handleSaveEdit = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/staff/manage-staff/${editEmployee.id}`, {
+      const res = await fetch(`http://localhost:8000/staff/manage-staff/${editEmployee._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -122,14 +127,16 @@ function ManageStaff() {
 
       if (!res.ok) {
         throw new Error("Failed to update employee");
+      }else{
+        alert(`User: ${editEmployee.fullName} Update Successful!`)
       }
 
       const updatedEmployee = await res.json();
       setEmployees(employees.map(emp => 
-        emp.id === updatedEmployee.id ? updatedEmployee : emp
+        emp._id === updatedEmployee._id ? updatedEmployee : emp
       ));
       setFilteredEmployees(filteredEmployees.map(emp => 
-        emp.id === updatedEmployee.id ? updatedEmployee : emp
+        emp._id === updatedEmployee._id ? updatedEmployee : emp
       ));
       setIsEditModalOpen(false);
     } catch (err) {
@@ -146,7 +153,7 @@ function ManageStaff() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/staff/manage-staff/${employeeToDelete.id}`, {
+      const res = await fetch(`http://localhost:8000/staff/manage-staff/${employeeToDelete._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -157,8 +164,8 @@ function ManageStaff() {
         throw new Error("Failed to delete employee");
       }
 
-      setEmployees(employees.filter(emp => emp.id !== employeeToDelete.id));
-      setFilteredEmployees(filteredEmployees.filter(emp => emp.id !== employeeToDelete.id));
+      setEmployees(employees.filter(emp => emp._id !== employeeToDelete._id));
+      setFilteredEmployees(filteredEmployees.filter(emp => emp._id !== employeeToDelete._id));
       setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Error deleting employee:", err);
@@ -175,8 +182,8 @@ function ManageStaff() {
   const downloadReport = (employee) => {
     const report = `
       Employee Report
-      ---------------
-      ID: ${employee.id}
+      ------------------
+      ID: ${employee._id}
       Full Name: ${employee.fullName}
       Email: ${employee.email}
       Phone: ${employee.phoneNo}
@@ -280,10 +287,10 @@ function ManageStaff() {
               {currentEmployees.length > 0 ? (
                 currentEmployees.map((employee, index) => (
                   <tr
-                    key={employee.id + index}
+                    key={employee._id + index}
                     className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors`}
                   >
-                    <td className="px-6 py-4 text-sm text-gray-900">{employee.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{employee._id}</td>
                     <td 
                       className="px-6 py-4 text-sm text-gray-900 cursor-pointer hover:text-indigo-600"
                       onClick={() => handleDetailClick(employee)}
@@ -306,12 +313,14 @@ function ManageStaff() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       <div className="flex space-x-2">
+                       
                         <button 
                           className="text-indigo-600 hover:text-indigo-900"
                           onClick={() => handleEditClick(employee)}
                         >
                           <Edit2 size={18} />
                         </button>
+                        
                         <button 
                           className="text-red-600 hover:text-red-900"
                           onClick={() => handleDeleteClick(employee)}
@@ -565,6 +574,7 @@ function ManageStaff() {
       </div>
       
       <div className="space-y-4">
+      <p>{selectedEmployee.profilePic}</p>
         <img 
           src={selectedEmployee.profilePic} 
           alt={selectedEmployee.fullName} 

@@ -15,7 +15,7 @@ const staffSchema = new mongoose.Schema({
     },
     phoneNo:{
         type: String,
-        required: true
+       required: true
     },
     DOB: {
         type: Date,
@@ -54,7 +54,14 @@ const staffSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"],
+        enum: [
+            "Business Owner",
+            "Warehouse Manager",
+            "Inventory Manager",
+            "Driver",
+            "Maintenance Staff",
+            "Other Staff"
+          ],
         required: true
     },
     emName: {
