@@ -17,6 +17,7 @@
     "@mui/material": "^6.4.7",
     "@react-google-maps/api": "^2.20.6",
     "@toolpad/core": "^0.13.0",
+    "axios": "^1.8.4",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",

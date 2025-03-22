@@ -55,12 +55,15 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 
   // Handle the map click to update coordinates and location name
   const handleMapClick = (event, isPickup) => {
+
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     const geocoder = new window.google.maps.Geocoder();
 
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+
       if (status === "OK" && results[0]) {
+        
         const address = results[0].formatted_address;
 
         if (isPickup) {

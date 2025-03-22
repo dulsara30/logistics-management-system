@@ -11,7 +11,7 @@ export default function VehicleRegistrationForm() {
   const [vehicleType, setVehicleType] = useState('');
   const [vehicleBrand, setVehicleBrand] = useState('');
   const [loadCapacity, setLoadCapacity] = useState('');
-  const [checked, setChecked] = useState([1]);
+  const [checked, setChecked] = useState([]);
   const [FuelType, setFuelType] = useState('');
 
   const handleTypeChange = (event) => {
@@ -134,42 +134,39 @@ export default function VehicleRegistrationForm() {
 
       </Paper>
 
-
-
       <Box mt={4}>
-
         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
 
           <Typography variant='h6' sx={{ m: 2 }}>Assign Driver to the vehicle</Typography>
 
-          {[0, 1, 2, 3].map((value) => {
+          {[0, 1, 2, 3].map((value) => (
 
-            const labelId = `checkbox-list-secondary-label-${value}`;
+            <ListItem key={value} disablePadding>
 
-            return (
+              <ListItemButton>
 
-              <ListItem key={value} secondaryAction={<Checkbox edge="end" onChange={handleToggle(value)} checked={checked.includes(value)} inputProps={{ 'aria-labelledby': labelId }} />} disablePadding>
-                
-                <ListItemButton>
-                 
-                  <ListItemAvatar>
-                
-                    <Avatar alt={`Avatar ${value + 1}`} src={`/static/images/avatar/${value + 1}.jpg`} />
-                 
-                  </ListItemAvatar>
-                 
-                  <ListItemText id={labelId} primary={`Driver ${value + 1}`} />
-               
-                </ListItemButton>
-             
-              </ListItem>
-            );
-         
-         })}
-        
+                <ListItemAvatar>
+                  <Avatar alt={`Driver ${value + 1}`} src={`/static/images/avatar/${value + 1}.jpg`} />
+                </ListItemAvatar>
+
+                <ListItemText primary={`Driver ${value + 1}`} />
+
+              </ListItemButton>
+
+              <Checkbox 
+                edge="end" 
+                onChange={handleToggle(value)} 
+                checked={checked.includes(value)} 
+              />
+
+            </ListItem>
+
+          ))}
+
         </List>
-    
-      </Box>
+        </Box>
+
+
    
     </div>
   );

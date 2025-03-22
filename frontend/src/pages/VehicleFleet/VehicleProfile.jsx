@@ -7,23 +7,21 @@ import {
   Grid,
   Paper
 } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect } from 'react';
+
+
+
 
 export default function VehicleProfile() {
 
+  const {VehicleNumber} = useParams(); // Get the Vehicle ID from the URL
+
+  const [vehicleData, setVehicleData] = useState({}); //store vehicle data
   const [editMode, setEditMode] = useState(false);
 
-  const [vehicleData, setVehicleData] = useState({
-    registrationNumber: 'ABC-1234',
-    type: 'Lorry',
-    fuelType: 'Diesel',
-    brand: 'Toyota',
-    loadCapacity: '1500kg',
-    ownerNIC: '123456789V',
-    ownerName:'Jack',
-    contactNumber: '0771234567',
-    address:'Kottawa',
-    email:'Jack@email'
-  });
+
 
   const handleChange = (e) => {
     setVehicleData({ ...vehicleData, [e.target.name]: e.target.value });
@@ -37,6 +35,24 @@ export default function VehicleProfile() {
     // You can add save logic here (e.g., send data to backend)
     setEditMode(false);
   };
+
+
+
+  // Fetch vehicle data from the backend
+
+  useEffect(() => {
+
+    axios.get(`http://localhost:8000/api/vehicles/${VehicleNumber}`).then((response) => {
+        setVehicleData(response.data); // Set the fetched data to state
+      })
+
+      .catch((error) => {
+        console.error('Error fetching vehicle details:', error);
+      });
+
+
+  }, [VehicleNumber]); // Re-fetch when vehicleId changes
+
 
 
 
@@ -56,10 +72,15 @@ export default function VehicleProfile() {
           <TextField
             label="Registration Number"
             name="registrationNumber"
-            value={vehicleData.registrationNumber}
+           value={vehicleData.VehicleNumber}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
+
           />
         </Grid>
 
@@ -67,10 +88,13 @@ export default function VehicleProfile() {
           <TextField
             label="Vehicle Type"
             name="type"
-            value={vehicleData.type}
+            value={vehicleData.VehicleType}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -78,10 +102,13 @@ export default function VehicleProfile() {
           <TextField
             label="Fuel Type"
             name="fuelType"
-            value={vehicleData.type}
+            value={vehicleData.FuelType}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -89,10 +116,13 @@ export default function VehicleProfile() {
           <TextField
             label="Brand"
             name="brand"
-            value={vehicleData.brand}
+            value={vehicleData.VehicleBrand}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -100,10 +130,13 @@ export default function VehicleProfile() {
           <TextField
             label="Load Capacity"
             name="loadCapacity"
-            value={vehicleData.loadCapacity}
+            value={vehicleData.LoadCapacity}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -111,10 +144,13 @@ export default function VehicleProfile() {
           <TextField
             label="Owner NIC"
             name="ownerNIC"
-            value={vehicleData.ownerNIC}
+            value={vehicleData.OwnersNIC}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -122,10 +158,13 @@ export default function VehicleProfile() {
           <TextField
             label="Owner Name"
             name="ownerName"
-            value={vehicleData.ownerName}
+            value={vehicleData.OwnersName}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -133,10 +172,13 @@ export default function VehicleProfile() {
           <TextField
             label="Contact Number"
             name="contactNumber"
-            value={vehicleData.contactNumber}
+            value={vehicleData.ContactNumber}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -144,10 +186,13 @@ export default function VehicleProfile() {
           <TextField
             label="Address"
             name="address"
-            value={vehicleData.address}
+            value={vehicleData.Address}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
 
@@ -155,10 +200,13 @@ export default function VehicleProfile() {
           <TextField
             label="Email Address"
             name="email"
-            value={vehicleData.email}
+            value={vehicleData.Email}
             onChange={handleChange}
             fullWidth
             disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, // prvent label overlapping
+            }}
           />
         </Grid>
       </Grid>

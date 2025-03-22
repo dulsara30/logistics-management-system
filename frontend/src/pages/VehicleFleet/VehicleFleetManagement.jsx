@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
+import axios from 'axios';
 
 
 const StyledTableHead = styled(TableHead)(() => ({
@@ -32,21 +32,30 @@ const StyledTableRow = styled(TableRow)(() => ({
 
 
 
-// Dummy Data
-function createData(Number, Type, Brand, Owner, Drivers, Availability) {
-  return { Number, Type, Brand, Owner, Drivers, Availability };
-}
-
-const rows = [
-  createData('PQ-3536', 'Lorry', 'TATA', 'Kamal Perera', 'Amal Silva', 'Yes'),
-  createData('AQ-3530', 'Van', 'Toyota', 'Nimal Rathnayake', 'Sunil Kumara', 'Yes'),
-  createData('KQ-3567', 'Truck', 'Ashok Leyland', 'Lal Wickramasinghe', 'Nuwan', 'Yes'),
-  createData('PL-8536', 'Bike', 'Bajaj', 'Ruwan Dias', 'Gihan', 'Yes'),
-  createData('PT-3596', 'Car', 'Suzuki', 'Tharindu', 'Kasun', 'Yes'),
-];
-
 export default function VehicleFleetManagement() {
+
   const navi = useNavigate();
+
+  const [vehicles, setVehicles] = React.useState([]); // State to store vehicles
+
+
+
+  // Fetch vehicles from the backend
+  React.useEffect(() => {
+
+    axios.get('http://localhost:8000/api/vehicles').then((response) => {
+
+        setVehicles(response.data); // Set the data to state
+
+      }).catch((error) => {
+
+        console.error('Error fetching vehicles:', error);
+
+      });
+
+
+  }, []); // Empty dependency array means this runs only once when the component mounts
+
 
   return (
     <Box sx={{ p: 4, bgcolor: '#FFFFFF', minHeight: '100vh' }}>
@@ -69,22 +78,25 @@ export default function VehicleFleetManagement() {
           </StyledTableHead>
 
           <TableBody>
-            {rows.map((row) => (
+
+            {vehicles.map((vehi) => (
+
               <StyledTableRow
-                key={row.Number}
-                onClick={() => navi('VehicleProfile')}
+                key={vehi.VehicleNumber}
+                onClick={() => navi(`VehicleProfile/${vehi.VehicleNumber} `)}
               >
-                <TableCell component="th" scope="row">
-                  {row.Number}
-                </TableCell>
-                <TableCell align="right">{row.Type}</TableCell>
-                <TableCell align="right">{row.Brand}</TableCell>
-                <TableCell align="right">{row.Owner}</TableCell>
-                <TableCell align="right">{row.Drivers}</TableCell>
+                <TableCell component="th" scope="row">{vehi.VehicleNumber}</TableCell>
+                <TableCell align="right">{vehi.VehicleType}</TableCell>
+                <TableCell align="right">{vehi.VehicleBrand}</TableCell>
+                <TableCell align="right">{vehi.OwnersName}</TableCell>
+                <TableCell align="right">{vehi.DriverID}</TableCell>
               </StyledTableRow>
             ))}
+
           </TableBody>
+
         </Table>
+
       </TableContainer>
 
       <Box sx={{ mt: 3, textAlign: 'right' }}>
