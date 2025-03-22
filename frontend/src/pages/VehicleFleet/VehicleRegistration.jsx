@@ -3,91 +3,130 @@ import {
   TextField, FormControl, MenuItem, Box, InputLabel,
   Select, Autocomplete, List, ListItem, ListItemButton,
   ListItemText, ListItemAvatar, Avatar, Checkbox,
-  Typography,
-  Paper
+  Typography, Paper, Button
 } from '@mui/material';
+import axios from 'axios'; // Make sure axios is installed
+import { validateNIC, validateName, validateContactNumber, validateAddress, 
+  validateEmail, validateVehicleNumber,
+   validateVehicleTypeAndFuelType, validateVehicleBrand, 
+   validateLoadCapacity, validateDriverSelection } from './vehicleValidations'
 
 export default function VehicleRegistrationForm() {
+  // Vehicle owner details
+  const [ownersNIC, setOwnersNIC] = useState('');
+  const [ownersName, setOwnersName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [email, setEmail] = useState('');
+
+  // Vehicle details
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const [vehicleType, setVehicleType] = useState('');
+  const [fuelType, setFuelType] = useState('');
   const [vehicleBrand, setVehicleBrand] = useState('');
   const [loadCapacity, setLoadCapacity] = useState('');
+
+  // Driver selection
   const [checked, setChecked] = useState([]);
-  const [FuelType, setFuelType] = useState('');
-
-  const handleTypeChange = (event) => {
-    setVehicleType(event.target.value);
-  };
-
-  const handleLoadChange = (event) => {
-    setLoadCapacity(event.target.value);
-  };
-
-  const handleFuelTypeChange = (event) => {
-    setFuelType(event.target.value);
-  };
 
   const handleToggle = (value) => () => {
-    setChecked([value]);
+    setChecked([value]); // only one driver allowed
   };
 
-  const vehicleBrandOptions = [
-    'Toyota', 'Nissan', 'Mitzubhishi', 'Isuzu',
-    'Benz', 'Hyundai', 'Honda', 'Bajaj',
-    'TATA', 'Leyland', 'Piageo'
-  ];
+
+  //Validations
+
+  const handleSubmit = async () => {
+  // Validate inputs
+  let validationMessage = validateNIC(ownersNIC) || 
+                          validateName(ownersName) || validateContactNumber(contactNumber) || 
+                          validateAddress(address) || validateEmail(email) || 
+                          validateVehicleNumber(vehicleNumber) || 
+                          validateVehicleTypeAndFuelType(vehicleType, fuelType) || 
+                          validateVehicleBrand(vehicleBrand) || validateLoadCapacity(loadCapacity) ||
+                          validateDriverSelection(checked);
+
+  if (validationMessage) {
+    alert(validationMessage);
+    return;
+  }
+
+  const driverID = `Driver${checked[0] + 1}`;
+
+    const vehicleData = {
+      OwnersNIC: ownersNIC,
+      OwnersName: ownersName,
+      ContactNumber: contactNumber,
+      Address: address,
+      Email: email,
+      VehicleNumber: vehicleNumber,
+      VehicleType: vehicleType,
+      FuelType: fuelType,
+      VehicleBrand: vehicleBrand,
+      LoadCapacity: parseInt(loadCapacity),
+      DriverID: driverID,
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/vehicles', vehicleData); // Adjust endpoint
+      console.log('Vehicle created:', response.data);
+      alert("Vehicle created successfully!");
+    } catch (error) {
+      console.error('Error creating vehicle:', error);
+      alert("Failed to create vehicle!");
+    }
+  };
+
+  const vehicleBrandOptions = ['Toyota', 'Nissan', 'Mitzubhishi', 'Isuzu', 'Benz', 
+                              'Hyundai', 'Honda', 'Bajaj', 'TATA', 'Leyland', 'Piageo'];
 
   return (
     <div className="p-16">
 
       <Paper elevation={0} sx={{ padding: '18px', paddingBottom: '24px' }}>
 
-
-
-        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle owner details </Typography>
-
+        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle owner details</Typography>
 
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
 
-          <TextField label="Vehicle Owner's NIC" variant="outlined" fullWidth />
+          <TextField label="Vehicle Owner's NIC" 
+          variant="outlined" 
+          fullWidth value={ownersNIC} onChange={(e) => setOwnersNIC(e.target.value)} />
 
-          <TextField label="Vehicle Owner's Name" variant="outlined" fullWidth />
+          <TextField label="Vehicle Owner's Name" 
+          variant="outlined" 
+          fullWidth value={ownersName} onChange={(e) => setOwnersName(e.target.value)} />
 
-          <TextField
-            label="Contact number"
-            variant="outlined"
-            type="number"
-            sx={{
-              '& input[type=number]': { MozAppearance: 'textfield' },
-              '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                WebkitAppearance: 'none', margin: 0,
-              }
-            }}
-            fullWidth
-          />
-
-          <TextField label="Address" variant="outlined" type="text" fullWidth />
-
-          <TextField label="Email address" variant="outlined" type="text" fullWidth />
+          <TextField label="Contact number" 
+          variant="outlined" type="tel" 
+          fullWidth value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />
+          
+          <TextField label="Address"
+           variant="outlined" 
+           type="text" fullWidth value={address} onChange={(e) => setAddress(e.target.value)} />
+          
+          <TextField label="Email address" 
+          variant="outlined" type="text" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
 
         </Box>
 
       </Paper>
 
-
-
       <Paper elevation={0} sx={{ padding: '18px', paddingBottom: '24px', mt: 4 }}>
 
-        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle details </Typography>
+        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle details</Typography>
 
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
 
-          <TextField label="Vehicle Registration Number" variant="outlined" fullWidth />
+          <TextField label="Vehicle Registration Number" 
+          variant="outlined" fullWidth value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} />
 
           <FormControl fullWidth>
 
             <InputLabel id="vehicle-type-label">Vehicle Type</InputLabel>
 
-            <Select labelId="vehicle-type-label" value={vehicleType} label="Vehicle Type" onChange={handleTypeChange}>
+            <Select labelId="vehicle-type-label" 
+            value={vehicleType} label="Vehicle Type" onChange={(e) => setVehicleType(e.target.value)}>
 
               <MenuItem value="">-- Select any vehicle type --</MenuItem>
               <MenuItem value="Lorry">Lorry</MenuItem>
@@ -98,13 +137,12 @@ export default function VehicleRegistrationForm() {
 
           </FormControl>
 
-
-
           <FormControl fullWidth>
 
-            <InputLabel id="Fuel-type-label">Fuel Type</InputLabel>
+            <InputLabel id="fuel-type-label">Fuel Type</InputLabel>
 
-            <Select labelId="Fuel-type-label" value={FuelType} label="Fuel Type" onChange={handleFuelTypeChange}>
+            <Select labelId="fuel-type-label" 
+            value={fuelType} label="Fuel Type" onChange={(e) => setFuelType(e.target.value)}>
 
               <MenuItem value="">-- Select fuel type--</MenuItem>
               <MenuItem value="Diesel">Diesel</MenuItem>
@@ -125,19 +163,21 @@ export default function VehicleRegistrationForm() {
               onInputChange={(event, newInputValue) => setVehicleBrand(newInputValue)}
               renderInput={(params) => <TextField {...params} label="Vehicle Brand" variant="outlined" />}
             />
-
           </FormControl>
 
-          <TextField label="Load Capacity" variant="outlined" type="number" value={loadCapacity} onChange={handleLoadChange} fullWidth />
-       
+          <TextField label="Load Capacity" 
+          variant="outlined" type="number" 
+          fullWidth value={loadCapacity} onChange={(e) => setLoadCapacity(e.target.value)} />
+
         </Box>
 
       </Paper>
 
       <Box mt={4}>
-        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
 
-          <Typography variant='h6' sx={{ m: 2 }}>Assign Driver to the vehicle</Typography>
+        <Typography variant='h6' sx={{ mb: 2 }}>Assign Driver to the vehicle</Typography>
+
+        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
 
           {[0, 1, 2, 3].map((value) => (
 
@@ -146,28 +186,25 @@ export default function VehicleRegistrationForm() {
               <ListItemButton>
 
                 <ListItemAvatar>
+
                   <Avatar alt={`Driver ${value + 1}`} src={`/static/images/avatar/${value + 1}.jpg`} />
+
                 </ListItemAvatar>
 
                 <ListItemText primary={`Driver ${value + 1}`} />
 
               </ListItemButton>
 
-              <Checkbox 
-                edge="end" 
-                onChange={handleToggle(value)} 
-                checked={checked.includes(value)} 
-              />
+              <Checkbox edge="end" onChange={handleToggle(value)} checked={checked.includes(value)} />
 
             </ListItem>
-
           ))}
-
         </List>
-        </Box>
+      </Box>
 
-
-   
+      <Box mt={4}>
+        <Button variant="contained" color="primary" onClick={handleSubmit}>Register Vehicle</Button>
+      </Box>
     </div>
   );
 }

@@ -1,48 +1,9 @@
 
 import express from 'express';
-import {getUserByEmail,getUserByName,createVehicle,getVehicles,getVehicleByID} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
+import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
 
 const router = express.Router();
 
-
-
-// Route to get user by name
-router.get('/users/name/:name', async (req, res) => {
-
-  const { name } = req.params; // Extract name from URL
-
-  try {
-
-    const user = await getUserByName(name); // Call service method
-
-    if (user) {
-      res.status(200).json(user); // Return user if found
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-
-
-});
-
-// Route to get user by email
-router.get('/users/email/:email', async (req, res) => {
-
-  const { email } = req.params; // Extract email from URL
-
-  try {
-    const user = await getUserByEmail(email); // Call service method
-    if (user) {
-      res.status(200).json(user); // Return user if found
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
 
 
 
@@ -120,6 +81,22 @@ router.get('/vehicles/:vehicleId', async (req, res) => {
   }
 });
 
+
+
+// Route to Update vehicle details
+
+router.put('/vehicles/:vehicleId', async (req, res) => {
+
+  const { vehicleId } = req.params; // Extract vehicleId from the route parameter
+  const updateData = req.body; // Extract the fields to be updated from the request body
+
+  try {
+    const result = await updateVehicleByID(vehicleId, updateData); 
+    res.json(result); // Send a success message if the update is successful
+  } catch (error) {
+    res.status(500).json({ message: "Error updating vehicle", error });
+  }
+});
 
 
 

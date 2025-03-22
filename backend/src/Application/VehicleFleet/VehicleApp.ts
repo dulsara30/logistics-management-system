@@ -113,3 +113,28 @@ export const getVehicleByID = async (VehicleNumber: string) => {
 
   }
 };
+
+
+//update vehicle details
+export const updateVehicleByID = async (vehicleId: string, updateData: object) => {
+  try {
+    const updateResult = await Vehicle.updateOne(
+      { VehicleNumber: vehicleId },
+      { $set: updateData } // Use $set to update the fields
+    );
+
+    
+    if (updateResult.modifiedCount === 0) {
+      // No document was updated (vehicle not found or no change)
+      throw new Error('Vehicle not found or no changes made');
+    }
+
+    return { message: 'Vehicle updated successfully' };
+  } catch (error) {
+    console.error('Error updating vehicle:', error);
+    throw error; 
+  }
+};
+
+
+
