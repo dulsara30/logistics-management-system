@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -11,25 +11,47 @@ import {
 } from "@mui/material";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { styled } from '@mui/material/styles';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
+
 
 const NewDeliverySchedule = () => {
   const [formData, setFormData] = useState({
-    pickupLocation: "Sample Pickup Location",
-    dropoffLocation: "Sample Dropoff Location",
-    pickupDate: "2025-03-22T10:00",
-    deliveryDate: "2025-03-23T12:00",
-    packageType: "Fragile",
-    quantity: "2",
-    vehicle: "Van",
-    driver: "Driver A",
-    specialInstructions: "Handle with care",
-    pickupLatitude: 6.9271,
-    pickupLongitude: 79.8612,
-    dropoffLatitude: 6.9271,
-    dropoffLongitude: 79.8612,
+    pickupLocation: "",
+    dropoffLocation: "",
+    pickupDate: "",
+    deliveryDate: "",
+    packageType: "",
+    quantity: "",
+    vehicle: "",
+    driver: "",
+    specialInstructions: "",
+    pickupLatitude: 0,
+    pickupLongitude: 0,
+    dropoffLatitude: 0,
+    dropoffLongitude: 0,
   });
 
-  const [isEditable, setIsEditable] = useState(false);  // New state for edit mode
+
+
+  const [isEditable, setIsEditable] = useState(false);  // edit mode
+
+  const {ScheduleID} = useParams();
+
+  useEffect(() => {
+    
+
+    axios.get(`http://localhost:8000/api/Delivery/${ScheduleID}`) 
+      .then(response => {
+        setFormData(response.data);  
+      })
+      .catch(error => {
+        console.error("Error fetching data", error);
+      });
+  }, []);  
+
+
 
   const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -44,12 +66,18 @@ const NewDeliverySchedule = () => {
     },
   }));
 
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+
+
+
   const handleMapClick = (event, isPickup) => {
+
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     const geocoder = new window.google.maps.Geocoder();
@@ -77,20 +105,28 @@ const NewDeliverySchedule = () => {
     });
   };
 
+
+
   const toggleEditMode = () => {
     setIsEditable(!isEditable);
   };
 
   const handleCancel = () => {
-    // Logic for canceling changes, if necessary
     setIsEditable(false);
   };
 
+  const formattedDeliveryDate = formData.deliveryDate
+  ? new Date(formData.deliveryDate).toISOString().slice(0, 16)
+  : "";
+
   return (
+
+
     <form style={{ padding: 20 }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#333' , mb:4}}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#333' , mb:4 }}>
         Delivery Schedule
       </Typography>
+
 
       <Grid container spacing={2}>
         {/* Pickup Location */}
@@ -106,6 +142,7 @@ const NewDeliverySchedule = () => {
           />
         </Grid>
 
+
         {/* Drop-off Location */}
         <Grid item xs={12} sm={6}>
           <StyledTextField
@@ -118,6 +155,7 @@ const NewDeliverySchedule = () => {
             sx={{ borderRadius: "4px" }}
           />
         </Grid>
+
 
         {/* Map for Pickup Location */}
         <Grid item xs={12} sm={6}>
@@ -132,7 +170,7 @@ const NewDeliverySchedule = () => {
                 lng: formData.pickupLongitude || 79.8612,
               }}
               zoom={12}
-              onClick={(event) => handleMapClick(event, true)} // True for pickup
+              onClick={isEditable ? (event) => handleMapClick(event, true) : undefined} 
             >
               {formData.pickupLatitude && formData.pickupLongitude && (
                 <Marker
@@ -159,7 +197,7 @@ const NewDeliverySchedule = () => {
                 lng: formData.dropoffLongitude || 79.8612,
               }}
               zoom={12}
-              onClick={(event) => handleMapClick(event, false)} // False for dropoff
+              onClick={isEditable ? (event) => handleMapClick(event, true) : undefined} // False for dropoff
             >
               {formData.dropoffLatitude && formData.dropoffLongitude && (
                 <Marker
@@ -173,21 +211,6 @@ const NewDeliverySchedule = () => {
           </LoadScript>
         </Grid>
 
-        {/* Pickup Date and Time */}
-        <Grid item xs={12}>
-          <StyledTextField
-            label="Pickup Date & Time"
-            type="datetime-local"
-            name="pickupDate"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={formData.pickupDate}
-            onChange={handleChange}
-            disabled={!isEditable}
-            sx={{ borderRadius: "4px" }}
-          />
-        </Grid>
-
         {/* Delivery Date and Time */}
         <Grid item xs={12}>
           <StyledTextField
@@ -196,7 +219,7 @@ const NewDeliverySchedule = () => {
             name="deliveryDate"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={formData.deliveryDate}
+            value={formattedDeliveryDate}
             onChange={handleChange}
             disabled={!isEditable}
             sx={{ borderRadius: "4px" }}
@@ -232,14 +255,15 @@ const NewDeliverySchedule = () => {
 
         {/* Driver Selection */}
         <Grid item xs={12}>
+
+        {isEditable ? (
           <FormControl fullWidth sx={{ borderRadius: "4px" }}>
             <InputLabel>Driver</InputLabel>
             <Select
               name="driver"
-              value={formData.driver}
+              value={formData.driver} 
               onChange={handleChange}
               label="Driver"
-              disabled={!isEditable}
               sx={{ borderRadius: "4px" }}
             >
               <MenuItem value="Driver A">Driver A</MenuItem>
@@ -247,6 +271,18 @@ const NewDeliverySchedule = () => {
               <MenuItem value="Driver C">Driver C</MenuItem>
             </Select>
           </FormControl>
+          ) : (
+            <StyledTextField
+              label="Driver"
+              value={
+                formData.driverName && formData.driverUsername
+                  ? `${formData.driverName} (${formData.driverUsername})`
+                  : ""
+              }
+              fullWidth
+              disabled
+    />
+  )}
         </Grid>
 
         {/* Special Instructions */}

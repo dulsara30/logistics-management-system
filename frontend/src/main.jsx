@@ -38,7 +38,7 @@ const router = createBrowserRouter([
           {path:"fleet/vehicleRegistration", element:<VehicleRegistrationForm />,},
           {path:"fleet/VehicleProfile/:VehicleNumber", element:<Vehicleprofile />,},
           {path:"delivery/NewDeliveryScheduling", element:<NewDeliverySchedule />,},
-          {path:"delivery/DeliveryProfile", element:<DeliveryScheduleProfile />,},
+          {path:"delivery/DeliveryProfile/:ScheduleID", element:<DeliveryScheduleProfile />,},
           
         ]
       }

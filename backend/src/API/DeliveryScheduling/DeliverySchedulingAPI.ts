@@ -1,47 +1,47 @@
 
 import express from 'express';
-import {createDeliverySchedule,getDeliverySchedules} from "../../Application/DeliveryScheduling/DeliveryApp"
+import {createDeliverySchedule,getDeliverySchedules,getDeliveryScheduleById} from "../../Application/DeliveryScheduling/DeliveryApp"
 
 
 const router = express.Router();
 
 
 // create delivery schedule
-router.post('/delivery-schedules', async (req, res) => {
+router.post('/Delivery', async (req, res) => {
     const {
-      deliveryScheduleId,
       pickupLocation,
       dropoffLocation,
-      pickupDate,
       deliveryDate,
       packageType,
       quantity,
       vehicle,
-      driver,
+      driverName,
+      driverUsername,
       specialInstructions,
       pickupLatitude,
       pickupLongitude,
       dropoffLatitude,
-      dropoffLongitude
+      dropoffLongitude,
+      status
     } = req.body;
   
     try {
       // Call the service function to create and save the new delivery schedule
       const newDeliverySchedule = await createDeliverySchedule(
-        deliveryScheduleId,
         pickupLocation,
         dropoffLocation,
-        pickupDate,
         deliveryDate,
         packageType,
         quantity,
         vehicle,
-        driver,
+        driverName,
+        driverUsername,
         specialInstructions,
         pickupLatitude,
         pickupLongitude,
         dropoffLatitude,
-        dropoffLongitude
+        dropoffLongitude,
+        status
       );
   
       // Return the created delivery schedule data as JSON
@@ -52,8 +52,10 @@ router.post('/delivery-schedules', async (req, res) => {
   });
 
   
+
+
   // get all delivery schedules
-router.get('/delivery-schedules', async (req, res) => {
+router.get('/Delivery', async (req, res) => {
     try {
       const deliverySchedules = await getDeliverySchedules();
       res.status(200).json(deliverySchedules);
@@ -62,3 +64,22 @@ router.get('/delivery-schedules', async (req, res) => {
     }
   });
   
+
+// Get a specific delivery schedule by scheduleID
+
+router.get('/Delivery/:Scheduleid', async (req, res) => {
+
+  const { Scheduleid } = req.params; 
+  
+  try {
+
+    const schedule = await getDeliveryScheduleById(Scheduleid); 
+    res.json(schedule); 
+
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching schedule", error}); 
+  }
+});
+
+
+  export default router;

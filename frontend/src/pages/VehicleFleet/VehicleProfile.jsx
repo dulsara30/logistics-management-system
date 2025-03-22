@@ -209,6 +209,21 @@ export default function VehicleProfile() {
             }}
           />
         </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Driver"
+            name="Driver"
+            value={vehicleData.DriverID}
+            onChange={handleChange}
+            fullWidth
+            disabled={!editMode}
+            InputLabelProps={{
+              shrink: true, 
+            }}
+          />
+        </Grid>
+
       </Grid>
 
       <Box mt={4}>

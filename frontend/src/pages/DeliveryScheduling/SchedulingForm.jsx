@@ -41,6 +41,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
       color: '#666',
     },
   }));
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,7 +64,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
 
       if (status === "OK" && results[0]) {
-        
+
         const address = results[0].formatted_address;
 
         if (isPickup) {
@@ -171,19 +172,6 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
           </LoadScript>
         </Grid>
 
-        {/* Pickup Date and Time */}
-        <Grid item xs={12}>
-          <StyledTextField
-            label="Pickup Date & Time"
-            type="datetime-local"
-            name="pickupDate"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={formData.pickupDate}
-            onChange={handleChange}
-            sx={{  borderRadius: "4px" }}
-          />
-        </Grid>
 
         {/* Delivery Date and Time */}
         <Grid item xs={12}>

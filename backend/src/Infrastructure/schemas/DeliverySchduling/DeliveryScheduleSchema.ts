@@ -15,10 +15,7 @@ const deliveryScheduleSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    pickupDate: {
-      type: Date,
-      required: true,
-    },
+ 
     deliveryDate: {
       type: Date,
       required: true,
@@ -35,10 +32,16 @@ const deliveryScheduleSchema: Schema = new Schema(
       type: String,
       default: null,
     },
-    driver: {
+    driverName: {
       type: String,
       required: true,
     },
+
+    driverUsername: {
+        type: String,
+        required: true,
+      },
+
     specialInstructions: {
       type: String,
       default: '',
@@ -59,6 +62,10 @@ const deliveryScheduleSchema: Schema = new Schema(
       type: Number,
       default: null,
     },
+
+    status :{
+        type : String,
+    }
   }
 );
 
