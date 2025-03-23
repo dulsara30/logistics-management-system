@@ -15,15 +15,15 @@ export const getAllWarehouses = async () => {
 };
 
 
-
-// (read)get a warehouse by ID
+// (read) get a warehouse by ID
 export const getWarehouseById = async (Wname: string) => {
   try {
-    return await Warehouse.find({WarehouseID:Wname});
+    return await Warehouse.findOne({ WarehouseID: Wname });  // This returns a single document instead of an array
   } catch (error) {
     console.error("Error fetching warehouse:", error);
     throw new Error("Error fetching warehouse");
-  }}
+  }
+}
 
 
 export const createWarehouse = async (
