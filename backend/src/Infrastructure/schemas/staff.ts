@@ -55,7 +55,7 @@ const staffSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: [
-            "Business Owner",
+            "Bussiness Owner",
             "Warehouse Manager",
             "Inventory Manager",
             "Driver",
@@ -85,3 +85,4 @@ const staffSchema = new mongoose.Schema({
 const staffMembers = mongoose.model("StaffMembers", staffSchema);
 
 export default staffMembers;
+

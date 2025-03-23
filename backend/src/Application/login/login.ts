@@ -30,6 +30,7 @@ export const login = async (req: Request, res: Response) => {
             id: user._id.toString(),
             email: user.email,
             role: user.role,
+            fullName: user.fullName
         });
 
         return res.status(200).json({token, role: user.role});

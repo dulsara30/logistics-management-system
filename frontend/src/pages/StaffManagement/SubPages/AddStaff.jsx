@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Upload, X, ArrowLeft, Calendar, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
-const roles = ["Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
+const roles = ["Bussiness Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
 const genders = ["Male", "Female"];
 const statuses = ["Active", "Inactive"];
 
@@ -143,9 +143,22 @@ function AddStaff() {
           formData.append("profilePic", blob, "profile.jpg");
         }
 
+        const token = localStorage.getItem("token");
+
+        //check if token exists
+        if(!token){
+          setErrors({ submit: "You must be logged in to add a staff member"});
+          setLoading(false);
+          navigate("/login"); //if token missing redirect to login
+          return;
+        }
+
       try{
         const res = await fetch("http://localhost:8000/staff/add-staff", {
           method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
           body: formData,
         });
 
@@ -174,6 +187,12 @@ function AddStaff() {
       }catch(err){
           console.error("Error adding employee:", err);
           setErrors({ submit: err.message }); //store errors in object form here 
+
+          if (err.message.includes("Invalid or expired token")) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            navigate("/login");
+          }
       }finally{
         setLoading(false);
       }

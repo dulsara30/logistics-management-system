@@ -8,11 +8,7 @@ function Breadcrumbs() {
   return (
     <nav className="text-gray-600 text-sm py-2">
       <ul className="flex">
-        <li>
-          <Link to="/" className="text-blue-500 hover:underline">
-            Home
-          </Link>
-        </li>
+
         {pathnames.map((path, index) => {
           // Construct URL for each breadcrumb step
           const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;

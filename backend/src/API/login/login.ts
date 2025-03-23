@@ -4,4 +4,6 @@ import { authenticateToken, authorizeRole } from "../../middleware/authenticatio
 
 const loginRouter = express.Router();
 
-loginRouter.post("/login", login)
+loginRouter.route("/login").post(login);
+
+export default loginRouter;

@@ -130,10 +130,8 @@ function DashboardLayout() {
         ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
-      <HeaderSec array={NAVIGATION}/>
+     <HeaderSec/>
     
-
-
         {/* Page Content */}
         
         <Outlet/>

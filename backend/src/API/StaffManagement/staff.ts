@@ -30,10 +30,9 @@ const upload = multer({
     limits: {fileSize: 5 * 1024 * 1024},
 });
 
-staffRouter.route("/manage-staff").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), getAllStaff);
-staffRouter.route("/add-staff").post(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager"]),  upload.single("profilePic"), addStaff);
-staffRouter.route("/manage-staff/:id").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), getStaffById).put(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), updateStaff).delete( authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), deleteStaff);
-
+staffRouter.route("/manage-staff").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager" ]), getAllStaff);
+staffRouter.route("/add-staff").post(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager"]),  upload.single("profilePic"), addStaff);
+staffRouter.route("/manage-staff/:id").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager" ]), getStaffById).put(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), updateStaff).delete( authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), deleteStaff);
 /*staffRouter.route("/manage-staff/:id").delete(deleteStaff);*/
 
 export default staffRouter;

@@ -23,18 +23,40 @@ function ManageStaff() {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
+
+  const BACKEND_BASE_URL = 'http://localhost:8000';
+
   // Fetch data from backend
   /*useEffect is like worker in the app that says, "hey, when the app starts,
   i will go get the list of employee from the server and put in to boxes made with useState*/
   useEffect(() => {
+
+    const token = localStorage.getItem("token");
+    if(!token){
+      setError({ submit: "You must be logged in to add a staff member"});
+      setIsLoading(false);
+      navigate("/login");
+      return;
+    }
+
     const getStaff = async () => {
       setIsLoading(true);//function from useState that change the isLoading box(value)
       setError(null);
+
+      const token = localStorage.getItem("token");
+
+      if(!token){
+        setError({ submit: "You must be logged in to add a staff member"});
+        setIsLoading(false);
+        navigate("/login");
+        return;
+      }
+
       try {
         const res = await fetch("http://localhost:8000/staff/manage-staff", {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
         });
 
@@ -50,6 +72,12 @@ function ManageStaff() {
       } catch (err) {
         setError(err.message);
         console.error("Error fetching staff:", err);
+
+        if (err.message.includes("Invalid or expired token")) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          navigate("/login");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -109,19 +137,47 @@ function ManageStaff() {
     }
   };
 
+
+  // Format date to YYYY-MM-DD
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+  };
+
+
   // Handle edit
   const handleEditClick = (employee) => {
+    // Format dates before setting editEmployee
+    const formattedEmployee = {
+      ...employee,
+      DOB: formatDateForInput(employee.DOB),
+      dateJoined: formatDateForInput(employee.dateJoined),
+    };
     setEditEmployee({...employee});
     setIsEditModalOpen(true);
   };
 
   const handleSaveEdit = async () => {
+
+    const token = localStorage.getItem("token");
+           //check if token exists
+           if(!token){
+            setError({ submit: "You must be logged in to add a staff member"});
+            setIsLoading(false);
+            navigate("/login"); //if token missing redirect to login
+            return;
+          }
+
+          console.log(editEmployee);
+
     try {
       const res = await fetch(`http://localhost:8000/staff/manage-staff/${editEmployee._id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         body: JSON.stringify(editEmployee)
       });
 
@@ -147,17 +203,27 @@ function ManageStaff() {
 
   // Handle delete
   const handleDeleteClick = (employee) => {
+
     setEmployeeToDelete(employee);
     setIsDeleteModalOpen(true);
   };
 
   const confirmDelete = async () => {
+
+    const token = localStorage.getItem("token");
+
+    if(!token){
+      setError({ submit: "You must be logged in to add a staff member"});
+      setIsLoading(false);
+      navigate("/login");
+      return;
+    }
     try {
       const res = await fetch(`http://localhost:8000/staff/manage-staff/${employeeToDelete._id}`, {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
-        }
+          "Authorization": `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
@@ -170,6 +236,12 @@ function ManageStaff() {
     } catch (err) {
       console.error("Error deleting employee:", err);
       setError(err.message);
+
+      if(err.message.includes("Invalid or expired token")){
+        localStorage.removeItem("token");
+        localStorage.removeItem("rele");
+        navigate("/login");
+      }
     }
   };
 
@@ -201,11 +273,11 @@ function ManageStaff() {
       - Number: ${employee.emNumber || 'N/A'}
     `;
     
-    const blob = new Blob([report], { type: 'text/plain' });
+    const blob = new Blob([report], { type: 'pdf/plain' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${employee.fullName}_report.txt`;
+    link.download = `${employee.fullName}_report.pdf`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -574,11 +646,13 @@ function ManageStaff() {
       </div>
       
       <div className="space-y-4">
-      <p>{selectedEmployee.profilePic}</p>
         <img 
-          src={selectedEmployee.profilePic} 
+          src={`${BACKEND_BASE_URL}${selectedEmployee.profilePic}`}
           alt={selectedEmployee.fullName} 
           className="w-24 h-24 rounded-full mx-auto"
+          onError={(e) => {
+            e.target.src = 'https://i.pinimg.com/736x/27/a1/98/27a198cd60ec735d50e9c1651e82226f.jpg';
+          }}
         />
         
         <div className="grid grid-cols-1 gap-2">

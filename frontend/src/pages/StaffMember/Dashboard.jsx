@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, Outlet, useNavigate } from 'react-router-dom'; // Removed Navigate since it's not used
 import {
   UserCircle,
   Calendar,
@@ -9,12 +9,14 @@ import {
   Plus,
   CheckCircle,
   Clock,
+  Package 
 } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode';
 
 const quickAccessCards = [
   {
     icon: UserCircle,
-    title: 'Profile',
+    title: 'profile',
     description: 'View and edit your profile',
     path: '/profile',
     color: 'from-purple-500 to-violet-600',
@@ -48,7 +50,7 @@ const quickAccessCards = [
     color: 'from-pink-500 to-rose-600',
   },
   {
-    icon: Plus,
+    icon: Package,
     title: 'Something',
     description: 'Coming soon',
     path: '/something',
@@ -78,14 +80,61 @@ const tasks = [
 ];
 
 export default function Dashboard() {
+  // Move hooks inside the component
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [fullName, setFullName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getUserData = () => {
+      setIsLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("You must be logged in to view this page");
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode(token);
+        if (!decoded.fullName) {
+          throw new Error("Full name not found in token");
+        }
+        setFullName(decoded.fullName);
+      } catch (err) {
+        console.error("Error decoding token:", err);
+        setError("Invalid token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        navigate("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getUserData();
+  }, [navigate]);
+
+  if (isLoading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-4 text-red-600">Error: {error}</div>;
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="px-8 py-5">
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, John! 👋</h1>
+        <h1 className="text-3xl font-bold">Welcome back, {fullName} 👋</h1>
         <p className="text-gray-600 mt-2">Here's what's happening today.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {quickAccessCards.map((card) => (
           <Link
             key={card.title}
@@ -103,7 +152,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Daily Tasks</h2>
           <Link
@@ -144,6 +193,9 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+      <main>
+        <Outlet/>
+      </main>
     </div>
   );
 }

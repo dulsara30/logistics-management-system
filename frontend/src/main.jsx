@@ -20,39 +20,189 @@ import LeaveReq from './pages/StaffManagement/SubPages/LeaveReq.jsx'
 import ManageSalary from './pages/StaffManagement/SubPages/ManageSalary.jsx'
 import Concerns from './pages/StaffManagement/SubPages/Concerns.jsx'
 import AttendanceTracking from './pages/StaffManagement/SubPages/AttendanceTracking.jsx'
+import Login from './pages/login/login.jsx'
+import Unauthorized from './pages/login/Unauthorized.jsx'
+import AdminLayout from './layouts/admin.layout.jsx'
+import ProtectedRoute from './component/ProtectedRoute.jsx'
+import StaffLayout from './layouts/staff.layout.jsx'
+import Dashboard from './pages/StaffMember/Dashboard.jsx'
+import Profile from './pages/StaffMember/Profile.jsx'
 
 const router = createBrowserRouter([
   {
     element: <RootLayout/>,
     children:[
       {
-        element: <DashboardLayout/>,
-        children:[
-          {path:"/", element:<Home/>, },
-          {path:"warehouse", element:<WarehouseManagement/>, },
-          {path:"fleet", element:<VehicleFleetManagement/>,},
-          {path:"delivery", element:<DeliveryManagement/>,},
-          {path:"inventory", element:<InventoryManagement/>,},
-          {path:"staff/", element:<StaffManagement/>,
-            children:[
-              {path:"manage-staff", element:<ManageStaff/>},
-              {path:"add-staff", element:<AddStaff/>},
-              {path:"assign-tasks", element:<AssignTask/>},
-              {path:"leave-requests", element:<LeaveReq/>},
-              {path:"manage-salary", element:<ManageSalary/>},
-              {path:"concerns", element:<Concerns/>},
-              {path:"Attendance-Tracking", element:<AttendanceTracking/>}
+        path:"/login",
+        element: <Login/>
+      },
+      {
+        path:"/unauthorized",
+        element: <Unauthorized/>
+      },
+      {
+            element: <DashboardLayout/>,
+            children: [
+              {
+                path:"/",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                    <Home/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path:"warehouse",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                    <WarehouseManagement/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path:"fleet",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                    <VehicleFleetManagement/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path:"delivery",
+                element: ( 
+                <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                  <DeliveryManagement/>
+                </ProtectedRoute>
+                ),
+              },
+              {
+                path:"inventory",
+                element: ( 
+                <ProtectedRoute allowedRoles={[["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]]}>
+                  <InventoryManagement/>
+                </ProtectedRoute>
+                ),
+              },
+              {
+                path:"staff/",
+                element: ( 
+                <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                  <StaffManagement/>
+                </ProtectedRoute>
+                ),
+                children: [
+                  {
+                    path:"manage-staff",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <ManageStaff/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"add-staff",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <AddStaff/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"assign-tasks",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <AssignTask/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"leave-requests",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <LeaveReq/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"manage-salary",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <ManageSalary/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"concerns",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <Concerns/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                  {
+                    path:"Attendance-Tracking",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <AttendanceTracking/>
+                      </ProtectedRoute>
+                    ),
+                  },
+                ],
+              },
+              {
+                path:"Suppliers",
+                element: (
+                  <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                    <SupplierManagement/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path:"returns",
+                element: (
+                  <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                    <ReturnDamageHandling/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path:"help",
+                element: (
+                  <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                    <Help/>
+                  </ProtectedRoute>
+                )
+              },
+  
             ],
           },
-          {path:"suppliers", element:<SupplierManagement/>,},
-          {path:"returns", element:<ReturnDamageHandling/>,},
-          {path:"help", element:<Help/>,},
-        ]
-      }
-    ]
-      },
-    ]
-)
+          {
+            element: <StaffLayout/>,
+            children: [
+              {
+                path:"dashboard/",
+                element: (
+                  <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
+                    <Dashboard/>
+                  </ProtectedRoute>
+                ),
+                children: [
+                  {
+                    path: "profile",
+                    element: (
+                      <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
+                        <Profile/>
+                      </ProtectedRoute>
+  
+                    ),
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        },
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
