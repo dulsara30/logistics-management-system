@@ -50,6 +50,8 @@ export default function WarehouseForm() {
     setEditMode(false);
   };
 
+  
+
   // Handle form submission (save data)
   const handleSubmit = () => {
 
@@ -68,11 +70,25 @@ export default function WarehouseForm() {
 
   // Handle delete action
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this warehouse profile?")) {
-      console.log("Warehouse profile deleted.");
+    const adminPassword = window.prompt("Enter Admin Password to delete:");
+  
+    if (adminPassword === "admin123") {
+      if (window.confirm("Are you sure you want to delete this warehouse profile?")) {
+        axios
+          .delete(`http://localhost:8000/api/warehouse/${WarehouseID}`)
+          .then(() => {
+            alert("Warehouse deleted successfully.");
+            navigate("/WarehouseSubmit");
+          })
+          .catch((error) => {
+            alert("Error deleting warehouse:", error);
+          });
+      }
+    } else if (adminPassword !== null) {
+      alert("Incorrect Admin Password!");
     }
   };
-
+  
   return (
     <Grid container spacing={2} sx={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
       <Box sx={{ width: "100%" }}>
