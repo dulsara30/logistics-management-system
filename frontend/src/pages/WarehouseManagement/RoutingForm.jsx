@@ -30,7 +30,7 @@ export default function RoutingMaintenanceForm() {
         <Typography variant="h5" sx={{ mb: 3 }}>Routing Maintenance Form</Typography>
         <form onSubmit={handleSubmit} className="space-y-4" style={{ width: '100%' }}>
           <TextField
-            label="ID"
+            label="RID"
             variant="outlined"
             fullWidth
             name="id"

@@ -32,6 +32,8 @@ import logo from '../assets/Picture1.png';
 import PageContent from './PageContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { Link } from 'react-router-dom';
+
 
 
 const NAVIGATION = [

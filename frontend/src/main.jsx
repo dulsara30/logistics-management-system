@@ -13,13 +13,17 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
-import WarehouseForm from './pages/WarehouseManagement/WarehouseForm.jsx'
+
+import WarehouseForm from './pages/WarehouseManagement/WarehouseProfile.jsx'
+
 import Maintainance from './pages/WarehouseManagement/Mantainance.jsx'
 import CorrectiveForm from './pages/WarehouseManagement/CorrectiveForm.jsx'
 import SubmitPage from './pages/WarehouseManagement/CorrectiveSubmit.jsx'
 import RoutingMaintenanceForm from './pages/WarehouseManagement/RoutingForm.jsx'
 import RoutingSubmit from './pages/WarehouseManagement/RoutingSubmit.jsx'
 
+//import WarehouseForm from './pages/WarehouseManagement/WarehouseForm.jsx'
+import CreateWarehouse from './pages/WarehouseManagement/CreateWarehouse.jsx'
 
 const router = createBrowserRouter([
   {
@@ -30,7 +34,11 @@ const router = createBrowserRouter([
         children:[
           {path:"/*", element:<Home/>, },
           {path:"warehouse", element:<WarehouseManagement/>, },
-          {path:"warehouse/warehouse-form", element:<WarehouseForm/>, },
+          {path:"warehouse/Addwarehouse", element:<CreateWarehouse/>, },
+          {path:"warehouse/WarehouseDetails/:WarehouseID", element:<WarehouseForm/>, },
+
+        //  {path:"warehouse/warehouse-form/WarehouseSubmit", element:<WarehouseSubmit/>, },
+        
           {path:"warehouse/Maintainance", element:<Maintainance/>, },
           {path:"warehouse/Maintainance/Corrective-Form", element:<CorrectiveForm/>, },
           {path:"warehouse/Maintainance/Corrective-Form/CorrectiveSubmit", element:<SubmitPage/>, },
