@@ -71,11 +71,14 @@ export default function VehicleProfile() {
 
     // If there are any errors, show them and prevent save
     if (Object.keys(filteredErrors).length > 0) {
+
       setErrorMessages(filteredErrors);
       return; // Stop the save process if there are errors
+
     }
 
-  
+    // Reset error messages before sending the data
+    setErrorMessages({});
 
     try {
       // Send the updated vehicle data to the backend
@@ -121,27 +124,37 @@ export default function VehicleProfile() {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth disabled={!editMode}>
-            <InputLabel id="vehicle-type-label">Vehicle Type</InputLabel>
-            <Select
-              labelId="vehicle-type-label"
-              name="VehicleType"
-              value={vehicleData.VehicleType || ''}
-              onChange={handleChange}
+        {editMode ? (
+            <FormControl fullWidth>
+              <InputLabel id="vehicle-type-label">Vehicle Type</InputLabel>
+              <Select
+                labelId="vehicle-type-label"
+                name="VehicleType"
+                value={vehicleData.VehicleType || ''}
+                onChange={handleChange}
+                label="Vehicle Type"
+              >
+                <MenuItem value="">-- Select Vehicle Type --</MenuItem>
+                <MenuItem value="Lorry">Lorry</MenuItem>
+                <MenuItem value="Van">Van</MenuItem>
+                <MenuItem value="Three Wheeler">Three Wheeler</MenuItem>
+              </Select>
+            </FormControl>
+          ) : (
+            <TextField
               label="Vehicle Type"
-              disabled={!editMode}
-            >
-              <MenuItem value="">-- Select Vehicle Type --</MenuItem>
-              <MenuItem value="Lorry">Lorry</MenuItem>
-              <MenuItem value="Van">Van</MenuItem>
-              <MenuItem value="Three Wheeler">Three Wheeler</MenuItem>
-            </Select>
-            {errorMessages.VehicleTypeAndFuelType && (
-              <Typography variant="body2" color="error">
-                {errorMessages.VehicleTypeAndFuelType}
-              </Typography>
-            )}
-          </FormControl>
+              value={vehicleData.VehicleType || ''}
+              fullWidth
+              disabled
+              InputLabelProps={{ shrink: true }}
+            />
+          )}
+
+          {errorMessages.VehicleTypeAndFuelType && (
+            <Typography variant="body2" color="error">
+              {errorMessages.VehicleTypeAndFuelType}
+            </Typography>
+          )}
         </Grid>
 
         <Grid item xs={12} sm={6}>
