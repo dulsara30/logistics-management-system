@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // For redirecting to login
 
 const InventoryManagementPage = () => {
   const [inventory, setInventory] = useState([]);
-  const [filteredInventory, setFilteredInventory] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,17 +21,25 @@ const InventoryManagementPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All"); // For filtering by category
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Replace this with your actual token (e.g., from localStorage after login)
-  const token = localStorage.getItem("token") || "your-jwt-token-here";
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  // Fetch inventory items from the backend
+  // Fetch inventory items from the backend with search and filter
   const fetchInventory = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:8000/api/manage-inventory", {
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const queryParams = new URLSearchParams();
+      if (searchTerm) queryParams.set("search", searchTerm);
+      if (selectedCategory !== "All") queryParams.set("category", selectedCategory);
+
+      const res = await fetch(`http://localhost:8000/api/manage-inventory?${queryParams.toString()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -40,50 +48,34 @@ const InventoryManagementPage = () => {
       });
 
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("Unauthorized. Please log in again.");
+        }
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
       const data = await res.json();
       console.log("Fetched inventory data:", data);
       setInventory(data);
-      setFilteredInventory(data);
     } catch (err) {
       setError(err.message);
       console.error("Error fetching inventory:", err);
+      if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("token");
+        navigate("/login"); // Redirect to login page
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Fetch inventory on component mount
+  // Fetch inventory on component mount and when search/filter changes
   useEffect(() => {
     fetchInventory();
-  }, []);
+  }, [searchTerm, selectedCategory]);
 
   // Get unique categories for the filter dropdown
   const categories = ["All", ...new Set(inventory.map(item => item.category))];
-
-  // Handle search and filtering
-  useEffect(() => {
-    let filtered = inventory;
-
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(
-        item =>
-          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.supplierID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply category filter
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter(item => item.category === selectedCategory);
-    }
-
-    setFilteredInventory(filtered);
-  }, [searchTerm, selectedCategory, inventory]);
 
   const openAddModal = () => {
     setFormData({
@@ -105,7 +97,7 @@ const InventoryManagementPage = () => {
   const openEditModal = (item) => {
     setFormData({
       ...item,
-      id: item._id, // Map _id to id for the form
+      id: item._id,
     });
     setIsEditing(true);
     setIsModalOpen(true);
@@ -120,6 +112,10 @@ const InventoryManagementPage = () => {
     setIsLoading(true);
     setError(null);
     try {
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
       const url = isEditing
         ? `http://localhost:8000/api/manage-inventory/${formData.id}`
         : "http://localhost:8000/api/manage-inventory";
@@ -146,13 +142,20 @@ const InventoryManagementPage = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Unauthorized. Please log in again.");
+        }
         throw new Error(isEditing ? "Failed to update item" : "Failed to add item");
       }
 
-      await fetchInventory(); // Refresh the inventory list
+      await fetchInventory();
       setIsModalOpen(false);
     } catch (err) {
       setError(err.message);
+      if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -162,6 +165,10 @@ const InventoryManagementPage = () => {
     setIsLoading(true);
     setError(null);
     try {
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
       const response = await fetch(`http://localhost:8000/api/manage-inventory/${id}`, {
         method: "DELETE",
         headers: {
@@ -170,13 +177,20 @@ const InventoryManagementPage = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Unauthorized. Please log in again.");
+        }
         throw new Error("Failed to delete item");
       }
 
-      await fetchInventory(); // Refresh the inventory list
+      await fetchInventory();
       if (selectedItem?._id === id) setSelectedItem(null);
     } catch (err) {
       setError(err.message);
+      if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -203,7 +217,7 @@ const InventoryManagementPage = () => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${item.supplierID}_details.txt`; // Updated from sku to supplierID
+    link.download = `${item.supplierID}_details.txt`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -361,9 +375,9 @@ const InventoryManagementPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredInventory.map(item => (
+                {inventory.map(item => (
                   <tr
-                    key={item._id} // Use _id from MongoDB
+                    key={item._id}
                     onClick={() => selectItem(item)}
                     className={`cursor-pointer ${
                       selectedItem?._id === item._id ? "bg-blue-100" : "bg-white"

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import InventoryManagements from "../infrastructure/schemas/InventoryManagement";
 
-
 interface InventoryItem {
-  _id?: string; 
+  _id?: string;
   name: string;
   supplierID: string;
   category: string;
@@ -16,10 +15,28 @@ interface InventoryItem {
   notes: string;
 }
 
-// Get all inventory items
+// Get all inventory items with search and filtering
 export const getAllInventoryManagement = async (req: Request, res: Response) => {
   try {
-    const inventoryItems = await InventoryManagements.find();
+    const { search, category } = req.query;
+    let query: any = {};
+
+    // Handle search (across name, supplierID, category)
+    if (search) {
+      const searchRegex = new RegExp(search as string, "i"); // Case-insensitive search
+      query.$or = [
+        { name: searchRegex },
+        { supplierID: searchRegex },
+        { category: searchRegex },
+      ];
+    }
+
+    // Handle category filter
+    if (category && category !== "All") {
+      query.category = category;
+    }
+
+    const inventoryItems = await InventoryManagements.find(query);
     return res.status(200).json(inventoryItems);
   } catch (error) {
     console.error("Error in getAllInventoryManagement:", error);

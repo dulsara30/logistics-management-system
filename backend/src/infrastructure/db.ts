@@ -1,12 +1,18 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const connectDB = async () => {
+
+    const uri = process.env.MONGO_URI;
+
     try{
-        const connectionString = "mongodb+srv://tulip:kavyy@cluster0.il8ec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        const connectionString = `${uri}`;
         await mongoose.connect(connectionString);
-        console.log("Db connection is successful!");
-       } catch (error){
-        console.log("Db connection is failed!");
-       }
- 
+        console.log("DB connections successful!");
+    }catch (error){
+        console.log("DB connections faild!");
+    }
+    
 }
