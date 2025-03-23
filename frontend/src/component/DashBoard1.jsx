@@ -5,6 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
+
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -16,8 +17,9 @@ import {
   RotateCcw,
   HelpCircle,
   Menu,
-  X
+  X  
 } from 'lucide-react';
+
 import { useState } from 'react';
 import Home from '../pages/Home/Home.jsx';
 import WarehouseManagement from '../pages/WarehouseManagement/WarehouseManagement';
@@ -32,7 +34,6 @@ import logo from '../assets/Picture1.png';
 import PageContent from './PageContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-
 
 const NAVIGATION = [
   { path: '/', title: 'Dashboard', icon: LayoutDashboard },
@@ -58,7 +59,7 @@ function DashboardLayout() {
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
-        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}  {/* ✅ Fixed: Now X is properly recognized */}
       </button>
 
       {/* Sidebar */}
@@ -69,56 +70,45 @@ function DashboardLayout() {
       `}>
         {/* Logo */}
         <Link to={"/"}>
-        <div className="flex items-center justify-center h-20 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <img src={logo} className='w-20 h-20'/>
-            <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
+          <div className="flex items-center justify-center h-20 border-b border-gray-200">
+            <div className="flex items-center space-x-2">
+              <img src={logo} className='w-20 h-20'/>
+              <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
+            </div>
           </div>
-        </div>
         </Link>
+        
         {/* Navigation */}
         <nav className="p-4 space-y-2">
-
-         
-
-            {NAVIGATION.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`
-                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                    ${isActive 
-                      ? 'bg-blue-50 text-blue-600' 
-                      : 'text-gray-600 hover:bg-gray-50'
-                    }
-                  `}
-                >
-
-              
-                 <Box display="flex" alignItems="flex-start" gap={2}>  
-                      <Icon size={28} color={isActive ? "#1976d2" : "#6b7280"} />
-
-                      <Typography 
-                        variant="subtitle1" 
-                        fontWeight={isActive ? 'bold' : 'medium'} 
-                        color={isActive ? 'primary' : 'text.secondary'}
-                        sx={{ whiteSpace: 'nowrap' }}
-                      >
-                        {item.title}
-                      </Typography>
-
-                 
-                  </Box>
-               
-                </button>
-              );
-            })}
-
-          
+          {NAVIGATION.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`
+                  w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
+                  ${isActive 
+                    ? 'bg-blue-50 text-blue-600' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                  }
+                `}
+              >
+                <Box display="flex" alignItems="flex-start" gap={2}>  
+                  <Icon size={28} color={isActive ? "#1976d2" : "#6b7280"} />
+                  <Typography 
+                    variant="subtitle1" 
+                    fontWeight={isActive ? 'bold' : 'medium'} 
+                    color={isActive ? 'primary' : 'text.secondary'}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    {item.title}
+                  </Typography>
+                </Box>
+              </button>
+            );
+          })}
         </nav>
       </aside>
 
@@ -138,25 +128,21 @@ function DashboardLayout() {
 
           <div className='flex p-5'>
             <div className='p-3'>
-            <Avatar>H</Avatar>
+              <Avatar>H</Avatar>
             </div>
             <div className='p-3'>
               <Badge badgeContent={4} color="primary">
                 <MailIcon color="action" />
               </Badge>
             </div>
-
           </div>
         </header>
 
         {/* Page Content */}
-        
         <PageContent/>
       </main>
     </div>
   );
 }
-
-
 
 export default DashboardLayout;
