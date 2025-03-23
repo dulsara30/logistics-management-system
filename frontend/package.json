@@ -18,12 +18,13 @@
     "@mui/material": "^6.4.7",
     "@toolpad/core": "^0.13.0",
     "antd": "^5.24.4",
+    "axios": "^1.8.4",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.3.0",
+    "react-router-dom": "^7.4.0",
     "styled-components": "^6.1.15"
   },
   "devDependencies": {

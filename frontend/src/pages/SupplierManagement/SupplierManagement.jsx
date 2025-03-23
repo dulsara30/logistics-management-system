@@ -5,6 +5,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 
 
+
+
 function SupplierManagement() {
 const location = useLocation();
 
@@ -12,10 +14,12 @@ const isBaseRoute = location.pathname === "/suppliers";
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    contact: "",
-    productCategory: "",
-    description: "",
+    email:"",
+    contact:"",
+    itemsName: "",
+    quantity: "",
+    unitPrice: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
   const handleChange = (e) => {
