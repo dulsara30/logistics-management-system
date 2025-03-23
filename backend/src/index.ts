@@ -1,5 +1,12 @@
 import "dotenv/config";
 import express from "express";
+import {
+  getAllInventoryManagement,
+  createInventoryManagement,
+  getInventoryById,
+  deleteInventoryManagement,
+  updateInventory,
+} from "./application/InventoryManagement";
 import { Request, Response } from "express";
 import { connectDB } from "./Infrastructure/db";
 import { resolve } from "path";
@@ -20,6 +27,17 @@ connectDB();
 app.use("/", loginRouter)
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
+
+app
+  .route("/Inventory")
+  .get(getAllInventoryManagement)
+  .post(createInventoryManagement);
+
+app
+  .route("/Inventory/:id")
+  .get(getInventoryById)
+  .put(updateInventory)
+  .delete(deleteInventoryManagement);
 
 
 const PORT = 8000
