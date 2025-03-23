@@ -16,9 +16,8 @@ import {
   RotateCcw,
   HelpCircle,
   Menu,
-  X  
+  X
 } from 'lucide-react';
-
 import { useState } from 'react';
 import Home from '../pages/Home/Home.jsx';
 import WarehouseManagement from '../pages/WarehouseManagement/WarehouseManagement';
@@ -34,7 +33,7 @@ import PageContent from './PageContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import HeaderSec from './HeaderSec.jsx';
-import Breadcrumbs from './Breadcrumbs.jsx';
+import { jwtDecode  } from 'jwt-decode';
 
 
 const NAVIGATION = [
@@ -89,7 +88,7 @@ function DashboardLayout() {
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
-        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}  {/* ✅ Fixed: Now X is properly recognized */}
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* Sidebar */}
@@ -100,18 +99,23 @@ function DashboardLayout() {
       `}>
         {/* Logo */}
         <Link to={"/"}>
-          <div className="flex items-center justify-center h-20 border-b border-gray-200">
-            <div className="flex items-center space-x-2">
-              <img src={logo} className='w-20 h-20'/>
-              <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
-            </div>
+        <div className="flex items-center justify-center h-20 border-b border-gray-200">
+          <div className="flex items-center space-x-2">
+            <img src={logo} className='w-20 h-20'/>
+            <span className="text-xl font-bold text-gray-800">GrocerEase Lanka</span>
           </div>
+        </div>
         </Link>
-        
         {/* Navigation */}
         <nav className="p-4 space-y-2">
 
-         
+        <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-lg">
+            
+            <div>
+              <p className="text-sm text-gray-600">Welcome back,</p>
+              <h2 className="text-lg font-semibold text-gray-800">{fullName}</h2>
+            </div>
+            </div>
 
             {NAVIGATION.map((item) => {
               const Icon = item.icon;
@@ -160,16 +164,16 @@ function DashboardLayout() {
         ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
-
      <HeaderSec/>
     
         {/* Page Content */}
         
         <Outlet/>
-
       </main>
     </div>
   );
 }
+
+
 
 export default DashboardLayout;

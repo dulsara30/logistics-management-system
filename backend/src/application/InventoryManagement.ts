@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import InventoryManagements from "../infrastructure/schemas/InventoryManagement";
+import InventoryManagements from "../Infrastructure/schemas/InventoryManagement";
 
 interface InventoryItem {
   _id?: string;

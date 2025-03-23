@@ -6,7 +6,7 @@ import {
   getInventoryById,
   deleteInventoryManagement,
   updateInventory,
-} from "./application/InventoryManagement";
+} from "./Application/InventoryManagement";
 import { Request, Response } from "express";
 import { connectDB } from "./Infrastructure/db";
 import { resolve } from "path";
@@ -29,12 +29,12 @@ app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 
 app
-  .route("/Inventory")
+  .route("/inventory")
   .get(getAllInventoryManagement)
   .post(createInventoryManagement);
 
 app
-  .route("/Inventory/:id")
+  .route("/inventory/:id")
   .get(getInventoryById)
   .put(updateInventory)
   .delete(deleteInventoryManagement);
