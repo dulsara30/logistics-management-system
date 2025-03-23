@@ -13,6 +13,11 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
+import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx'
+import ItemsList from './pages/Return&DamageHandling/ItemList.jsx'
+import ReturnList from './pages/Return&DamageHandling/ReturnList.jsx'
+import ReturnForm from './pages/Return&DamageHandling/ReturnList.jsx'
+import DamageForm from './pages/Return&DamageHandling/DamageForm.jsx'
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx'
 import AddStaff from './pages/StaffManagement/SubPages/AddStaff.jsx'
 import AssignTask from './pages/StaffManagement/SubPages/AssignTask.jsx'
@@ -156,6 +161,13 @@ const router = createBrowserRouter([
                     <SupplierManagement/>
                   </ProtectedRoute>
                 ),
+                children: [
+                  {path: "Add-Supplier",
+                  element: ( 
+                    <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
+                        <AddSupplier/>
+                    </ProtectedRoute>),
+                ],
               },
               {
                 path:"returns",
@@ -164,6 +176,34 @@ const router = createBrowserRouter([
                     <ReturnDamageHandling/>
                   </ProtectedRoute>
                 ),
+                children: [
+                  {
+                     path: "Damage-Form",
+                     element: (
+                       <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                         <DamageForm/>
+                      </ProtectedRoute>
+                     ),
+                  },
+                  {
+                     path: "item-list/*",
+                     element: (
+                      <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                         <ItemsList/>
+                      </ProtectedRoute>
+                     ),
+                     children: [
+                       {
+                          path: "Return-Form",
+                          element: (
+                             <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager"]}>
+                               <ReturnForm/>
+                             </ProtectedRoute>
+                          ), 
+                       },
+                     ],  
+                  },
+                ],  
               },
               {
                 path:"help",

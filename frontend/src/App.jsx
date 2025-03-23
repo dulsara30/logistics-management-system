@@ -14,6 +14,7 @@ import SupplierManagement from './pages/SupplierManagement.jsx'
 import ReturnDamageHandling from './pages/ReturnDamageHandling.jsx'
 import Help from './pages/Help.jsx'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SupplierDetails from './pages/SupplierManagement/SupplierDetails.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
