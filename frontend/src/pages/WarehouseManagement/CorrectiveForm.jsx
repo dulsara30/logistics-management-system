@@ -14,6 +14,7 @@ import {
   Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const CombinedMaintenanceForm = () => {
   const navi = useNavigate();
@@ -61,6 +62,31 @@ const CombinedMaintenanceForm = () => {
     console.log("Form Submitted:", formData, "Items:", items);
     navigate("/CorrectiveSubmit");
   };
+
+
+
+  //warehouse varibale have the database data set
+  const [maintenance, setMaintenance] = React.useState([]);
+
+
+
+//getting data from backend
+React.useEffect(() => {
+
+  axios.post('http://localhost:8000/api/maintenance').then((response) => {
+
+    setMaintenance(response.data); // Set the data to state
+
+    }).catch((error) => {
+
+      console.error('Error fetching warehouse:', error);
+
+    });
+  },[])
+
+
+
+
 
   return (
     <Box sx={{ width: 600, margin: "auto", padding: 3, boxShadow: 3, bgcolor: "#FFFFFF", borderRadius: 2 }}>
