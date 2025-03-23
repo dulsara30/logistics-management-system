@@ -4,7 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -32,6 +32,8 @@ import logo from '../assets/Picture1.png';
 import PageContent from './PageContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import HeaderSec from './HeaderSec.jsx';
+import Breadcrumbs from './Breadcrumbs.jsx';
 
 
 const NAVIGATION = [
@@ -128,30 +130,11 @@ function DashboardLayout() {
         ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
-        {/* Header */}
-        <header className="h-20 bg-white shadow-sm flex items-center px-6 justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
-              {NAVIGATION.find(item => item.path === location.pathname)?.title || 'Dashboard'}
-            </h1>
-          </div>
-
-          <div className='flex p-5'>
-            <div className='p-3'>
-            <Avatar>H</Avatar>
-            </div>
-            <div className='p-3'>
-              <Badge badgeContent={4} color="primary">
-                <MailIcon color="action" />
-              </Badge>
-            </div>
-
-          </div>
-        </header>
-
+     <HeaderSec/>
+    
         {/* Page Content */}
         
-        <PageContent/>
+        <Outlet/>
       </main>
     </div>
   );
