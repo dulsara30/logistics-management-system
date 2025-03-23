@@ -17,7 +17,7 @@ import VehicleRegistrationForm from './pages/VehicleFleet/VehicleRegistration.js
 import Vehicleprofile from './pages/VehicleFleet/VehicleProfile.jsx'
 import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx'
 import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx'
-import "leaflet/dist/leaflet.css";
+//import "leaflet/dist/leaflet.css";
 
 const router = createBrowserRouter([
   {

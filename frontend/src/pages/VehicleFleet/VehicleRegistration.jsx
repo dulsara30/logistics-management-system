@@ -71,6 +71,7 @@ export default function VehicleRegistrationForm() {
       const response = await axios.post('http://localhost:8000/api/vehicles', vehicleData); // Adjust endpoint
       console.log('Vehicle created:', response.data);
       alert("Vehicle created successfully!");
+      window.location.href = "/fleet"; 
     } catch (error) {
       console.error('Error creating vehicle:', error);
       alert("Failed to create vehicle!");

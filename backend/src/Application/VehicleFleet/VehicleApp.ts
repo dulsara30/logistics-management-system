@@ -138,3 +138,22 @@ export const updateVehicleByID = async (vehicleId: string, updateData: object) =
 
 
 
+// delete vehicle by ID
+export const deleteVehicleByID = async (vehicleId: string) => {
+  
+  try {
+    const deleteResult = await Vehicle.deleteOne({ VehicleNumber: vehicleId });
+
+    if (deleteResult.deletedCount === 0) {
+      throw new Error('Vehicle not found or already deleted');
+    }
+
+    return { message: 'Vehicle deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting vehicle:', error);
+    throw error;
+  }
+};
+
+
+

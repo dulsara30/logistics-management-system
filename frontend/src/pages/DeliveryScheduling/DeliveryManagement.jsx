@@ -71,7 +71,6 @@ const DeliveryManagement = () => {
               <StyledTableCellHead>Pickup</StyledTableCellHead>
               <StyledTableCellHead>Destination</StyledTableCellHead>
               <StyledTableCellHead>Date</StyledTableCellHead>
-              <StyledTableCellHead>Vehicel Number</StyledTableCellHead>
               <StyledTableCellHead>Status</StyledTableCellHead>
             </TableRow>
           </StyledTableHead>
@@ -85,7 +84,6 @@ const DeliveryManagement = () => {
                 <TableCell>{row.pickupLocation}</TableCell>
                 <TableCell>{row.dropoffLocation}</TableCell>
                 <TableCell>{row.deliveryDate}</TableCell>
-                <TableCell>{row.vehicle}</TableCell>
                 <TableCell>
                   <Typography sx={{ color: getStatusColor(row.status), fontWeight: 500 }}>
                     {row.status}

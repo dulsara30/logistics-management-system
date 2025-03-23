@@ -1,6 +1,6 @@
 
 import express from 'express';
-import {createDeliverySchedule,getDeliverySchedules,getDeliveryScheduleById} from "../../Application/DeliveryScheduling/DeliveryApp"
+import {createDeliverySchedule,getDeliverySchedules,getDeliveryScheduleById,updateDeliveryScheduleById,deleteDeliveryScheduleByID} from "../../Application/DeliveryScheduling/DeliveryApp"
 
 
 const router = express.Router();
@@ -80,6 +80,38 @@ router.get('/Delivery/:Scheduleid', async (req, res) => {
     res.status(500).json({ message: "Error fetching schedule", error}); 
   }
 });
+
+
+//update delivery
+// Route to Update delivery schedule details
+
+router.put('/Delivery/:Scheduleid', async (req, res) => {
+
+  const { Scheduleid } = req.params; // Extract deliveryScheduleId from the route parameter
+  const updateData = req.body; // Extract the fields to be updated from the request body
+
+  try {
+    const result = await updateDeliveryScheduleById(Scheduleid, updateData); 
+    res.json(result); // Send a success message if the update is successful
+  } catch (error) {
+    res.status(500).json({ message: "Error updating delivery schedule", error });
+  }
+});
+
+
+// Delete delivery schedule by ID
+router.delete('/Delivery/:scheduleId', async (req, res) => {
+  const { scheduleId } = req.params; // Extract ScheduleID from the route parameter
+
+  try {
+    const result = await deleteDeliveryScheduleByID(scheduleId); // Call the delete service function
+    res.json(result); // Send a success message if deleted
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting delivery schedule', error });
+  }
+});
+
+
 
 
   export default router;

@@ -28,10 +28,7 @@ const deliveryScheduleSchema: Schema = new Schema(
       type: Number,
       required: true,
     },
-    vehicle: {
-      type: String,
-      default: null,
-    },
+
     driverName: {
       type: String,
       required: true,
@@ -65,6 +62,7 @@ const deliveryScheduleSchema: Schema = new Schema(
 
     status :{
         type : String,
+        default: 'In pending'
     }
   }
 );

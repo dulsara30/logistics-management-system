@@ -1,6 +1,6 @@
 
 import express from 'express';
-import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
+import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID,deleteVehicleByID} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
 
 const router = express.Router();
 
@@ -97,6 +97,20 @@ router.put('/vehicles/:vehicleId', async (req, res) => {
     res.status(500).json({ message: "Error updating vehicle", error });
   }
 });
+
+
+// Delete vehicle by ID
+router.delete('/vehicles/:vehicleId', async (req, res) => {
+  const { vehicleId } = req.params; // Extract vehicleId from the route parameter
+
+  try {
+    const result = await deleteVehicleByID(vehicleId); // Call your delete function
+    res.json(result); // Send a success message if deleted
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting vehicle', error });
+  }
+});
+
 
 
 

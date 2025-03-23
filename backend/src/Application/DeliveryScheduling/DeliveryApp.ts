@@ -19,7 +19,7 @@ export const createDeliverySchedule = async (
   pickupLongitude: number | null,
   dropoffLatitude: number | null,
   dropoffLongitude: number | null,
-  status : string
+  status : string = "pending"
 
 ) => {
   try {
@@ -51,7 +51,7 @@ export const createDeliverySchedule = async (
       pickupLongitude,
       dropoffLatitude,
       dropoffLongitude,
-      status
+      status 
     });
 
     // Save the new delivery schedule to the database and return the result
@@ -96,3 +96,41 @@ export const getDeliveryScheduleById = (deliveryScheduleId: string): any => {
       throw new Error("Error retrieving delivery schedule");
     });
 };
+
+
+// Update delivery schedule details
+export const updateDeliveryScheduleById = async (deliveryScheduleId: string, updateData: object) => {
+  try {
+    const updateResult = await deliveryScheduleSchema.updateOne(
+      { deliveryScheduleId },
+      { $set: updateData }
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      throw new Error('Delivery schedule not found or no changes made');
+    }
+
+    return { message: 'Delivery schedule updated successfully' };
+  } catch (error) {
+    console.error('Error updating delivery schedule:', error);
+    throw error;
+  }
+};
+
+
+// delete delivery schedule by ID
+export const deleteDeliveryScheduleByID = async (scheduleId: string) => {
+  try {
+    const deleteResult = await deliveryScheduleSchema.deleteOne({ deliveryScheduleId: scheduleId });
+
+    if (deleteResult.deletedCount === 0) {
+      throw new Error('Delivery schedule not found or already deleted');
+    }
+
+    return { message: 'Delivery schedule deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting delivery schedule:', error);
+    throw error;
+  }
+};
+

@@ -31,6 +31,25 @@ export default function VehicleProfile() {
     setEditMode(!editMode);
   };
 
+
+  const handleDelete = async () => {
+      
+    const confirmDelete = window.confirm("Are you sure you want to delete this vehicle?");
+    if (!confirmDelete) return;
+  
+    try {
+     
+      await axios.delete(`http://localhost:8000/api/vehicles/${VehicleNumber}`);
+      alert("Vehicle deleted successfully.");
+      
+      // Redirect user after deletion 
+      window.location.href = "/fleet"; 
+    } catch (error) {
+      alert("Error deleting vehicle: " + error);
+    }
+  };
+  
+
   // Handle Save with validation
   const handleSave = async () => {
     const errors = {};
@@ -55,6 +74,8 @@ export default function VehicleProfile() {
       setErrorMessages(filteredErrors);
       return; // Stop the save process if there are errors
     }
+
+  
 
     try {
       // Send the updated vehicle data to the backend
@@ -283,6 +304,16 @@ export default function VehicleProfile() {
             </Button>
           </>
         )}
+
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleDelete}
+          sx={{ ml: 2 }}
+        >
+          Delete Vehicle
+        </Button>
+
       </Box>
     </Paper>
   );

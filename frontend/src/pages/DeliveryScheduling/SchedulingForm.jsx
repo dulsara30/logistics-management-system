@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   TextField,
   Button,
+  Grid,
+  Typography,
+  FormControl,
   Select,
   MenuItem,
   InputLabel,
-  FormControl,
-  Typography,
-  Grid,
 } from "@mui/material";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { styled } from "@mui/material/styles";
-import validateForm from './ScheduleValidation';
+import axios from 'axios';
 
 const NewDeliverySchedule = () => {
   const [formData, setFormData] = useState({
@@ -23,56 +21,34 @@ const NewDeliverySchedule = () => {
     packageType: "",
     quantity: "",
     vehicle: "",
-    driver: "",
+    driverName: "",
+    driverUsername: "",
     specialInstructions: "",
-    pickupLatitude: null,
-    pickupLongitude: null,
-    dropoffLatitude: null,
-    dropoffLongitude: null,
+    pickupLatitude: 6.9271,
+    pickupLongitude: 79.8612,
+    dropoffLatitude: 6.9271,
+    dropoffLongitude: 79.8612,
   });
 
-  const [validationErrors, setValidationErrors] = useState({});
-
-  const StyledTextField = styled(TextField)(({ theme }) => ({
-    "& .MuiInputBase-root": {
-      backgroundColor: "#f7f7f7",
-      borderRadius: "10px",
-    },
-    "& .MuiInputLabel-root": {
-      color: "#333",
-    },
-    "& .Mui-disabled": {
-      color: "#666",
-    },
-  }));
-
-
+  const drivers = [
+    { driverName: "Driver A", driverUsername: "driver_a" },
+    { driverName: "Driver B", driverUsername: "driver_b" },
+    { driverName: "Driver C", driverUsername: "driver_c" },
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-  
-
-
-    const errors = validateForm(formData); // Assuming validateForm returns an error object
-   
-   
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      return;
-    }
-
-    try {
-      const response = await axios.post("http://localhost:8000/api//Delivery", formData);
-      console.log("Delivery Schedule Submitted:", response.data);
-      // Optionally reset form or show success message here
-    } catch (error) {
-      console.error("Error submitting delivery schedule:", error);
+    if (name === "driverName") {
+      // Find the selected driver by username
+      const selectedDriver = drivers.find((driver) => driver.driverUsername === value);
+      setFormData((prevData) => ({
+        ...prevData,
+        driverName: selectedDriver.driverName,
+        driverUsername: selectedDriver.driverUsername, // Store both the name and username
+      }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
@@ -84,6 +60,7 @@ const NewDeliverySchedule = () => {
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results[0]) {
         const address = results[0].formatted_address;
+
         if (isPickup) {
           setFormData({
             ...formData,
@@ -103,157 +80,147 @@ const NewDeliverySchedule = () => {
     });
   };
 
+  const handleSubmit = () => {
+    axios.post("http://localhost:8000/api/Delivery", formData)
+      .then(() => {
+        alert("Delivery schedule created successfully");
+        window.location.href = "/Delivery";
+      })
+      .catch((error) => {
+        console.error("Error creating delivery schedule:", error);
+      });
+  };
+
+  const formattedDeliveryDate = formData.deliveryDate
+    ? new Date(formData.deliveryDate).toISOString().slice(0, 16)
+    : "";
+
   return (
-    <form onSubmit={handleSubmit} style={{ padding: 20 }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: "#333" }}>
-        Delivery Schedule
+    <form style={{ padding: 20 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#333', mb: 4 }}>
+        Create Delivery Schedule
       </Typography>
 
       <Grid container spacing={2}>
+        {/* Pickup Location */}
         <Grid item xs={12} sm={6}>
-          <StyledTextField
+          <TextField
             label="Pickup Location"
             name="pickupLocation"
             fullWidth
             value={formData.pickupLocation}
             onChange={handleChange}
-            helperText={validationErrors.pickupLocation}
+            multiline
+            rows={2}
           />
         </Grid>
 
+        {/* Drop-off Location */}
         <Grid item xs={12} sm={6}>
-          <StyledTextField
+          <TextField
             label="Drop-off Location"
             name="dropoffLocation"
             fullWidth
             value={formData.dropoffLocation}
             onChange={handleChange}
-            helperText={validationErrors.dropoffLocation}
+            multiline
+            rows={2}
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle1" sx={{ color: "darkgrey" }}>
-            Select Pickup Location
-          </Typography>
+        {/* Google Map for Pickup Location */}
+        <Grid item xs={12} sm={6} style={{ height: "400px" }}>
           <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
             <GoogleMap
-              mapContainerStyle={{ width: "100%", height: "400px" }}
-              center={{
-                lat: formData.pickupLatitude || 6.9271,
-                lng: formData.pickupLongitude || 79.8612,
-              }}
-              zoom={12}
+              mapContainerStyle={{ width: "100%", height: "100%" }}
+              center={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }}
+              zoom={14}
               onClick={(event) => handleMapClick(event, true)}
             >
-              {formData.pickupLatitude && formData.pickupLongitude && (
-                <Marker position={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }} />
-              )}
+              <Marker position={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }} />
             </GoogleMap>
           </LoadScript>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle1" sx={{ color: "darkgrey" }}>
-            Select Drop-off Location
-          </Typography>
+        {/* Google Map for Dropoff Location */}
+        <Grid item xs={12} sm={6} style={{ height: "400px" }}>
           <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
             <GoogleMap
-              mapContainerStyle={{ width: "100%", height: "400px" }}
-              center={{
-                lat: formData.dropoffLatitude || 6.9271,
-                lng: formData.dropoffLongitude || 79.8612,
-              }}
-              zoom={12}
+              mapContainerStyle={{ width: "100%", height: "100%" }}
+              center={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }}
+              zoom={14}
               onClick={(event) => handleMapClick(event, false)}
             >
-              {formData.dropoffLatitude && formData.dropoffLongitude && (
-                <Marker position={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }} />
-              )}
+              <Marker position={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }} />
             </GoogleMap>
           </LoadScript>
         </Grid>
 
+        {/* Delivery Date and Time */}
         <Grid item xs={12}>
-          <StyledTextField
+          <TextField
             label="Expected Delivery Date & Time"
             type="datetime-local"
             name="deliveryDate"
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={formData.deliveryDate}
+            value={formattedDeliveryDate}
             onChange={handleChange}
-            helperText={validationErrors.deliveryDate}
+            inputProps={{
+              min: new Date().toISOString().slice(0, 16), // Set min value to the current date and time
+            }}
           />
         </Grid>
 
+        {/* Package Type */}
         <Grid item xs={12}>
-          <StyledTextField
+          <TextField
             label="Package Type"
             name="packageType"
             fullWidth
             value={formData.packageType}
             onChange={handleChange}
-            helperText={validationErrors.packageType}
           />
         </Grid>
 
+        {/* Quantity */}
         <Grid item xs={12}>
-          <StyledTextField
+          <TextField
             label="Quantity"
             type="number"
             name="quantity"
             fullWidth
             value={formData.quantity}
             onChange={handleChange}
-            helperText={validationErrors.quantity}
           />
         </Grid>
 
+        {/* Driver Selection */}
         <Grid item xs={12}>
-          <FormControl fullWidth>
-            <InputLabel>Driver</InputLabel>
-            <Select
-              name="driver"
-              value={formData.driver}
-              onChange={handleChange}
-              label="Driver"
-              helperText={validationErrors.driver}
-            >
-              <MenuItem value="Driver A">Driver A</MenuItem>
-              <MenuItem value="Driver B">Driver B</MenuItem>
-              <MenuItem value="Driver C">Driver C</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12}>
-          <StyledTextField
-            label="Special Instructions"
-            name="specialInstructions"
-            fullWidth
-            multiline
-            rows={3}
-            value={formData.specialInstructions}
+        <FormControl fullWidth>
+          <InputLabel>Driver</InputLabel>
+          <Select
+            name="driverName"
+            label="Driver"
+            value={formData.driverUsername} 
             onChange={handleChange}
-            helperText={validationErrors.specialInstructions}
-          />
+          >
+            {drivers.map((driver) => (
+              <MenuItem key={driver.driverUsername} value={driver.driverUsername}> 
+                {driver.driverName} ({driver.driverUsername})
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         </Grid>
 
-        <Grid item xs={12}>
+        {/* Submit Button */}
+        <Grid item xs={12} display="flex" justifyContent="space-between">
           <Button
             variant="contained"
-            type="submit"
-
-            sx={{
-              background: "linear-gradient(to right, #8e2de2, #4a00e0)",
-              color: "white",
-              "&:hover": {
-                background: "linear-gradient(to right, #4a00e0, #8e2de2)",
-              },
-            }}
+            onClick={handleSubmit}
           >
-            Submit Delivery Schedule
+            Create Delivery Schedule
           </Button>
         </Grid>
       </Grid>
