@@ -221,10 +221,11 @@ function AddStaff() {
           <div className="space-y-2">
             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name *</label>
             <input
+              type='text'
               id="fullName"
               value={staff.fullName}
               onChange={handleInputChange}
-              placeholder="John Smith"
+              placeholder="Enter the name..."
               required
               className={`w-full border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
             />
@@ -239,11 +240,12 @@ function AddStaff() {
               type="email"
               value={staff.email}
               onChange={handleInputChange}
-              placeholder="john.smith@example.com"
+              placeholder="Enter valid email "
               required
               className={`w-full border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            <p className="text-xs text-gray-500">Login credential send to this emails</p>
           </div>
 
           {/* Phone Number */}

@@ -83,7 +83,7 @@ function HeaderSec(){
 
                   <div className='flex p-5'>
                     <div className='p-3'>
-                      <Link to={"profile"}>
+                      <Link to={"/dashboard/profile"}>
                     <Avatar>{firstLetter}</Avatar>
                     </Link>
                     </div>

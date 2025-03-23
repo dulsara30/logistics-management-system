@@ -84,7 +84,7 @@ function ManageStaff() {
     };
 
     getStaff();
-  }, []);
+  }, [navigate]);
 
   // Apply filters when searchTerm, warehouseFilter, or status changes
   useEffect(() => {

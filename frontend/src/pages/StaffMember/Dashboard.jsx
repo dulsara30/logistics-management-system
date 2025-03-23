@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom'; // Removed Navigate since it's not used
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'; // Removed Navigate since it's not used
 import {
   UserCircle,
   Calendar,
@@ -18,42 +18,42 @@ const quickAccessCards = [
     icon: UserCircle,
     title: 'profile',
     description: 'View and edit your profile',
-    path: '/profile',
+    path: 'profile',
     color: 'from-purple-500 to-violet-600',
   },
   {
     icon: Calendar,
     title: 'Request Leave',
     description: 'Submit leave requests',
-    path: '/leave-request',
+    path: 'leave-request',
     color: 'from-blue-500 to-cyan-600',
   },
   {
     icon: FileText,
     title: 'Pay Sheet',
     description: 'Access your payslips',
-    path: '/paysheet',
+    path: 'paysheet',
     color: 'from-emerald-500 to-teal-600',
   },
   {
     icon: MessageSquare,
     title: 'Any Concern',
     description: 'Chat with management',
-    path: '/concerns',
+    path: 'concerns',
     color: 'from-orange-500 to-red-600',
   },
   {
     icon: QrCode,
     title: 'My QR',
     description: 'View attendance QR code',
-    path: '/my-qr',
+    path: 'my-qr',
     color: 'from-pink-500 to-rose-600',
   },
   {
     icon: Package,
     title: 'Something',
     description: 'Coming soon',
-    path: '/something',
+    path: 'something',
     color: 'from-gray-500 to-slate-600',
   },
 ];
@@ -127,8 +127,16 @@ export default function Dashboard() {
     return <div className="text-center py-4 text-red-600">Error: {error}</div>;
   }
 
+  const location = useLocation();
+
+  const isBaseRoute = location.pathname === "/dashboard";
+
   return (
     <div className="px-8 py-5">
+
+    {isBaseRoute && (
+
+   <div>
       <div>
         <h1 className="text-3xl font-bold">Welcome back, {fullName} 👋</h1>
         <p className="text-gray-600 mt-2">Here's what's happening today.</p>
@@ -138,7 +146,7 @@ export default function Dashboard() {
         {quickAccessCards.map((card) => (
           <Link
             key={card.title}
-            to={card.path}
+            to={`/dashboard/${card.path}`}
             className="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
           >
             <div
@@ -193,6 +201,10 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+      </div>
+       )};
+      
+       
       <main>
         <Outlet/>
       </main>
