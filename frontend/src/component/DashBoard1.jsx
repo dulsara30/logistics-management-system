@@ -36,6 +36,7 @@ import Box from '@mui/material/Box';
 import HeaderSec from './HeaderSec.jsx';
 import Breadcrumbs from './Breadcrumbs.jsx';
 
+
 const NAVIGATION = [
   { path: '/', title: 'Dashboard', icon: LayoutDashboard },
   { path: '/warehouse', title: 'Warehouse Management', icon: Warehouse },
@@ -50,8 +51,36 @@ const NAVIGATION = [
 
 function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [fullName, setFullName] = useState();
   const location = useLocation();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if(!token){
+      navigate("/login");
+      return;
+    }
+
+    try{
+      const decoded = jwtDecode(token);
+      if(!decoded.fullName) {
+        alert("Somthing went wrong. Please try again");
+        navigate("/login");
+        return;
+      }
+
+      setFullName(decoded.fullName);
+    }catch(err){
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      navigate("/login");
+    }
+
+  }, [navigate]);
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,35 +110,47 @@ function DashboardLayout() {
         
         {/* Navigation */}
         <nav className="p-4 space-y-2">
-          {NAVIGATION.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`
-                  w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                  ${isActive 
-                    ? 'bg-blue-50 text-blue-600' 
-                    : 'text-gray-600 hover:bg-gray-50'
-                  }
-                `}
-              >
-                <Box display="flex" alignItems="flex-start" gap={2}>  
-                  <Icon size={28} color={isActive ? "#1976d2" : "#6b7280"} />
-                  <Typography 
-                    variant="subtitle1" 
-                    fontWeight={isActive ? 'bold' : 'medium'} 
-                    color={isActive ? 'primary' : 'text.secondary'}
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    {item.title}
-                  </Typography>
-                </Box>
-              </button>
-            );
-          })}
+
+         
+
+            {NAVIGATION.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`
+                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
+                    ${isActive 
+                      ? 'bg-blue-50 text-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50'
+                    }
+                  `}
+                >
+
+              
+                 <Box display="flex" alignItems="flex-start" gap={2}>  
+                      <Icon size={28} color={isActive ? "#1976d2" : "#6b7280"} />
+
+                      <Typography 
+                        variant="subtitle1" 
+                        fontWeight={isActive ? 'bold' : 'medium'} 
+                        color={isActive ? 'primary' : 'text.secondary'}
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {item.title}
+                      </Typography>
+
+                 
+                  </Box>
+               
+                </button>
+              );
+            })}
+
+          
         </nav>
       </aside>
 

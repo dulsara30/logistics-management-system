@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Download, Eye, Search, Pencil, User, Briefcase, 
-  DollarSign, CreditCard, X, ChevronDown, ArrowLeft
+  Download, Eye, Search, Pencil, User, Briefcase, CreditCard, X, ChevronDown, ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,10 +8,9 @@ import { useNavigate } from 'react-router-dom';
 const salaryData = [
   { 
     id: '001', 
-    employee: 'John Smith', 
-    position: 'Manager', 
-    department: 'Operations',
-    email: 'john.smith@company.com',
+    employee: 'Dulsara Manakal', 
+    position: 'Warehouse Manager', 
+    email: 'dulsaramanakal@gmail.com',
     joinDate: '12 Jan 2022',
     basicSalary: 5000, 
     bonuses: 800, 
@@ -21,10 +19,9 @@ const salaryData = [
   },
   { 
     id: '002', 
-    employee: 'Sarah Johnson', 
-    position: 'Team Lead', 
-    department: 'Development',
-    email: 'sarah.johnson@company.com',
+    employee: 'Thisaru Yasanjith', 
+    position: 'Business Owner', 
+    email: 'yasanjith365@gmail.com',
     joinDate: '03 Mar 2022',
     basicSalary: 4000, 
     bonuses: 500, 
@@ -33,10 +30,9 @@ const salaryData = [
   },
   { 
     id: '003', 
-    employee: 'David Lee', 
-    position: 'Associate', 
-    department: 'Marketing',
-    email: 'david.lee@company.com',
+    employee: 'Janeesha Malshani', 
+    position: 'Driver', 
+    email: 'janeeshamalshani@gmail.com',
     joinDate: '18 Jul 2023',
     basicSalary: 3200, 
     bonuses: 200, 
@@ -45,10 +41,9 @@ const salaryData = [
   },
   { 
     id: '004', 
-    employee: 'Emma Davis', 
-    position: 'Senior Manager', 
-    department: 'Human Resources',
-    email: 'emma.davis@company.com',
+    employee: 'Kavindya Liyanaarachchi', 
+    position: 'Other Staff', 
+    email: 'kavindyaliayanaarachchi@gmail.com',
     joinDate: '05 Apr 2021',
     basicSalary: 6000, 
     bonuses: 1000, 
@@ -57,10 +52,9 @@ const salaryData = [
   },
   { 
     id: '005', 
-    employee: 'Michael Brown', 
-    position: 'Associate', 
-    department: 'Finance',
-    email: 'michael.brown@company.com',
+    employee: 'Dilani Kanchana', 
+    position: 'Inventory Manager', 
+    email: 'dilanikanchana@gmail.com',
     joinDate: '22 Sep 2023',
     basicSalary: 3200, 
     bonuses: 300, 
@@ -225,7 +219,6 @@ const navigate = useNavigate();
         <h1 className="text-2xl font-bold text-gray-900">Manage Salary</h1>
         <div className="flex gap-2">
           <button className="bg-gradient-to-r from-violet-500 to-violet-700 hover:from-violet-600 hover:to-violet-800 text-white px-4 py-2 rounded-lg flex items-center">
-            <DollarSign className="mr-2 h-4 w-4" />
             Process Payroll
           </button>
         </div>
@@ -393,7 +386,7 @@ const navigate = useNavigate();
                           <div className="p-4">
                             <div className="flex items-center gap-3">
                               <div className="bg-violet-100 p-2 rounded-lg">
-                                <DollarSign className="h-5 w-5 text-violet-600" />
+                                
                               </div>
                               <div>
                                 <p className="text-sm text-gray-500">Basic Salary</p>
@@ -457,7 +450,7 @@ const navigate = useNavigate();
                         <div className="space-y-3">
                           <h3 className="font-medium text-gray-900 flex items-center">
                             <span className="bg-green-100 p-1 rounded-md mr-2">
-                              <DollarSign className="h-4 w-4 text-green-600" />
+                             
                             </span>
                             Earnings
                           </h3>

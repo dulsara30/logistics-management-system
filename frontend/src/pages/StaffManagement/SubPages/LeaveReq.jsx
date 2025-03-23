@@ -28,7 +28,7 @@ const StatusBadge = ({ status }) => {
 const leaveRequestsData = [
   { 
     id: '1', 
-    employee: 'John Smith', 
+    employee: 'Dulsara Manakal', 
     type: 'Annual', 
     startDate: new Date('2023-07-15'), 
     endDate: new Date('2023-07-20'), 
@@ -38,7 +38,7 @@ const leaveRequestsData = [
   },
   { 
     id: '2', 
-    employee: 'Sarah Johnson', 
+    employee: 'Thisaru Yasanjith', 
     type: 'Sick', 
     startDate: new Date('2023-07-10'), 
     endDate: new Date('2023-07-12'), 
@@ -48,7 +48,7 @@ const leaveRequestsData = [
   },
   { 
     id: '3', 
-    employee: 'David Lee', 
+    employee: 'Janeesha Malshani', 
     type: 'Unpaid', 
     startDate: new Date('2023-07-05'), 
     endDate: new Date('2023-07-09'), 
@@ -58,7 +58,7 @@ const leaveRequestsData = [
   },
   { 
     id: '4', 
-    employee: 'Emma Davis', 
+    employee: 'Kavindya Liyanaarachchi', 
     type: 'Annual', 
     startDate: new Date('2023-07-25'), 
     endDate: new Date('2023-07-27'), 
@@ -68,7 +68,7 @@ const leaveRequestsData = [
   },
   { 
     id: '5', 
-    employee: 'Michael Brown', 
+    employee: 'Dilani Kanchana', 
     type: 'Sick', 
     startDate: new Date('2023-07-17'), 
     endDate: new Date('2023-07-18'), 

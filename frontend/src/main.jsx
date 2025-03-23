@@ -167,6 +167,7 @@ const router = createBrowserRouter([
                     <ProtectedRoute allowedRoles={["Bussiness Owner", "Warehouse Manager", "Inventory Manager"]}>
                         <AddSupplier/>
                     </ProtectedRoute>),
+                  }, 
                 ],
               },
               {
