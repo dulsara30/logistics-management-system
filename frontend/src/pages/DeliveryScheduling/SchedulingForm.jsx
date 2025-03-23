@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   TextField,
   Button,
@@ -10,7 +11,8 @@ import {
   Grid,
 } from "@mui/material";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
+import validateForm from './ScheduleValidation';
 
 const NewDeliverySchedule = () => {
   const [formData, setFormData] = useState({
@@ -29,44 +31,59 @@ const NewDeliverySchedule = () => {
     dropoffLongitude: null,
   });
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiInputBase-root': {
-      backgroundColor: '#f7f7f7',
-      borderRadius: '10px',
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const StyledTextField = styled(TextField)(({ theme }) => ({
+    "& .MuiInputBase-root": {
+      backgroundColor: "#f7f7f7",
+      borderRadius: "10px",
     },
-    '& .MuiInputLabel-root': {
-      color: '#333',
+    "& .MuiInputLabel-root": {
+      color: "#333",
     },
-    '& .Mui-disabled': {
-      color: '#666',
+    "& .Mui-disabled": {
+      color: "#666",
     },
   }));
-  
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
-    // You can send the formData to backend API here
+
+  
+
+
+    const errors = validateForm(formData); // Assuming validateForm returns an error object
+   
+   
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:8000/api//Delivery", formData);
+      console.log("Delivery Schedule Submitted:", response.data);
+      // Optionally reset form or show success message here
+    } catch (error) {
+      console.error("Error submitting delivery schedule:", error);
+    }
   };
 
-  // Handle the map click to update coordinates and location name
   const handleMapClick = (event, isPickup) => {
-
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     const geocoder = new window.google.maps.Geocoder();
 
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-
       if (status === "OK" && results[0]) {
-
         const address = results[0].formatted_address;
-
         if (isPickup) {
           setFormData({
             ...formData,
@@ -88,13 +105,11 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 
   return (
     <form onSubmit={handleSubmit} style={{ padding: 20 }}>
-
-    <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#333' }}>
-          Delivery Schedule
-    </Typography>
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: "#333" }}>
+        Delivery Schedule
+      </Typography>
 
       <Grid container spacing={2}>
-        {/* Pickup Location */}
         <Grid item xs={12} sm={6}>
           <StyledTextField
             label="Pickup Location"
@@ -102,11 +117,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             fullWidth
             value={formData.pickupLocation}
             onChange={handleChange}
-            sx={{ borderRadius: "4px" }}
+            helperText={validationErrors.pickupLocation}
           />
         </Grid>
 
-        {/* Drop-off Location */}
         <Grid item xs={12} sm={6}>
           <StyledTextField
             label="Drop-off Location"
@@ -114,11 +128,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             fullWidth
             value={formData.dropoffLocation}
             onChange={handleChange}
-            sx={{ borderRadius: "4px" }}
+            helperText={validationErrors.dropoffLocation}
           />
         </Grid>
 
-        {/* Map for Pickup Location */}
         <Grid item xs={12} sm={6}>
           <Typography variant="subtitle1" sx={{ color: "darkgrey" }}>
             Select Pickup Location
@@ -131,21 +144,15 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
                 lng: formData.pickupLongitude || 79.8612,
               }}
               zoom={12}
-              onClick={(event) => handleMapClick(event, true)} // True for pickup
+              onClick={(event) => handleMapClick(event, true)}
             >
               {formData.pickupLatitude && formData.pickupLongitude && (
-                <Marker
-                  position={{
-                    lat: formData.pickupLatitude,
-                    lng: formData.pickupLongitude,
-                  }}
-                />
+                <Marker position={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }} />
               )}
             </GoogleMap>
           </LoadScript>
         </Grid>
 
-        {/* Map for Drop-off Location */}
         <Grid item xs={12} sm={6}>
           <Typography variant="subtitle1" sx={{ color: "darkgrey" }}>
             Select Drop-off Location
@@ -158,22 +165,15 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
                 lng: formData.dropoffLongitude || 79.8612,
               }}
               zoom={12}
-              onClick={(event) => handleMapClick(event, false)} // False for dropoff
+              onClick={(event) => handleMapClick(event, false)}
             >
               {formData.dropoffLatitude && formData.dropoffLongitude && (
-                <Marker
-                  position={{
-                    lat: formData.dropoffLatitude,
-                    lng: formData.dropoffLongitude,
-                  }}
-                />
+                <Marker position={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }} />
               )}
             </GoogleMap>
           </LoadScript>
         </Grid>
 
-
-        {/* Delivery Date and Time */}
         <Grid item xs={12}>
           <StyledTextField
             label="Expected Delivery Date & Time"
@@ -183,11 +183,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             InputLabelProps={{ shrink: true }}
             value={formData.deliveryDate}
             onChange={handleChange}
-            sx={{  borderRadius: "4px" }}
+            helperText={validationErrors.deliveryDate}
           />
         </Grid>
 
-        {/* Package Type */}
         <Grid item xs={12}>
           <StyledTextField
             label="Package Type"
@@ -195,11 +194,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             fullWidth
             value={formData.packageType}
             onChange={handleChange}
-            sx={{ borderRadius: "4px" }}
+            helperText={validationErrors.packageType}
           />
         </Grid>
 
-        {/* Quantity */}
         <Grid item xs={12}>
           <StyledTextField
             label="Quantity"
@@ -208,20 +206,19 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             fullWidth
             value={formData.quantity}
             onChange={handleChange}
-            sx={{  borderRadius: "4px" }}
+            helperText={validationErrors.quantity}
           />
         </Grid>
 
-        {/* Driver Selection */}
         <Grid item xs={12}>
-          <FormControl fullWidth sx={{  borderRadius: "4px" }}>
+          <FormControl fullWidth>
             <InputLabel>Driver</InputLabel>
             <Select
               name="driver"
               value={formData.driver}
               onChange={handleChange}
               label="Driver"
-              sx={{borderRadius: "4px"}}
+              helperText={validationErrors.driver}
             >
               <MenuItem value="Driver A">Driver A</MenuItem>
               <MenuItem value="Driver B">Driver B</MenuItem>
@@ -230,7 +227,6 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
           </FormControl>
         </Grid>
 
-        {/* Special Instructions */}
         <Grid item xs={12}>
           <StyledTextField
             label="Special Instructions"
@@ -240,15 +236,15 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
             rows={3}
             value={formData.specialInstructions}
             onChange={handleChange}
-            sx={{ borderRadius: "4px" }}
+            helperText={validationErrors.specialInstructions}
           />
         </Grid>
 
-        {/* Submit Button */}
         <Grid item xs={12}>
           <Button
             variant="contained"
             type="submit"
+
             sx={{
               background: "linear-gradient(to right, #8e2de2, #4a00e0)",
               color: "white",
