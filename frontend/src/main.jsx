@@ -228,7 +228,7 @@ const router = createBrowserRouter([
             ),
             children: [
               {
-                path: "profile",
+                path: "profile/:id",
                 element: (
                   <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
                     <Profile />

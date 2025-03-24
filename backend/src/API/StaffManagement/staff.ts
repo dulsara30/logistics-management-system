@@ -6,6 +6,7 @@ import { authenticateToken, authorizeRole } from "../../middleware/authenticatio
 
 
 const staffRouter = express.Router();
+const staffLogin = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -33,6 +34,9 @@ const upload = multer({
 staffRouter.route("/manage-staff").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager" ]), getAllStaff);
 staffRouter.route("/add-staff").post(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager"]),  upload.single("profilePic"), addStaff);
 staffRouter.route("/manage-staff/:id").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager" ]), getStaffById).put(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), updateStaff).delete( authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager" ]), deleteStaff);
+staffLogin.route("/profile/id").get(authenticateToken, authorizeRole(["Driver","Maintenance Staff","Other Staff"]), getStaffById);
+staffRouter.route("/profile/id").put(authenticateToken, authorizeRole(["Driver","Maintenance Staff","Other Staff"]),  upload.single("profilePic"), updateStaff);
+
 /*staffRouter.route("/manage-staff/:id").delete(deleteStaff);*/
 
 export default staffRouter;

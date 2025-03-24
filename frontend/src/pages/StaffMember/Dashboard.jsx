@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'; // Removed Navigate since it's not used
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   UserCircle,
   Calendar,
@@ -13,12 +13,13 @@ import {
 } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
-const quickAccessCards = [
+// Define the quickAccessCards array without the dynamic path for now
+const quickAccessCardsBase = [
   {
     icon: UserCircle,
-    title: 'profile',
+    title: 'Profile',
     description: 'View and edit your profile',
-    path: 'profile',
+    path: 'profile', // We'll append the ID dynamically in the component
     color: 'from-purple-500 to-violet-600',
   },
   {
@@ -80,10 +81,11 @@ const tasks = [
 ];
 
 export default function Dashboard() {
-  // Move hooks inside the component
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState(null);
   const [fullName, setFullName] = useState('');
+  const [userId, setUserId] = useState(''); // New state to store the user ID
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function Dashboard() {
 
       if (!token) {
         setError("You must be logged in to view this page");
-        navigate("/login");
+        navigate("/login", { replace: true });
         return;
       }
 
@@ -104,13 +106,17 @@ export default function Dashboard() {
         if (!decoded.fullName) {
           throw new Error("Full name not found in token");
         }
+        if (!decoded.id) {
+          throw new Error("User ID not found in token");
+        }
         setFullName(decoded.fullName);
+        setUserId(decoded.id); // Store the user ID in state
       } catch (err) {
         console.error("Error decoding token:", err);
         setError("Invalid token");
         localStorage.removeItem("token");
         localStorage.removeItem("role");
-        navigate("/login");
+        navigate("/login", { replace: true });
       } finally {
         setIsLoading(false);
       }
@@ -119,94 +125,109 @@ export default function Dashboard() {
     getUserData();
   }, [navigate]);
 
+  // Early returns after all Hooks are called
   if (isLoading) {
-    return <div className="text-center py-4">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-gray-600 text-lg">Loading...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-4 text-red-600">Error: {error}</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-600 text-lg">Error: {error}</div>
+      </div>
+    );
   }
 
-  const location = useLocation();
+  // Create a new quickAccessCards array with the dynamic profile path
+  const quickAccessCards = quickAccessCardsBase.map(card => {
+    if (card.title === 'Profile') {
+      return {
+        ...card,
+        path: `profile/${userId}`, // Append the user ID to the profile path
+      };
+    }
+    return card;
+  });
 
   const isBaseRoute = location.pathname === "/dashboard";
 
   return (
     <div className="px-8 py-5">
+      {isBaseRoute && (
+        <div>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-800">Welcome back, {fullName} 👋</h1>
+            <p className="text-gray-600 mt-2">Here's what's happening today.</p>
+          </div>
 
-    {isBaseRoute && (
-
-   <div>
-      <div>
-        <h1 className="text-3xl font-bold">Welcome back, {fullName} 👋</h1>
-        <p className="text-gray-600 mt-2">Here's what's happening today.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {quickAccessCards.map((card) => (
-          <Link
-            key={card.title}
-            to={`/dashboard/${card.path}`}
-            className="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div
-              className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${card.color}`}
-            >
-              <card.icon className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">{card.title}</h3>
-            <p className="mt-1 text-sm text-gray-600">{card.description}</p>
-          </Link>
-        ))}
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Daily Tasks</h2>
-          <Link
-            to="/tasks"
-            className="text-sm text-blue-600 hover:text-blue-700"
-          >
-            See More
-          </Link>
-        </div>
-
-        <div className="space-y-4">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                {task.status === 'completed' ? (
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                ) : (
-                  <Clock className="w-5 h-5 text-orange-500" />
-                )}
-                <div>
-                  <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-gray-500">{task.time}</p>
-                </div>
-              </div>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  task.status === 'completed'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-orange-100 text-orange-700'
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {quickAccessCards.map((card) => (
+              <Link
+                key={card.title}
+                to={`/dashboard/${card.path}`}
+                className="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200"
               >
-                {task.status}
-              </span>
+                <div
+                  className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${card.color}`}
+                >
+                  <card.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-gray-800">{card.title}</h3>
+                <p className="mt-1 text-sm text-gray-600">{card.description}</p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-6 mt-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">Daily Tasks</h2>
+              <Link
+                to="/tasks"
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                See More
+              </Link>
             </div>
-          ))}
+
+            <div className="space-y-4">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    {task.status === 'completed' ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Clock className="w-5 h-5 text-orange-500" />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-800">{task.title}</p>
+                      <p className="text-sm text-gray-500">{task.time}</p>
+                    </div>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      task.status === 'completed'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-orange-100 text-orange-700'
+                    }`}
+                  >
+                    {task.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
-       )};
+      )}
       
-       
       <main>
-        <Outlet/>
+        <Outlet />
       </main>
     </div>
   );
