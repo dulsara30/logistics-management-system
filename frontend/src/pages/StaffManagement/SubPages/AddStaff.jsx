@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Upload, X, ArrowLeft, Calendar, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
-const roles = ["Bussiness Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
+const roles = ["Bussiness Owner", "Warehouse Manager", "Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
 const genders = ["Male", "Female"];
 const statuses = ["Active", "Inactive"];
-
-// Sample warehouses - replace with your actual data
 const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C", "Warehouse D"];
 
 function AddStaff() {
@@ -26,134 +24,234 @@ function AddStaff() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Calculate max date for DOB (18 years ago from today)
+  const navigate = useNavigate();
+
+  // Calculate max date for DOB (18 years ago from today) and min date (100 years ago)
   const calculateMaxDate = () => {
     const today = new Date();
     today.setFullYear(today.getFullYear() - 18);
     return today.toISOString().split('T')[0];
   };
 
+  const calculateMinDate = () => {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 100);
+    return today.toISOString().split('T')[0];
+  };
+
   const handleInputChange = (e) => {
     setStaff({ ...staff, [e.target.id]: e.target.value });
-    
-    // Clear error when field is being edited
     if (errors[e.target.id]) {
-      setErrors({...errors, [e.target.id]: null});
+      setErrors({ ...errors, [e.target.id]: null });
     }
   };
 
   const handleSelectChange = (field, value) => {
     setStaff({ ...staff, [field]: value });
-    
-    // Clear error when field is being edited
     if (errors[field]) {
-      setErrors({...errors, [field]: null});
+      setErrors({ ...errors, [field]: null });
     }
   };
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       // Validate file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!validTypes.includes(file.type)) {
-        setErrors({...errors, profilePic: 'Only JPG, JPEG and PNG files are allowed'});
+        setErrors({ ...errors, profilePic: 'Only JPG, JPEG, and PNG files are allowed' });
         return;
       }
-      
+
       // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        setErrors({...errors, profilePic: 'File size should not exceed 2MB'});
+        setErrors({ ...errors, profilePic: 'File size should not exceed 2MB' });
         return;
       }
-      
-      // Clear error
-      setErrors({...errors, profilePic: null});
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target) {
-          setProfileImage(event.target.result);
+
+      // Validate image dimensions
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        if (img.width < 100 || img.height < 100) {
+          setErrors({ ...errors, profilePic: 'Image dimensions must be at least 100x100 pixels' });
+          return;
         }
+        if (img.width > 1000 || img.height > 1000) {
+          setErrors({ ...errors, profilePic: 'Image dimensions must not exceed 1000x1000 pixels' });
+          return;
+        }
+
+        // If all validations pass, set the profile image
+        setErrors({ ...errors, profilePic: null });
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target) {
+            setProfileImage(event.target.result);
+          }
+        };
+        reader.readAsDataURL(file);
       };
-      reader.readAsDataURL(file);
+      img.onerror = () => {
+        setErrors({ ...errors, profilePic: 'Invalid image file' });
+      };
     }
   };
 
   const removeImage = () => {
     setProfileImage(null);
-    setErrors({...errors, profilePic: null});
+    setErrors({ ...errors, profilePic: null });
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
-    // Validate phone number (exactly 10 digits starting with 0)
-    if (!/^0\d{9}$/.test(staff.phoneNo)) {
-      newErrors.phoneNo = 'Phone number must be exactly 10 digits and start with 0';
+
+    // Full Name: Only letters and spaces, 2-50 characters
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!staff.fullName || staff.fullName.trim() === "") {
+      newErrors.fullName = "Full name is required";
+    } else if (!nameRegex.test(staff.fullName)) {
+      newErrors.fullName = "Full name must contain only letters and spaces";
+    } else if (staff.fullName.length < 2 || staff.fullName.length > 50) {
+      newErrors.fullName = "Full name must be between 2 and 50 characters";
     }
-    
-    // Check required fields
-    for (const field of ['fullName', 'email', 'phoneNo', 'DOB', 'gender', 'address', 'warehouseAssigned', 'role']) {
-      if (!staff[field]) {
-        newErrors[field] = 'This field is required';
+
+    // Email: Valid email format, 5-100 characters
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!staff.email || staff.email.trim() === "") {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(staff.email)) {
+      newErrors.email = "Please enter a valid email address";
+    } else if (staff.email.length < 5 || staff.email.length > 100) {
+      newErrors.email = "Email must be between 5 and 100 characters";
+    }
+
+    // Phone Number: Exactly 10 digits starting with 0
+    if (!staff.phoneNo || !/^0\d{9}$/.test(staff.phoneNo)) {
+      newErrors.phoneNo = "Phone number must be exactly 10 digits and start with 0";
+    }
+
+    // Date of Birth: Must be a valid date, between 18 and 100 years ago
+    if (!staff.DOB) {
+      newErrors.DOB = "Date of birth is required";
+    } else {
+      const dob = new Date(staff.DOB);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const minDate = new Date(calculateMinDate());
+      const maxDate = new Date(calculateMaxDate());
+      if (isNaN(dob.getTime())) {
+        newErrors.DOB = "Date of birth must be a valid date";
+      } else if (dob > maxDate) {
+        newErrors.DOB = "Staff must be at least 18 years old";
+      } else if (dob < minDate) {
+        newErrors.DOB = "Staff cannot be older than 100 years";
+      } else if (dob > today) {
+        newErrors.DOB = "Date of birth cannot be in the future";
       }
     }
-    
-    // Validate email format
-    if (staff.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(staff.email)) {
-      newErrors.email = 'Please enter a valid email address';
+
+    // Gender: Must be one of the predefined options
+    if (!staff.gender) {
+      newErrors.gender = "Gender is required";
+    } else if (!genders.includes(staff.gender)) {
+      newErrors.gender = "Invalid gender selected";
     }
-    
-    // Validate profile image
+
+    // Role: Must be one of the predefined options
+    if (!staff.role) {
+      newErrors.role = "Role is required";
+    } else if (!roles.includes(staff.role)) {
+      newErrors.role = "Invalid role selected";
+    }
+
+    // Date Joined: Must be a valid date, not before 18 years after DOB
+    if (!staff.dateJoined) {
+      newErrors.dateJoined = "Date joined is required";
+    } else {
+      const dateJoined = new Date(staff.dateJoined);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (isNaN(dateJoined.getTime())) {
+        newErrors.dateJoined = "Date joined must be a valid date";
+      } else if (dateJoined > today) {
+        newErrors.dateJoined = "Date joined cannot be in the future";
+      } else if (staff.DOB) {
+        const dob = new Date(staff.DOB);
+        const minJoinDate = new Date(dob);
+        minJoinDate.setFullYear(minJoinDate.getFullYear() + 18);
+        if (dateJoined < minJoinDate) {
+          newErrors.dateJoined = "Staff cannot join before they are 18 years old";
+        }
+      }
+    }
+
+    // Warehouse Assigned: Must be one of the predefined options
+    if (!staff.warehouseAssigned) {
+      newErrors.warehouseAssigned = "Warehouse assignment is required";
+    } else if (!warehouses.includes(staff.warehouseAssigned)) {
+      newErrors.warehouseAssigned = "Invalid warehouse selected";
+    }
+
+    // Status: Must be one of the predefined options
+    if (!statuses.includes(staff.status)) {
+      newErrors.status = "Invalid status selected";
+    }
+
+    // Address: 5-200 characters, no harmful scripts
+    const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    if (!staff.address || staff.address.trim() === "") {
+      newErrors.address = "Address is required";
+    } else if (staff.address.length < 5 || staff.address.length > 200) {
+      newErrors.address = "Address must be between 5 and 200 characters";
+    } else if (scriptRegex.test(staff.address)) {
+      newErrors.address = "Address must not contain script tags";
+    }
+
+    // Profile Picture: Already required, add dimension validation in handleImageChange
     if (!profileImage) {
-      newErrors.profilePic = 'Profile picture is required';
+      newErrors.profilePic = "Profile picture is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
-       setLoading(true); 
-        const formData = new FormData();
-        formData.append("fullName", staff.fullName);
-        formData.append("email", staff.email);
-        formData.append("phoneNo", staff.phoneNo);
-        formData.append("DOB", staff.DOB);
-        formData.append("gender", staff.gender);
-        formData.append("address", staff.address);
-        formData.append("dateJoined", staff.dateJoined);
-        formData.append("warehouseAssigned", staff.warehouseAssigned);
-        formData.append("status", staff.status);
-        formData.append("role", staff.role);
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("fullName", staff.fullName.trim());
+      formData.append("email", staff.email.trim());
+      formData.append("phoneNo", staff.phoneNo);
+      formData.append("DOB", staff.DOB);
+      formData.append("gender", staff.gender);
+      formData.append("address", staff.address.trim());
+      formData.append("dateJoined", staff.dateJoined);
+      formData.append("warehouseAssigned", staff.warehouseAssigned);
+      formData.append("status", staff.status);
+      formData.append("role", staff.role);
 
-        for (let [key, value] of formData.entries()) {
-          console.log(`${key}: ${value}`);
-        }
+      // Profile image conversion (convert data URL to blob)
+      if (profileImage) {
+        const response = await fetch(profileImage);
+        const blob = await response.blob();
+        formData.append("profilePic", blob, "profile.jpg");
+      }
 
-        //profile image converion (convert data URL to blob)
-        if(profileImage){
-          const response = await fetch(profileImage);
-          const blob = await response.blob();
-          formData.append("profilePic", blob, "profile.jpg");
-        }
+      const token = localStorage.getItem("token");
 
-        const token = localStorage.getItem("token");
+      if (!token) {
+        setErrors({ submit: "You must be logged in to add a staff member" });
+        setLoading(false);
+        navigate("/login");
+        return;
+      }
 
-        //check if token exists
-        if(!token){
-          setErrors({ submit: "You must be logged in to add a staff member"});
-          setLoading(false);
-          navigate("/login"); //if token missing redirect to login
-          return;
-        }
-
-      try{
+      try {
         const res = await fetch("http://localhost:8000/staff/add-staff", {
           method: "POST",
           headers: {
@@ -162,53 +260,47 @@ function AddStaff() {
           body: formData,
         });
 
-        if(!res.ok){
+        if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || "Failed to add staff member");
         }
 
         alert(`Employee: ${staff.fullName} added successfully!`);
-        
-          // Reset after submission
-          setStaff({
-            fullName: '',
-            email: '',
-            phoneNo: '',
-            DOB: '',
-            gender: '',
-            address: '',
-            dateJoined: new Date().toISOString().split('T')[0],
-            warehouseAssigned: '',
-            status: 'Active',
-            role: '',
-          });
-          setProfileImage(null);
 
-      }catch(err){
-          console.error("Error adding employee:", err);
-          setErrors({ submit: err.message }); //store errors in object form here 
+        // Reset after submission
+        setStaff({
+          fullName: '',
+          email: '',
+          phoneNo: '',
+          DOB: '',
+          gender: '',
+          address: '',
+          dateJoined: new Date().toISOString().split('T')[0],
+          warehouseAssigned: '',
+          status: 'Active',
+          role: '',
+        });
+        setProfileImage(null);
+      } catch (err) {
+        console.error("Error adding employee:", err);
+        setErrors({ submit: err.message });
 
-          if (err.message.includes("Invalid or expired token")) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            navigate("/login");
-          }
-      }finally{
+        if (err.message.includes("Invalid or expired token")) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          navigate("/login");
+        }
+      } finally {
         setLoading(false);
       }
-      console.log('Submitting form data:', { ...staff, profilePic: profileImage });
-
     } else {
       console.log('Form validation failed', errors);
     }
   };
 
-  const navigate = useNavigate();
-
-  // Format today's date for dateJoined default value
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    setStaff(prev => ({...prev, dateJoined: today}));
+    setStaff(prev => ({ ...prev, dateJoined: today }));
   }, []);
 
   return (
@@ -240,12 +332,12 @@ function AddStaff() {
               type="email"
               value={staff.email}
               onChange={handleInputChange}
-              placeholder="Enter valid email "
+              placeholder="Enter valid email"
               required
               className={`w-full border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-            <p className="text-xs text-gray-500">Login credential send to this emails</p>
+            <p className="text-xs text-gray-500">Login credential sent to this email</p>
           </div>
 
           {/* Phone Number */}
@@ -255,9 +347,11 @@ function AddStaff() {
               id="phoneNo"
               value={staff.phoneNo}
               onChange={handleInputChange}
-              placeholder="07* **** ***"
               required
-              pattern="^0\d{9}$"
+              pattern="0[0-9]{9}"
+              maxLength="10"
+              onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
+              placeholder="Enter 10-digit phone number starting with 0"
               className={`w-full border ${errors.phoneNo ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
             />
             {errors.phoneNo && <p className="text-red-500 text-xs mt-1">{errors.phoneNo}</p>}
@@ -274,13 +368,14 @@ function AddStaff() {
                 value={staff.DOB}
                 onChange={handleInputChange}
                 required
+                min={calculateMinDate()}
                 max={calculateMaxDate()}
                 className={`w-full border ${errors.DOB ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
               />
               <Calendar className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
             </div>
             {errors.DOB && <p className="text-red-500 text-xs mt-1">{errors.DOB}</p>}
-            <p className="text-xs text-gray-500">Must be at least 18 years old</p>
+            <p className="text-xs text-gray-500">Must be at least 18 years old and not older than 100 years</p>
           </div>
 
           {/* Gender */}
@@ -330,10 +425,11 @@ function AddStaff() {
                 onChange={handleInputChange}
                 required
                 max={new Date().toISOString().split('T')[0]}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className={`w-full border ${errors.dateJoined ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
               />
               <Calendar className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
             </div>
+            {errors.dateJoined && <p className="text-red-500 text-xs mt-1">{errors.dateJoined}</p>}
           </div>
 
           {/* Warehouse Assigned */}
@@ -361,12 +457,13 @@ function AddStaff() {
               id="status"
               value={staff.status}
               onChange={(e) => handleSelectChange('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className={`w-full border ${errors.status ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500`}
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>
+            {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status}</p>}
           </div>
         </div>
 
@@ -411,7 +508,7 @@ function AddStaff() {
               <div className="flex flex-col items-center text-center">
                 <Upload className="h-10 w-10 text-gray-400 mb-2" />
                 <p className="text-sm font-medium text-gray-600">Drag & drop or click to upload</p>
-                <p className="text-xs text-gray-400">JPG, JPEG or PNG (max. 5MB)</p>
+                <p className="text-xs text-gray-400">JPG, JPEG, or PNG (max. 2MB, 100x100 to 1000x1000 pixels)</p>
               </div>
             </div>
           )}
@@ -419,7 +516,7 @@ function AddStaff() {
         </div>
         {errors.submit && <p className="text-red-500 text-sm mt-2">{errors.submit}</p>}
         <div className="flex justify-end">
-          <button 
+          <button
             type="submit"
             disabled={loading}
             className={`flex items-center bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${
@@ -434,7 +531,6 @@ function AddStaff() {
             ) : (
               "Add Staff Member"
             )}
-           
           </button>
         </div>
       </form>

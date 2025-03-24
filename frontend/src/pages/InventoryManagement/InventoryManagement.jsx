@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const InventoryManagementPage = () => {
   const [inventory, setInventory] = useState([]);
+  const [filteredInventory, setFilteredInventory] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -10,7 +11,7 @@ const InventoryManagementPage = () => {
     category: "",
     quantity: "",
     location: "",
-    lastUpdated: new Date().toISOString().split("T")[0], // Default to today
+    lastUpdated: new Date().toISOString().split("T")[0],
     supplierName: "",
     unitPrice: "",
     expirationDate: "",
@@ -21,10 +22,11 @@ const InventoryManagementPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortByDate, setSortByDate] = useState("latest");
+  const [sortByQuantity, setSortByQuantity] = useState("none");
   const navigate = useNavigate();
 
-  // Fetch inventory items from the backend with search and filter
+  // Fetch inventory items from the backend
   const fetchInventory = async () => {
     setIsLoading(true);
     setError(null);
@@ -34,10 +36,6 @@ const InventoryManagementPage = () => {
       if (!token) {
         throw new Error("No authentication token found. Please log in.");
       }
-
-      const queryParams = new URLSearchParams();
-      if (searchTerm) queryParams.set("search", searchTerm);
-      if (selectedCategory !== "All") queryParams.set("category", selectedCategory);
 
       const res = await fetch(`http://localhost:8000/inventory`, {
         method: "GET",
@@ -57,6 +55,7 @@ const InventoryManagementPage = () => {
 
       const data = await res.json();
       setInventory(data);
+      setFilteredInventory(data);
     } catch (err) {
       setError(err.message);
       console.error("Error fetching inventory:", err);
@@ -70,13 +69,36 @@ const InventoryManagementPage = () => {
     }
   };
 
-  // Fetch inventory on component mount and when search/filter changes
   useEffect(() => {
     fetchInventory();
-  }, [searchTerm, selectedCategory]);
+  }, []);
 
-  // Get unique categories for the filter dropdown
-  const categories = ["All", ...new Set(inventory.map(item => item.category))];
+  useEffect(() => {
+    let updatedInventory = [...inventory];
+
+    if (searchTerm) {
+      updatedInventory = updatedInventory.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.supplierID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (sortByDate === "oldest") {
+      updatedInventory.sort((a, b) => new Date(a.lastUpdated) - new Date(b.lastUpdated));
+    } else if (sortByDate === "latest") {
+      updatedInventory.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+    }
+
+    if (sortByQuantity === "lowest") {
+      updatedInventory.sort((a, b) => Number(a.quantity) - Number(b.quantity));
+    } else if (sortByQuantity === "highest") {
+      updatedInventory.sort((a, b) => Number(b.quantity) - Number(b.quantity));
+    }
+
+    setFilteredInventory(updatedInventory);
+  }, [inventory, searchTerm, sortByDate, sortByQuantity]);
 
   const openAddModal = () => {
     setFormData({
@@ -101,7 +123,7 @@ const InventoryManagementPage = () => {
       id: item._id,
       quantity: item.quantity.toString(),
       unitPrice: item.unitPrice.toString(),
-      lastUpdated: item.lastUpdated.split("T")[0], // Format date for input
+      lastUpdated: item.lastUpdated.split("T")[0],
     });
     setIsEditing(true);
     setIsModalOpen(true);
@@ -110,41 +132,165 @@ const InventoryManagementPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setError(null); // Clear error on input change
   };
 
   const validateForm = () => {
+    // Name: Only letters and spaces, 2-50 characters
+    const nameRegex = /^[A-Za-z\s]+$/;
     if (!formData.name || formData.name.trim() === "") {
       setError("Product name is required");
       return false;
     }
+    if (!nameRegex.test(formData.name)) {
+      setError("Product name must contain only letters and spaces");
+      return false;
+    }
+    if (formData.name.length < 2 || formData.name.length > 50) {
+      setError("Product name must be between 2 and 50 characters");
+      return false;
+    }
+
+    // Supplier ID: Alphanumeric, 3-10 characters
+    const supplierIDRegex = /^[A-Za-z0-9]+$/;
     if (!formData.supplierID || formData.supplierID.trim() === "") {
       setError("Supplier ID is required");
       return false;
     }
+    if (!supplierIDRegex.test(formData.supplierID)) {
+      setError("Supplier ID must be alphanumeric (letters and numbers only)");
+      return false;
+    }
+    if (formData.supplierID.length < 3 || formData.supplierID.length > 10) {
+      setError("Supplier ID must be between 3 and 10 characters");
+      return false;
+    }
+
+    // Category: Letters, spaces, and some special characters, 2-50 characters
+    const categoryRegex = /^[A-Za-z\s&]+$/;
     if (!formData.category || formData.category.trim() === "") {
       setError("Category is required");
       return false;
     }
-    if (!formData.quantity || isNaN(formData.quantity) || Number(formData.quantity) <= 0) {
+    if (!categoryRegex.test(formData.category)) {
+      setError("Category must contain only letters, spaces, and '&'");
+      return false;
+    }
+    if (formData.category.length < 2 || formData.category.length > 50) {
+      setError("Category must be between 2 and 50 characters");
+      return false;
+    }
+
+    // Quantity: Positive integer, 1-10000
+    const quantity = parseInt(formData.quantity);
+    if (!formData.quantity || isNaN(quantity)) {
+      setError("Quantity must be a valid number");
+      return false;
+    }
+    if (quantity <= 0) {
       setError("Quantity must be a positive number");
       return false;
     }
+    if (quantity > 10000) {
+      setError("Quantity must not exceed 10,000");
+      return false;
+    }
+
+    // Location: Alphanumeric with spaces and some special characters, 2-100 characters
+    const locationRegex = /^[A-Za-z0-9\s\-]+$/;
     if (!formData.location || formData.location.trim() === "") {
       setError("Location is required");
       return false;
     }
+    if (!locationRegex.test(formData.location)) {
+      setError("Location must contain only letters, numbers, spaces, and hyphens");
+      return false;
+    }
+    if (formData.location.length < 2 || formData.location.length > 100) {
+      setError("Location must be between 2 and 100 characters");
+      return false;
+    }
+
+    // Last Updated: Must be a valid date, not in the future
+    if (!formData.lastUpdated) {
+      setError("Last updated date is required");
+      return false;
+    }
+    const lastUpdatedDate = new Date(formData.lastUpdated);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for comparison
+    if (isNaN(lastUpdatedDate.getTime())) {
+      setError("Last updated date must be a valid date");
+      return false;
+    }
+    if (lastUpdatedDate > today) {
+      setError("Last updated date cannot be in the future");
+      return false;
+    }
+
+    // Supplier Name: Only letters and spaces, 2-100 characters
+    const supplierNameRegex = /^[A-Za-z\s]+$/;
     if (!formData.supplierName || formData.supplierName.trim() === "") {
       setError("Supplier name is required");
       return false;
     }
-    if (!formData.unitPrice || isNaN(formData.unitPrice) || Number(formData.unitPrice) <= 0) {
-      setError("Unit price must be a positive number");
+    if (!supplierNameRegex.test(formData.supplierName)) {
+      setError("Supplier name must contain only letters and spaces");
       return false;
     }
+    if (formData.supplierName.length < 2 || formData.supplierName.length > 100) {
+      setError("Supplier name must be between 2 and 100 characters");
+      return false;
+    }
+
+    // Unit Price: Positive number, 0.01-10000, max 2 decimal places
+    const unitPrice = parseFloat(formData.unitPrice);
+    if (!formData.unitPrice || isNaN(unitPrice)) {
+      setError("Unit price must be a valid number");
+      return false;
+    }
+    if (unitPrice < 0.01) {
+      setError("Unit price must be at least 0.01");
+      return false;
+    }
+    if (unitPrice > 10000) {
+      setError("Unit price must not exceed 10,000");
+      return false;
+    }
+    const decimalPlaces = (formData.unitPrice.toString().split(".")[1] || "").length;
+    if (decimalPlaces > 2) {
+      setError("Unit price must have at most 2 decimal places");
+      return false;
+    }
+
+    // Expiration Date: Must be a valid date, in the future
     if (!formData.expirationDate) {
       setError("Expiration date is required");
       return false;
     }
+    const expirationDate = new Date(formData.expirationDate);
+    if (isNaN(expirationDate.getTime())) {
+      setError("Expiration date must be a valid date");
+      return false;
+    }
+    if (expirationDate <= today) {
+      setError("Expiration date must be in the future");
+      return false;
+    }
+
+    // Notes: Optional, max 500 characters, no harmful scripts
+    if (formData.notes) {
+      if (formData.notes.length > 500) {
+        setError("Notes must not exceed 500 characters");
+        return false;
+      }
+      const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+      if (scriptRegex.test(formData.notes)) {
+        setError("Notes must not contain script tags");
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -171,16 +317,16 @@ const InventoryManagementPage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: formData.name,
-          supplierID: formData.supplierID,
-          category: formData.category,
+          name: formData.name.trim(),
+          supplierID: formData.supplierID.trim(),
+          category: formData.category.trim(),
           quantity: parseInt(formData.quantity),
-          location: formData.location,
+          location: formData.location.trim(),
           lastUpdated: formData.lastUpdated,
-          supplierName: formData.supplierName,
+          supplierName: formData.supplierName.trim(),
           unitPrice: parseFloat(formData.unitPrice),
           expirationDate: formData.expirationDate,
-          notes: formData.notes,
+          notes: formData.notes ? formData.notes.trim() : "",
         }),
       });
 
@@ -332,13 +478,13 @@ const InventoryManagementPage = () => {
             <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
               <h3 className="text-gray-600 text-sm font-medium">Current Stock</h3>
               <p className="text-2xl font-bold text-gray-800">
-                {inventory.reduce((sum, item) => sum + Number(item.quantity), 0)} units
+                {filteredInventory.reduce((sum, item) => sum + Number(item.quantity), 0)} units
               </p>
             </div>
             <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
               <h3 className="text-gray-600 text-sm font-medium">Low Stock Alerts</h3>
               <p className="text-2xl font-bold text-gray-800 flex items-center">
-                {inventory.filter(item => item.quantity < 50).length} products
+                {filteredInventory.filter(item => item.quantity < 50).length} products
                 <span className="w-3 h-3 bg-red-500 rounded-full ml-2"></span>
               </p>
             </div>
@@ -376,25 +522,37 @@ const InventoryManagementPage = () => {
             </div>
           )}
 
-          {/* Search and Filter Bar */}
+          {/* Search and Sort Bar */}
           <div className="mb-6 flex gap-4">
             <input
               type="text"
               placeholder="Search by Supplier ID, product name, or category"
-              className="w-3/4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={sortByDate}
+              onChange={(e) => {
+                setSortByDate(e.target.value);
+                setSortByQuantity("none");
+              }}
               className="w-1/4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+              <option value="latest">Latest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+            <select
+              value={sortByQuantity}
+              onChange={(e) => {
+                setSortByQuantity(e.target.value);
+                setSortByDate("latest");
+              }}
+              className="w-1/4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="none">Sort by Quantity</option>
+              <option value="lowest">Lowest Quantity First</option>
+              <option value="highest">Highest Quantity First</option>
             </select>
           </div>
 
@@ -413,14 +571,14 @@ const InventoryManagementPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {inventory.length === 0 ? (
+                {filteredInventory.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-4 text-center text-gray-500">
                       No inventory items found.
                     </td>
                   </tr>
                 ) : (
-                  inventory.map(item => (
+                  filteredInventory.map(item => (
                     <tr
                       key={item._id}
                       onClick={() => selectItem(item)}
@@ -463,7 +621,7 @@ const InventoryManagementPage = () => {
         </section>
       </div>
 
-      {/* Modal for CRUD - Improved for better screen fit */}
+      {/* Modal for CRUD */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-screen overflow-y-auto">
