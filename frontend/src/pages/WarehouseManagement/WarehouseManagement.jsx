@@ -29,44 +29,16 @@ export default function WarehouseManagement() {
 
       }).catch((error) => {
 
-        console.error('Error fetching vehicles:', error);
+        console.error('Error fetching warehouse:', error);
 
       });
     })
 
-
-
-  /*const warehouses = [
-    { id: 1, name: 'Warehouse 1', category: 'AC' },
-    { id: 2, name: 'Warehouse 2', category: 'Non-AC' },
-    { id: 3, name: 'Warehouse 3', category: 'Green' },
-    { id: 4, name: 'Warehouse 4', category: 'High Security' },
-    { id: 5, name: 'Warehouse 5', category: 'AC' },
-  ];*/
-
-  
-//const filteredWarehouses =
-   // selectedCategory === 'All'? warehouses : warehouses.filter((w) => w.category === selectedCategory);
-
-
   return (
     <Box sx={{ padding: 2 }}>
 
-      {/* Category Buttons */}
-      <Stack direction="row" spacing={1} sx={{ marginBottom: 2 }}>
-        {['All', 'AC', 'Non-AC', 'Green', 'High Security'].map((category) => (
-          <Button
-            variant="filled"
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </Button>
-        ))}
-      </Stack>
-
       {/* Maintenance Button */}
-      <Box sx={{ position: 'absolute', top: 110, right: 130 }}>
+      <Box sx={{ position: 'absolute', top: 100, right: 130 }}>
         <Button
           variant="contained"
           color="primary"

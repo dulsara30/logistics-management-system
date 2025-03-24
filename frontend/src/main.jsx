@@ -21,6 +21,8 @@ import CorrectiveForm from './pages/WarehouseManagement/CorrectiveForm.jsx'
 import SubmitPage from './pages/WarehouseManagement/CorrectiveSubmit.jsx'
 import RoutingMaintenanceForm from './pages/WarehouseManagement/RoutingForm.jsx'
 import RoutingSubmit from './pages/WarehouseManagement/RoutingSubmit.jsx'
+import MaintenanceDetails from './pages/WarehouseManagement/CorrectiveDetails.jsx'
+
 
 //import WarehouseForm from './pages/WarehouseManagement/WarehouseForm.jsx'
 import CreateWarehouse from './pages/WarehouseManagement/CreateWarehouse.jsx'
@@ -40,6 +42,7 @@ const router = createBrowserRouter([
         //  {path:"warehouse/warehouse-form/WarehouseSubmit", element:<WarehouseSubmit/>, },
         
           {path:"warehouse/Maintainance", element:<Maintainance/>, },
+          {path:"warehouse/Maintainance/CorrectiveDetails", element:<MaintenanceDetails/>, },
           {path:"warehouse/Maintainance/Corrective-Form", element:<CorrectiveForm/>, },
           {path:"warehouse/Maintainance/Corrective-Form/CorrectiveSubmit", element:<SubmitPage/>, },
           {path:"warehouse/Maintainance/Routing-Form", element:<RoutingMaintenanceForm/>, },

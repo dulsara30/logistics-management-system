@@ -1,6 +1,8 @@
 // Application/userService.ts
 import Warehouse from "../../Infrastructure/schemas/WarehouseManagement/Warehouseschema";
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 // Read all Warehouse
@@ -13,6 +15,7 @@ export const getAllWarehouses = async () => {
     throw new Error("Error retrieving Warehouse");
   }
 };
+
 
 
 // (read) get a warehouse by ID
@@ -41,6 +44,9 @@ export const createWarehouse = async (
 
 ) => {
   try {
+
+    //auto generated warehouse id
+    const WarehouseID = uuidv4();
 
     // Create a new warehouse instance or object with the provided data
     const W = new Warehouse({ WarehouseID,StreetName,City,Province,SpecialInstruction,Description,

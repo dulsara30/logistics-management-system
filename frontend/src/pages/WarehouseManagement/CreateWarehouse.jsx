@@ -1,49 +1,37 @@
-import * as React from 'react';
-import { useState } from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { Grid, TextField, Typography } from '@mui/material';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from "@mui/material";
 
-
-
-// enne na
-function createData(Section, Size) {
-  return { Section, Size };
-}
-
-const rows = [
-  createData('Bulky item sections', 2),
-  createData('Hazardous item section', 1),
-  createData('Perishable Items section', 1),
-  createData('Spare Parts and Components item section', 1),
-  createData('Other items', 2),
-];
-
-const totalSize = rows.reduce((sum, row) => sum + row.Size, 0);
-
-export default function CreateWarehouse() {
-    
+export default function WarehouseForm() {
   const navigate = useNavigate();
 
+  // Initialize formData with empty values
   const [formData, setFormData] = useState({
-    warehouseId: '',
-    streetName: '',
-    city: '',
-    province: '',
-    instruction: '',
-    description: '',
+    WarehouseName: "",
+    StreetName: "",
+    City: "",
+    Province: "",
+    SpecialInstruction: "",
+    Description: "",
+    WarehouseSize: "",
+    Bulkysecsize: "",
+    Hazardoussecsize: "",
+    Perishablesecsize: "",
+    Sparesecsize: "",
+    Otheritems: ""
   });
 
-  
-
+  // Handle input field changes
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -51,103 +39,135 @@ export default function CreateWarehouse() {
     }));
   };
 
+  
+
+  // Handle form submission (Create)
   const handleSubmit = () => {
-    console.log('Submitted Data:', formData);
-    navigate('/WarehouseSubmit'); // your routing path
+    axios
+      .post("http://localhost:8000/api/warehouse", formData)
+      .then((response) => {
+        alert("Warehouse created successfully!" ,response );
+        navigate("/WarehouseSubmit");
+      })
+      .catch((error) => {
+        alert("Error creating warehouse:", error);
+      });
   };
 
   return (
-    <Grid container spacing={2} sx={{ padding: '16px', maxWidth: '800px', margin: 'auto' }}>
-      <Box sx={{ width: '100%' }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold', textAlign: 'center' }}>
-          Warehouse Profile Form
+    <Grid container spacing={2} sx={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
+      <Box sx={{ width: "100%" }}>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold", textAlign: "center" }}>
+          Create Warehouse
         </Typography>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2 , 1fr)', gap: 2 }}>
+        {/* Warehouse Details */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2 , 1fr)", gap: 2 }}>
+        
+         
           <TextField
-            label="Warehouse ID"
-            name="warehouseId"
+            label="Warehouse Name"
+            name="WarehouseName"
+            value={formData.WarehouseName}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
           />
           <TextField
             label="Street Name"
-            name="streetName"
+            name="StreetName"
+            value={formData.StreetName}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
           />
           <TextField
             label="City"
-            name="city"
+            name="City"
+            value={formData.City}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
           />
           <TextField
             label="Province"
-            name="province"
+            name="Province"
+            value={formData.Province}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
-        />
-        
-        <TextField
+          />
+          <TextField
             label="Special Instruction"
-            name="instruction"
-            value={formData.instruction}
+            name="SpecialInstruction"
+            value={formData.SpecialInstruction}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
             multiline
-            rows={4}
+            rows={2}
           />
-          
           <TextField
             label="Description"
-            name="description"
+            name="Description"
+            value={formData.Description}
             onChange={handleChange}
-            variant="filled"
+            variant="outlined"
             fullWidth
             multiline
-            rows={4}
+            rows={2}
           />
+          
+          
         </Box>
 
+        {/* Section Sizes */}
         <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+            Section Sizes
+          </Typography>
           <TableContainer component={Paper}>
-            <Table sx={{ minWidth: '100%' }} aria-label="sections table">
+            <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#e0e0e0' }}>
+                <TableRow>
                   <TableCell><strong>Section</strong></TableCell>
-                  <TableCell align="right"><strong>Size (m³)</strong></TableCell>
+                  <TableCell><strong>Size (sq ft)</strong></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.Section}>
-                    <TableCell>{row.Section}</TableCell>
-                    <TableCell align="right">{row.Size}</TableCell>
+                {[
+                  { label: "Bulky Items", field: "Bulkysecsize" },
+                  { label: "Hazardous Items", field: "Hazardoussecsize" },
+                  { label: "Perishables", field: "Perishablesecsize" },
+                  { label: "Spare Parts", field: "Sparesecsize" },
+                  { label: "Other Items", field: "Otheritems" }
+                ].map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{row.label}</TableCell>
+                    <TableCell>
+                      <TextField
+                        name={row.field}
+                        type="number"
+                        value={formData[row.field] || ""}
+                        onChange={handleChange}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
-                <TableRow>
-                  <TableCell colSpan={2} style={{ borderBottom: '2px solid black' }} />
-                </TableRow>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#e0e0e0' }}>Total</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#e0e0e0' }}>
-                    {totalSize}
-                  </TableCell>
-                </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Button variant="contained" sx={{ backgroundColor: '#ab47bc' }} onClick={handleSubmit}>
-            Submit
+        {/* Action Buttons */}
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Create Warehouse
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={() => navigate("/WarehouseSubmit")}>
+            Cancel
           </Button>
         </Box>
       </Box>
