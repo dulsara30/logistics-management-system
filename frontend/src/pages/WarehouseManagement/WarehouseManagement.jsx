@@ -14,7 +14,7 @@ import axios from 'axios';
 export default function WarehouseManagement() {
   const navi = useNavigate();
   
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
+  //const [selectedCategory, setSelectedCategory] = React.useState('All');
 
 //warehouse varibale have the database data set
   const [warehouse, setWarehouse] = React.useState([]);
@@ -93,11 +93,13 @@ export default function WarehouseManagement() {
           >
             <Box sx={{ p: 2 }}>
               <Typography gutterBottom variant="h5" component="div">
-                {w.StreetName}
+                {w.WarehouseID}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Description: {w.Description}
+               
               </Typography>
+              City: {w.City}
             </Box>
           </Card>
         ))}
