@@ -120,12 +120,12 @@ export const updateVehicleByID = async (vehicleId: string, updateData: object) =
   try {
     const updateResult = await Vehicle.updateOne(
       { VehicleNumber: vehicleId },
-      { $set: updateData } // Use $set to update the fields
+      { $set: updateData } // update the fields
     );
 
     
     if (updateResult.modifiedCount === 0) {
-      // No document was updated (vehicle not found or no change)
+      // No document was updated
       throw new Error('Vehicle not found or no changes made');
     }
 
@@ -140,7 +140,7 @@ export const updateVehicleByID = async (vehicleId: string, updateData: object) =
 
 // delete vehicle by ID
 export const deleteVehicleByID = async (vehicleId: string) => {
-  
+
   try {
     const deleteResult = await Vehicle.deleteOne({ VehicleNumber: vehicleId });
 

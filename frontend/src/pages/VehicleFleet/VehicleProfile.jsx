@@ -15,10 +15,10 @@ import {
   validateVehicleBrand, 
   validateLoadCapacity, 
   validateDriverSelection 
-} from './vehicleValidations';  // Adjust path as needed
+} from './vehicleValidations';  
 
 export default function VehicleProfile() {
-  const { VehicleNumber } = useParams(); // Get the Vehicle ID from the URL
+  const { VehicleNumber } = useParams(); 
   const [vehicleData, setVehicleData] = useState({}); // Store vehicle data
   const [editMode, setEditMode] = useState(false);
   const [errorMessages, setErrorMessages] = useState({}); // Store validation errors
@@ -118,7 +118,7 @@ export default function VehicleProfile() {
             fullWidth
             disabled={!editMode}
             InputLabelProps={{ shrink: true }}
-            error={!!errorMessages.VehicleNumber} // Display error if any
+            error={!!errorMessages.VehicleNumber} // Display error
             helperText={errorMessages.VehicleNumber}
           />
         </Grid>

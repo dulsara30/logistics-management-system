@@ -5,7 +5,7 @@ import {
   ListItemText, ListItemAvatar, Avatar, Checkbox,
   Typography, Paper, Button
 } from '@mui/material';
-import axios from 'axios'; // Make sure axios is installed
+import axios from 'axios'; 
 import { validateNIC, validateName, validateContactNumber, validateAddress, 
   validateEmail, validateVehicleNumber,
    validateVehicleTypeAndFuelType, validateVehicleBrand, 
@@ -109,6 +109,7 @@ export default function VehicleRegistrationForm() {
           <TextField label="Email address" 
           variant="outlined" type="text" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
 
+          
         </Box>
 
       </Paper>

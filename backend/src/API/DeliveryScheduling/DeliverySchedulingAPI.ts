@@ -82,7 +82,7 @@ router.get('/Delivery/:Scheduleid', async (req, res) => {
 });
 
 
-//update delivery
+
 // Route to Update delivery schedule details
 
 router.put('/Delivery/:Scheduleid', async (req, res) => {
@@ -101,7 +101,7 @@ router.put('/Delivery/:Scheduleid', async (req, res) => {
 
 // Delete delivery schedule by ID
 router.delete('/Delivery/:scheduleId', async (req, res) => {
-  const { scheduleId } = req.params; // Extract ScheduleID from the route parameter
+  const { scheduleId } = req.params; 
 
   try {
     const result = await deleteDeliveryScheduleByID(scheduleId); // Call the delete service function
