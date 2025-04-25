@@ -17,7 +17,9 @@ import VehicleRegistrationForm from './pages/VehicleFleet/VehicleRegistration.js
 import Vehicleprofile from './pages/VehicleFleet/VehicleProfile.jsx'
 import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx'
 import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx'
-//import "leaflet/dist/leaflet.css";
+
+import VehicleMaintenanceForm from './pages/VehicleFleet/VehicleMaintainance.jsx'
+
 
 const router = createBrowserRouter([
   {
@@ -39,8 +41,9 @@ const router = createBrowserRouter([
           {path:"fleet/VehicleProfile/:VehicleNumber", element:<Vehicleprofile />,},
           {path:"delivery/NewDeliveryScheduling", element:<NewDeliverySchedule />,},
           {path:"delivery/DeliveryProfile/:ScheduleID", element:<DeliveryScheduleProfile />,},
-          
-        ]
+          {path:"fleet/vehicleMaintenance", element:<VehicleMaintenanceForm/>,},
+          {path:"fleet/VehicleProfile/:VehicleNumber/vehicleMaintenance", element:<VehicleMaintenanceForm/>,},
+        ]              
       }
     ]
       },

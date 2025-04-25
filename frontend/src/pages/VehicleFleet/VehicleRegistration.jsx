@@ -82,9 +82,10 @@ export default function VehicleRegistrationForm() {
                               'Hyundai', 'Honda', 'Bajaj', 'TATA', 'Leyland', 'Piageo'];
 
   return (
+    
     <div className="p-16">
 
-      <Paper elevation={0} sx={{ padding: '18px', paddingBottom: '24px' }}>
+     <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 , borderRadius: 3}}>
 
         <Typography variant='h6' sx={{ mb: 2 }}>Vehicle owner details</Typography>
 
@@ -114,7 +115,7 @@ export default function VehicleRegistrationForm() {
 
       </Paper>
 
-      <Paper elevation={0} sx={{ padding: '18px', paddingBottom: '24px', mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 , borderRadius: 3}}>
 
         <Typography variant='h6' sx={{ mb: 2 }}>Vehicle details</Typography>
 
@@ -175,6 +176,7 @@ export default function VehicleRegistrationForm() {
 
       </Paper>
 
+      <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 , borderRadius: 3}}>
       <Box mt={4}>
 
         <Typography variant='h6' sx={{ mb: 2 }}>Assign Driver to the vehicle</Typography>
@@ -203,10 +205,12 @@ export default function VehicleRegistrationForm() {
           ))}
         </List>
       </Box>
+      </Paper>
 
       <Box mt={4}>
         <Button variant="contained" color="primary" onClick={handleSubmit}>Register Vehicle</Button>
       </Box>
+
     </div>
   );
 }

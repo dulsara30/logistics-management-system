@@ -2,6 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, Typography, Button, Grid, Paper, FormControl, MenuItem, Select, InputLabel } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import { styled } from '@mui/material/styles';
+import TableHead from '@mui/material/TableHead';
+import { useNavigate } from 'react-router-dom';
+
+
+const StyledTableHead = styled(TableHead)(() => ({
+  backgroundColor: '#f0f0f0',
+
+}));
+
+const StyledTableCell = styled(TableCell)(() => ({
+  color: '#333333',
+  fontWeight: 'bold',
+  fontSize: 15,
+}));
+
+const StyledTableRow = styled(TableRow)(() => ({
+  '&:hover': {
+    backgroundColor: '#f5f5f5',
+    cursor: 'pointer',
+  },
+}));
+
 
 // Import validation functions
 import { 
@@ -22,6 +50,8 @@ export default function VehicleProfile() {
   const [vehicleData, setVehicleData] = useState({}); // Store vehicle data
   const [editMode, setEditMode] = useState(false);
   const [errorMessages, setErrorMessages] = useState({}); // Store validation errors
+  const [maintenanceData, setMaintenanceData] = useState([]); // Store maintenance data
+  const navi = useNavigate();
 
   const handleChange = (e) => {
     setVehicleData({ ...vehicleData, [e.target.name]: e.target.value });
@@ -98,6 +128,7 @@ export default function VehicleProfile() {
     axios.get(`http://localhost:8000/api/vehicles/${VehicleNumber}`)
       .then((response) => {
         setVehicleData(response.data); // Set the fetched data to state
+        setMaintenanceData(response.data.Maintenance || []); //Maintenence data
       })
       .catch((error) => {
         alert('Error fetching vehicle details:', error);
@@ -105,7 +136,12 @@ export default function VehicleProfile() {
   }, [VehicleNumber]); // Re-fetch when vehicleId changes
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 700, margin: 'auto', mt: 5 }}>
+
+  <Box>
+
+    <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 , borderRadius: 3}}>
+
+      
       <Typography variant="h5" sx={{ mb: 4 }}>Vehicle Details</Typography>
 
       <Grid container spacing={2}>
@@ -294,9 +330,10 @@ export default function VehicleProfile() {
             onClick={handleEditToggle}
             sx={{
               background: "linear-gradient(to right, #8e2de2, #4a00e0)",
-              color: "white",
+              color: "white",borderRadius: '12px',
               "&:hover": {
                 background: "linear-gradient(to right, #4a00e0, #8e2de2)",
+                borderRadius: '12px',
               },
             }}
           >
@@ -308,11 +345,11 @@ export default function VehicleProfile() {
               variant="contained"
               color="success"
               onClick={handleSave}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2 ,borderRadius: '12px',}}
             >
               Save
             </Button>
-            <Button variant="outlined" onClick={handleEditToggle}>
+            <Button variant="outlined" onClick={handleEditToggle} sx={{ mr: 2 ,borderRadius: '12px',}}>
               Cancel
             </Button>
           </>
@@ -322,12 +359,77 @@ export default function VehicleProfile() {
           variant="outlined"
           color="error"
           onClick={handleDelete}
-          sx={{ ml: 2 }}
+          sx={{ ml: 2 ,borderRadius: '12px'}}
         >
           Delete Vehicle
         </Button>
 
       </Box>
     </Paper>
+
+    <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 ,borderRadius: 3}}>
+
+    <Typography variant="h5" sx={{ mb: 4 }}>Vehicle Maintainance</Typography>
+      
+      <Box  sx={{ mb: '20px' }}>
+
+      <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+        <Table sx={{ minWidth: 700 }} aria-label="vehicle maintenance table">
+          <StyledTableHead>
+            <TableRow>
+
+             <StyledTableCell>Maintenance ID</StyledTableCell>
+              <StyledTableCell >Maintenance Date</StyledTableCell>
+              <StyledTableCell >Maintenance Type</StyledTableCell>
+              <StyledTableCell >Cost</StyledTableCell>
+              <StyledTableCell >Description</StyledTableCell>
+            
+            </TableRow>
+          </StyledTableHead>
+
+          <TableBody>
+          {maintenanceData.map((maintenance) => (
+            <StyledTableRow
+              key={maintenance._id || maintenance.MaintenanceID}
+              onClick={() => navi(`VehicleMaintenance/${maintenance._id}`)}
+            >
+              <TableCell>{maintenance.MaintenanceID}</TableCell>
+              <TableCell>{maintenance.MaintenanceDate}</TableCell>
+              <TableCell>{maintenance.Type}</TableCell>
+              <TableCell>{maintenance.Cost}</TableCell>
+              <TableCell>{maintenance.Description}</TableCell>
+            </StyledTableRow>
+          ))}
+
+          </TableBody>
+        </Table>
+      </TableContainer>
+      </Box>
+
+        <Box>
+                <Button
+                  variant="contained"
+                  onClick={() => navi(`/fleet/VehicleProfile/${vehicleData.VehicleNumber}/vehicleMaintenance`)}
+                  sx={{
+                    background: 'linear-gradient(to right, #8e2de2, #4a00e0)',
+                    color: '#FFFFFF',
+                    fontWeight: 'bold',
+                    borderRadius: '12px',
+                    paddingX: 3,
+                    paddingY: 1,
+                    textTransform: 'none',
+                    '&:hover': {
+                      background: 'linear-gradient(to right, #7b1fa2, #311b92)',
+                    },
+                  }}
+                >
+                  Add Vehicle Maintenance
+                </Button>
+              </Box>
+
+
+    </Paper>
+  </Box>
+
   );
 }

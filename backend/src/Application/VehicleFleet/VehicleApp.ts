@@ -94,7 +94,9 @@ export const getVehicleByID = async (VehicleNumber: string) => {
 
   try {
 
-      const vehicle = await Vehicle.findOne({ VehicleNumber });
+      const vehicle = await Vehicle.findOne({ VehicleNumber })
+      .populate('Maintenance')  // Populating the maintenance records
+      .exec();
 
     if (!vehicle) {
 

@@ -62,7 +62,10 @@ const VehicleSchema = new mongoose.Schema({
     type: String, 
     required: true, 
    
-  }
+  },
+
+  Maintenance: [{ type: mongoose.Schema.Types.ObjectId, ref: 'maintenance' }],
+
 });
 
 const Vehicle = mongoose.model("vehicles", VehicleSchema);

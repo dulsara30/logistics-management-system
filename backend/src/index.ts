@@ -2,6 +2,7 @@ import express from "express";
 import connectDB from "./Infrastructure/db"; // Import the connectDB function
 import VehicleFleetRoutes from "./API/VehicleFleet/VehiclefleetAPI"; // Import routes
 import DeliverySchdeulingRoutes from "./API/DeliveryScheduling/DeliverySchedulingAPI"
+import MaintenenceRoute from "./API/VehicleFleet/VehicleMaintenanceAPI";
 import cors from 'cors';
 
 
@@ -18,7 +19,7 @@ app.use(express.json());
 connectDB();
 
 // Use your routes for API handling
-app.use("/api", VehicleFleetRoutes , DeliverySchdeulingRoutes);
+app.use("/api", VehicleFleetRoutes , DeliverySchdeulingRoutes,MaintenenceRoute);
 
 // Start the server
 app.listen(8000, () => console.log("Server is listening on port 8000."));
