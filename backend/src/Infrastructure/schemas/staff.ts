@@ -1,21 +1,20 @@
 import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema({
-
-    fullName:{
+    fullName: {
         type: String,
         required: true,
         trim: true
     },
     email: {
-        type:String,
-        required:true,
+        type: String,
+        required: true,
         unique: true,
         lowercase: true
     },
-    phoneNo:{
+    phoneNo: {
         type: String,
-       required: true
+        required: true
     },
     DOB: {
         type: Date,
@@ -45,7 +44,7 @@ const staffSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Active", "Inactive"],
+        enum: ["Active", "Inactive", "On Leave", "Suspended", "Terminated"],
         default: "Active"
     },
     password: {
@@ -55,14 +54,19 @@ const staffSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: [
-            "Bussiness Owner",
+            "Business Owner",
             "Warehouse Manager",
             "Inventory Manager",
             "Driver",
             "Maintenance Staff",
             "Other Staff"
-          ],
+        ],
         required: true
+    },
+    NIC: {
+        type: String,
+        required: true,
+        unique: true,
     },
     emName: {
         type: String,
@@ -80,9 +84,8 @@ const staffSchema = new mongoose.Schema({
         type: String,
         default: null
     } 
-    },{timestamps: true});
+}, { timestamps: true });
 
 const staffMembers = mongoose.model("StaffMembers", staffSchema);
 
 export default staffMembers;
-

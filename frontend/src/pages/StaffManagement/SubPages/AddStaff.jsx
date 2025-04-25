@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Upload, X, ArrowLeft, Calendar, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
-const roles = ["Bussiness Owner", "Warehouse Manager", "Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
+const roles = ["Business Owner", "Warehouse Manager", "Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"];
 const genders = ["Male", "Female"];
-const statuses = ["Active", "Inactive"];
+const statuses = ["Active", "Inactive", "On Leave", "Suspended", "Terminated"];
 const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C", "Warehouse D"];
 
 function AddStaff() {
@@ -19,6 +19,7 @@ function AddStaff() {
     warehouseAssigned: '',
     status: 'Active',
     role: '',
+    NIC: '', // Changed from 'nic' to 'NIC'
   });
   const [profileImage, setProfileImage] = useState(null);
   const [errors, setErrors] = useState({});
@@ -78,7 +79,7 @@ function AddStaff() {
           setErrors({ ...errors, profilePic: 'Image dimensions must be at least 100x100 pixels' });
           return;
         }
-        if (img.width > 1000 || img.height > 1000) {
+        if (img.width > 2000 || img.height > 2000) {
           setErrors({ ...errors, profilePic: 'Image dimensions must not exceed 1000x1000 pixels' });
           return;
         }
@@ -209,6 +210,15 @@ function AddStaff() {
       newErrors.address = "Address must not contain script tags";
     }
 
+    // NIC: Sri Lankan format (9 digits + V/X or 12 digits)
+    const nicRegexOld = /^[0-9]{9}[VX]$/;
+    const nicRegexNew = /^[0-9]{12}$/;
+    if (!staff.NIC || staff.NIC.trim() === "") {
+      newErrors.NIC = "NIC is required";
+    } else if (!nicRegexOld.test(staff.NIC) && !nicRegexNew.test(staff.NIC)) {
+      newErrors.NIC = "NIC must be either 9 digits followed by V/X (e.g., 123456789V) or 12 digits (e.g., 200012345678)";
+    }
+
     // Profile Picture: Already required, add dimension validation in handleImageChange
     if (!profileImage) {
       newErrors.profilePic = "Profile picture is required";
@@ -234,12 +244,18 @@ function AddStaff() {
       formData.append("warehouseAssigned", staff.warehouseAssigned);
       formData.append("status", staff.status);
       formData.append("role", staff.role);
+      formData.append("NIC", staff.NIC.trim().toUpperCase()); // Changed from 'nic' to 'NIC'
 
       // Profile image conversion (convert data URL to blob)
       if (profileImage) {
         const response = await fetch(profileImage);
         const blob = await response.blob();
-        formData.append("profilePic", blob, "profile.jpg");
+        formData.append("profilePic", blob, `${staff.NIC.trim().toUpperCase()}-profile.jpg`); // Changed from 'staff.nic' to 'staff.NIC'
+      }
+
+      // Debug FormData
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
       }
 
       const token = localStorage.getItem("token");
@@ -262,6 +278,9 @@ function AddStaff() {
 
         if (!res.ok) {
           const errorData = await res.json();
+          if (errorData.missingFields) {
+            throw new Error(`All fields are required. Missing: ${errorData.missingFields.join(", ")}`);
+          }
           throw new Error(errorData.message || "Failed to add staff member");
         }
 
@@ -279,6 +298,7 @@ function AddStaff() {
           warehouseAssigned: '',
           status: 'Active',
           role: '',
+          NIC: '', // Changed from 'nic' to 'NIC'
         });
         setProfileImage(null);
       } catch (err) {
@@ -356,6 +376,22 @@ function AddStaff() {
             />
             {errors.phoneNo && <p className="text-red-500 text-xs mt-1">{errors.phoneNo}</p>}
             <p className="text-xs text-gray-500">Must be exactly 10 digits starting with 0</p>
+          </div>
+
+          {/* NIC */}
+          <div className="space-y-2">
+            <label htmlFor="NIC" className="block text-sm font-medium text-gray-700">National Identity Card (NIC) *</label>
+            <input
+              id="NIC"
+              type="text"
+              value={staff.NIC}
+              onChange={handleInputChange}
+              placeholder="e.g., 123456789V or 200012345678"
+              required
+              className={`w-full border ${errors.NIC ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200`}
+            />
+            {errors.NIC && <p className="text-red-500 text-xs mt-1">{errors.NIC}</p>}
+            <p className="text-xs text-gray-500">Enter 9 digits followed by V/X or 12 digits</p>
           </div>
 
           {/* Date of Birth */}
