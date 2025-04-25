@@ -19,7 +19,7 @@ import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx'
 import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx'
 
 import VehicleMaintenanceForm from './pages/VehicleFleet/VehicleMaintainance.jsx'
-
+import UpdateVehicleMaintenanceForm from './pages/VehicleFleet/VehicleMaintenanceUpdate.jsx'
 
 const router = createBrowserRouter([
   {
@@ -43,6 +43,10 @@ const router = createBrowserRouter([
           {path:"delivery/DeliveryProfile/:ScheduleID", element:<DeliveryScheduleProfile />,},
           {path:"fleet/vehicleMaintenance", element:<VehicleMaintenanceForm/>,},
           {path:"fleet/VehicleProfile/:VehicleNumber/vehicleMaintenance", element:<VehicleMaintenanceForm/>,},
+          {path:"fleet/VehicleProfile/:VehicleNumber/vehicleMaintenance/:MaintenanceID", element:<UpdateVehicleMaintenanceForm/>,},
+        
+        
+        
         ]              
       }
     ]

@@ -135,6 +135,15 @@ export default function VehicleProfile() {
       });
   }, [VehicleNumber]); // Re-fetch when vehicleId changes
 
+   // Function to format the date as YYYY-MM-DD
+   const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   return (
 
   <Box>
@@ -388,20 +397,28 @@ export default function VehicleProfile() {
           </StyledTableHead>
 
           <TableBody>
-          {maintenanceData.map((maintenance) => (
-            <StyledTableRow
-              key={maintenance._id || maintenance.MaintenanceID}
-              onClick={() => navi(`VehicleMaintenance/${maintenance._id}`)}
-            >
-              <TableCell>{maintenance.MaintenanceID}</TableCell>
-              <TableCell>{maintenance.MaintenanceDate}</TableCell>
-              <TableCell>{maintenance.Type}</TableCell>
-              <TableCell>{maintenance.Cost}</TableCell>
-              <TableCell>{maintenance.Description}</TableCell>
-            </StyledTableRow>
-          ))}
+            {maintenanceData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No maintenance records available.
+                </TableCell>
+              </TableRow>
+            ) : (
+              maintenanceData.map((maintenance) => (
+                <StyledTableRow
+                  key={maintenance._id || maintenance.MaintenanceID}
+                  onClick={() => navi(`/fleet/VehicleProfile/${VehicleNumber}/vehicleMaintenance/${maintenance.MaintenanceID}`)}
+                >
+                  <TableCell>{maintenance.MaintenanceID}</TableCell>
+                  <TableCell>{formatDate(maintenance.MaintenanceDate)}</TableCell>
+                  <TableCell>{maintenance.Type}</TableCell>
+                  <TableCell>{maintenance.Cost}</TableCell>
+                  <TableCell>{maintenance.Description}</TableCell>
+                </StyledTableRow>
+              ))
+            )}
+        </TableBody>
 
-          </TableBody>
         </Table>
       </TableContainer>
       </Box>

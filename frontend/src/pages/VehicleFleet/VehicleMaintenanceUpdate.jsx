@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -9,32 +9,67 @@ const StyledTextField = styled(TextField)(() => ({
 }));
 
 const StyledButton = styled(Button)(() => ({
-  background: 'linear-gradient(to right, #00b09b, #96c93d)',
-  color: '#FFFFFF',
   fontWeight: 'bold',
   borderRadius: '12px',
   paddingX: 3,
   paddingY: 1,
   textTransform: 'none',
   '&:hover': {
-    background: 'linear-gradient(to right, #00897b, #8fbc8f)',
+    // Inherit color to allow customization
   },
 }));
 
-const VehicleMaintenanceForm = () => {
+const UpdateVehicleMaintenanceForm = () => {
   const navigate = useNavigate();
-  const { VehicleNumber } = useParams();
+  const { MaintenanceID } = useParams(); // Get the maintenance record ID from the URL
+  const { VehicleNumber } = useParams(); // Optionally get VehicleNumber if needed for context
 
-  const [vehicleNumber, setVehicleNumber] = useState(VehicleNumber || '');
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const [maintenanceDate, setMaintenanceDate] = useState('');
   const [maintenanceType, setMaintenanceType] = useState('');
   const [description, setDescription] = useState('');
-  const [cost, setCost] = useState(''); // Changed to string to handle input and validation
+  const [cost, setCost] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchMaintenanceData = async () => {
+
+      setLoading(true);
+      setError('');
+
+      try {
+
+        const response = await axios.get(`http://localhost:8000/api/maintenance/${MaintenanceID}`);
+        const data = response.data;
+        setVehicleNumber(data.VehicleNumber);
+        setMaintenanceDate(data.MaintenanceDate ? data.MaintenanceDate.split('T')[0] : ''); // Extract only the date part
+        setMaintenanceType(data.Type);
+        setDescription(data.Description || '');
+        setCost(String(data.Cost));
+console.log(MaintenanceID);
+
+      } catch (err) {
+        setError('Error fetching maintenance details.');
+        console.error('Error fetching maintenance details:', err);
+
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (MaintenanceID) {
+      fetchMaintenanceData();
+    } else {
+      setLoading(false); // If no MaintenanceID, we are not in update mode
+    }
+  }, [MaintenanceID]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setValidationErrors(prevErrors => ({ ...prevErrors, [name]: '' })); // Clear error on change
+    setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     switch (name) {
       case 'vehicleNumber':
         setVehicleNumber(value);
@@ -56,14 +91,10 @@ const VehicleMaintenanceForm = () => {
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleUpdate = async (event) => {
     event.preventDefault();
     const errors = {};
 
-    // Basic validations
-    if (!vehicleNumber) {
-      errors.vehicleNumber = 'Vehicle Registration Number is required.';
-    }
     if (!maintenanceDate) {
       errors.maintenanceDate = 'Maintenance Date is required.';
     }
@@ -71,11 +102,8 @@ const VehicleMaintenanceForm = () => {
       errors.maintenanceType = 'Maintenance Type is required.';
     }
     if (!cost) {
-
       errors.cost = 'Cost is required.';
-
     } else if (isNaN(parseFloat(cost)) || parseFloat(cost) < 0) {
-      
       errors.cost = 'Cost must be a valid non-negative number.';
     }
 
@@ -85,49 +113,64 @@ const VehicleMaintenanceForm = () => {
       return;
     }
 
-    const maintenanceData = {
-      VehicleNumber: vehicleNumber,
+    const updatedMaintenanceData = {
       MaintenanceDate: maintenanceDate,
       Type: maintenanceType,
       Description: description,
       Cost: parseFloat(cost),
-      MaintenanceID: `M-${Date.now()}`, // Simple unique ID generation for now
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/api/maintenance', maintenanceData);
-      console.log('Maintenance details saved:', response.data);
-      alert('Maintenance details saved successfully!');
-      
+      const response = await axios.put(`http://localhost:8000/api/maintenance/${MaintenanceID}`, updatedMaintenanceData);
+      console.log('Maintenance details updated:', response.data);
+      alert('Maintenance details updated successfully!');
       navigate(-1);
-
     } catch (error) {
-      console.error('Error saving maintenance details:', error);
-      alert('Error saving maintenance details.');
+      console.error('Error updating maintenance details:', error);
+      alert('Error updating maintenance details.');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this maintenance record?')) {
+      try {
+        await axios.delete(`http://localhost:8000/api/maintenance/${MaintenanceID}`);
+        console.log('Maintenance record deleted successfully');
+        alert('Maintenance record deleted successfully!');
+        navigate(-1);
+      } catch (error) {
+        console.error('Error deleting maintenance record:', error);
+        alert('Error deleting maintenance record.');
+      }
     }
   };
 
   const handleCancel = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
+
+  if (loading) {
+    return <Typography variant="h6">Loading maintenance details...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <Box sx={{ p: 4, bgcolor: '#FFFFFF', minHeight: '100vh' }}>
       <Typography variant="h5" gutterBottom sx={{ color: '#2E2E2E', fontWeight: 'bold', mb: 3 }}>
-        Add Vehicle Maintenance Details
+        Update/Delete Vehicle Maintenance Details
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        {/* Vehicle Number Input */}
+      <form onSubmit={handleUpdate}>
         <StyledTextField
           fullWidth
           label="Vehicle Registration Number"
           value={vehicleNumber}
           name="vehicleNumber"
-          onChange={handleInputChange}
           InputProps={{ readOnly: true }}
-          error={!!validationErrors.vehicleNumber}
-          helperText={validationErrors.vehicleNumber}
+          sx={{ marginBottom: '1rem' }}
         />
 
         <StyledTextField
@@ -143,6 +186,7 @@ const VehicleMaintenanceForm = () => {
           }}
           error={!!validationErrors.maintenanceDate}
           helperText={validationErrors.maintenanceDate}
+          sx={{ marginBottom: '1rem' }}
         />
 
         <FormControl fullWidth sx={{ marginBottom: '1rem' }} error={!!validationErrors.maintenanceType}>
@@ -162,7 +206,11 @@ const VehicleMaintenanceForm = () => {
             <MenuItem value="Oil Change">Oil Change</MenuItem>
             <MenuItem value="Other">Other</MenuItem>
           </Select>
-          {validationErrors.maintenanceType && <Typography variant="caption" color="error">{validationErrors.maintenanceType}</Typography>}
+          {validationErrors.maintenanceType && (
+            <Typography variant="caption" color="error">
+              {validationErrors.maintenanceType}
+            </Typography>
+          )}
         </FormControl>
 
         <StyledTextField
@@ -190,20 +238,27 @@ const VehicleMaintenanceForm = () => {
         />
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button
-            onClick={handleCancel}
-            variant="outlined"
-            sx={{ borderRadius: '12px', textTransform: 'none' }}
-          >
+          <Button onClick={handleCancel} variant="outlined" sx={{ borderRadius: '12px', textTransform: 'none' }}>
             Cancel
           </Button>
-          <StyledButton type="submit">
-            Save Maintenance Details
+          <StyledButton
+            type="submit"
+            sx={{ background: 'linear-gradient(to right, #00b09b, #96c93d)', color: '#FFFFFF' }}
+          >
+            Update Maintenance
           </StyledButton>
+          <Button
+            onClick={handleDelete}
+            variant="outlined"
+            color="error"
+            sx={{ borderRadius: '12px', textTransform: 'none' }}
+          >
+            Delete Maintenance
+          </Button>
         </Box>
       </form>
     </Box>
   );
 };
 
-export default VehicleMaintenanceForm;
+export default UpdateVehicleMaintenanceForm;
