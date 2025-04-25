@@ -225,10 +225,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-      
-      <main>
-        <Outlet />
-      </main>
+
     </div>
   );
 }
