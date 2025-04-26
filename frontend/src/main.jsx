@@ -11,8 +11,8 @@ import StaffLayout from './layouts/staff.layout.jsx';
 // Pages
 import Home from './pages/Home/Home.jsx';
 import WarehouseManagement from './pages/WarehouseManagement/WarehouseManagement.jsx';
-import VehicleFleetManagement from './pages/DeliveryAndVehicleFleet/VehicleFleetManagement.jsx';
-import DeliveryManagement from './pages/DeliveryAndVehicleFleet/DeliveryManagement.jsx';
+import VehicleFleetManagement from './pages/VehicleFleet/VehicleFleetManagement.jsx';
+import DeliveryManagement from './pages/DeliveryScheduling/DeliveryManagement.jsx';
 import InventoryManagement from './pages/InventoryManagement/InventoryManagement.jsx';
 import StaffManagement from './pages/StaffManagement/StaffManagement.jsx';
 import SupplierManagement from './pages/SupplierManagement/SupplierManagement.jsx';

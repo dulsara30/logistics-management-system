@@ -1,11 +1,10 @@
 import "dotenv/config";
 import express from "express";
-import connectDB from "./Infrastructure/db"; // Import the connectDB function
+import { connectDB } from "./Infrastructure/db"; // Import the connectDB function
 import VehicleFleetRoutes from "./API/VehicleFleet/VehiclefleetAPI"; // Import routes
-import DeliverySchdeulingRoutes from "./API/DeliveryScheduling/DeliverySchedulingAPI"
+import DeliverySchdeulingRoutes from "./API/DeliveryScheduling/DeliverySchedulingAPI";
 import MaintenenceRoute from "./API/VehicleFleet/VehicleMaintenanceAPI";
 import cors from 'cors';
-
 
 import {
   getAllInventoryManagement,
@@ -16,11 +15,7 @@ import {
 } from "./Application/InventoryManagement";
 import { Request, Response } from "express";
 
-import { resolve } from "path";
-import { json } from "stream/consumers";
-import { create } from "domain";
 import suppliersRouter from "./API/SpplierManagement/suppliers";
-
 import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
 
@@ -32,27 +27,18 @@ app.use(cors());
 // Middleware to parse incoming JSON requests
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-app.use(cors());
 
 // Connect to MongoDB before setting up routes
 connectDB();
 
 // Use your routes for API handling
-app.use("/api", VehicleFleetRoutes , DeliverySchdeulingRoutes,MaintenenceRoute);
+app.use("/api", VehicleFleetRoutes, DeliverySchdeulingRoutes, MaintenenceRoute);
 
-// Start the server
-app.listen(8000, () => console.log("Server is listening on port 8000."));
-
-// Default route for testing
-app.get('/', (req, res) => {
-  res.send("Hello from ts");
-});
-connectDB();
-
-app.use("/", loginRouter)
+app.use("/", loginRouter);
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 
+// Inventory management routes
 app
   .route("/inventory")
   .get(getAllInventoryManagement)
@@ -64,7 +50,13 @@ app
   .put(updateInventory)
   .delete(deleteInventoryManagement);
 
+// Default route for testing
+app.get('/', (req, res) => {
+  res.send("Hello from ts");
+});
 
-const PORT = 8000
-
-app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+// Start the server
+const PORT = 8000;
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});

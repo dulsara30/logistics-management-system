@@ -17,11 +17,13 @@
     "@mui/material": "^6.4.7",
     "@react-google-maps/api": "^2.20.6",
     "@toolpad/core": "^0.13.0",
+    "@types/express": "^5.0.1",
+    "@types/multer": "^1.4.12",
     "axios": "^1.8.4",
-    "leaflet": "^1.9.4",
     "cloudinary": "^2.6.0",
     "date-fns": "^4.1.0",
     "jwt-decode": "^4.0.0",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
@@ -32,6 +34,7 @@
     "react-router-dom": "^7.3.0",
     "recharts": "^2.12.2",
     "styled-components": "^6.1.15",
+    "tabbable": "^6.2.0",
     "twilio": "^5.5.1"
   },
   "devDependencies": {
