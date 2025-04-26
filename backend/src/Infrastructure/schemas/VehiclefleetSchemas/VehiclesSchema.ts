@@ -2,10 +2,10 @@
 import mongoose from "mongoose";
 
 const VehicleSchema = new mongoose.Schema({
+
   OwnersNIC: { 
     type: String, 
-    required: true, 
-    unique: true,  
+    required: true,  
     minlength: 12,  
     maxlength: 15,  
   },

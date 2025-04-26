@@ -2,7 +2,7 @@
 import User from "../../Infrastructure/schemas/VehiclefleetSchemas/VehiclesSchema"; // Import User schema
 
 import Vehicle from "../../Infrastructure/schemas/VehiclefleetSchemas/VehiclesSchema"
-
+import staffMembers from '../../Infrastructure/schemas/staff'; 
 
 // Get user by name
 export const getUserByName = async (name: string) => {
@@ -156,6 +156,24 @@ export const deleteVehicleByID = async (vehicleId: string) => {
     throw error;
   }
 };
+
+
+//Get the Driver details
+export const getBriefStaffDetails = async () => {
+
+  try {
+
+    const staffDetails = await staffMembers.find({ role: 'Driver' }).select('fullName email phoneNo role');
+    console.log("Brief Staff Details Fetched:", staffDetails);
+    return staffDetails;
+
+  } catch (error: unknown) {
+
+    console.error("Error fetching brief staff details:", error);
+    throw new Error("Error fetching staff details");
+  }
+};
+
 
 
 

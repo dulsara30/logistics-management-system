@@ -57,8 +57,8 @@ export const validateNIC = (nic) => {
   };
   
   export const validateVehicleBrand = (vehicleBrand) => {
-    if (vehicleBrand.length > 50) {
-      return "Vehicle brand must be less than 50 characters.";
+    if (vehicleBrand.length > 50 || vehicleBrand.length < 1 ) {
+      return "Vehicle brand must be inserted.";
     }
     return null;
   };
@@ -70,8 +70,8 @@ export const validateNIC = (nic) => {
     return null;
   };
   
-  export const validateDriverSelection = (checked) => {
-    if (checked.length === 0) {
+  export const validateDriverSelection = (selectedDriver) => {
+    if (!selectedDriver || selectedDriver === '') {
       return "Please assign a driver to the vehicle.";
     }
     return null;

@@ -1,6 +1,8 @@
 
 import express from 'express';
-import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID,deleteVehicleByID} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
+import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID,deleteVehicleByID,getBriefStaffDetails} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
+
+
 
 const router = express.Router();
 
@@ -41,7 +43,7 @@ router.post('/vehicles', async (req, res) => {
       LoadCapacity,
       DriverID
     );
-
+ 
     // Return the created vehicle data as JSON
     res.status(201).json(newVehicle);
   } catch (error) {
@@ -110,6 +112,26 @@ router.delete('/vehicles/:vehicleId', async (req, res) => {
     res.status(500).json({ message: 'Error deleting vehicle', error });
   }
 });
+
+// Route to get brief staff details (fullName, email, phoneNo, role)
+router.get('/drivers', async (req, res) => {
+  try {
+    const staffDetails = await getBriefStaffDetails();
+
+    if (!staffDetails || staffDetails.length === 0) {
+      return res.status(404).json({ message: "No staff details found" });
+    }
+
+    return res.status(200).json(staffDetails);
+
+  } catch (error: any) {
+    console.error("Error fetching brief staff details:", error);
+    return res.status(500).json({ message: "Error fetching staff details", error: error.message });
+  }
+});
+
+
+
 
 
 

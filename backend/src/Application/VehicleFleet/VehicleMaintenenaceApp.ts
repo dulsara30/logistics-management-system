@@ -108,3 +108,15 @@ export const deleteMaintenance = async (maintenanceId: string) => {
     throw new Error('Error deleting maintenance record');
   }
 };
+
+ // New function to get all maintenance details
+ export const getAllMaintenance = async () => {
+   try {
+    const allMaintenanceRecords = await Maintenance.find();
+    return allMaintenanceRecords;
+   } catch (error: any) {
+    console.error('Error fetching all maintenance records:', error);
+    throw new Error('Error fetching all maintenance records');
+   }
+  };
+

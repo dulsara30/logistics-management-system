@@ -10,6 +10,9 @@ import TableRow from '@mui/material/TableRow';
 import { styled } from '@mui/material/styles';
 import TableHead from '@mui/material/TableHead';
 import { useNavigate } from 'react-router-dom';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload'; // Import the download icon
+import ReportDownloader from './MaintenanceSpecificVehicleReport'; // Import the ReportDownloader component
+
 
 
 const StyledTableHead = styled(TableHead)(() => ({
@@ -28,6 +31,22 @@ const StyledTableRow = styled(TableRow)(() => ({
     backgroundColor: '#f5f5f5',
     cursor: 'pointer',
   },
+}));
+
+const TotalCostPaper = styled(Paper)(() => ({
+  padding: '16px',
+  marginTop: '20px',
+  marginBottom: '20px',
+  borderRadius: '8px',
+  backgroundColor: '#e0f7fa', // A light blue background
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  display: 'inline-block',
+}));
+
+const TotalCostTypography = styled(Typography)(() => ({
+  fontWeight: 'bold',
+  fontSize: '1.2rem',
+  color: '#1976d2', // A primary blue color
 }));
 
 
@@ -52,6 +71,11 @@ export default function VehicleProfile() {
   const [errorMessages, setErrorMessages] = useState({}); // Store validation errors
   const [maintenanceData, setMaintenanceData] = useState([]); // Store maintenance data
   const navi = useNavigate();
+  const [totalMaintenanceCost, setTotalMaintenanceCost] = useState(0);
+  const [drivers, setDrivers] = useState([]);
+  const [driverError, setDriverError] = useState('');
+
+
 
   const handleChange = (e) => {
     setVehicleData({ ...vehicleData, [e.target.name]: e.target.value });
@@ -59,6 +83,11 @@ export default function VehicleProfile() {
 
   const handleEditToggle = () => {
     setEditMode(!editMode);
+
+     // If we are canceling the edit, refresh the page
+    if (editMode) {
+    window.location.reload(); // Refresh the page
+  }
   };
 
 
@@ -82,6 +111,8 @@ export default function VehicleProfile() {
 
   // Handle Save with validation
   const handleSave = async () => {
+
+    setErrorMessages({});
     const errors = {};
 
     // Validate all fields and store error messages
@@ -95,6 +126,7 @@ export default function VehicleProfile() {
     errors.VehicleBrand = validateVehicleBrand(vehicleData.VehicleBrand);
     errors.LoadCapacity = validateLoadCapacity(vehicleData.LoadCapacity);
     errors.DriverSelection = validateDriverSelection(vehicleData.DriverID);
+
 
     // Filter out fields with no error message
     const filteredErrors = Object.fromEntries(Object.entries(errors).filter(([key, value]) => value !== null));
@@ -134,6 +166,31 @@ export default function VehicleProfile() {
         alert('Error fetching vehicle details:', error);
       });
   }, [VehicleNumber]); // Re-fetch when vehicleId changes
+
+//fetch drivers
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/drivers');
+        setDrivers(response.data);
+      } catch (error) {
+        console.error("Error fetching drivers:", error);
+      }
+    };
+
+    fetchDrivers();
+  }, []);
+
+
+
+  // Calculate total maintenance cost whenever maintenance data changes
+  useEffect(() => {
+    const totalCost = maintenanceData.reduce((sum, maintenance) => sum + parseFloat(maintenance.Cost || 0), 0);
+    setTotalMaintenanceCost(totalCost);
+  }, [maintenanceData]);
+
+
+
 
    // Function to format the date as YYYY-MM-DD
    const formatDate = (dateString) => {
@@ -179,7 +236,7 @@ export default function VehicleProfile() {
                 onChange={handleChange}
                 label="Vehicle Type"
               >
-                <MenuItem value="">-- Select Vehicle Type --</MenuItem>
+                <MenuItem value="" disabled>-- Select Vehicle Type --</MenuItem>
                 <MenuItem value="Lorry">Lorry</MenuItem>
                 <MenuItem value="Van">Van</MenuItem>
                 <MenuItem value="Three Wheeler">Three Wheeler</MenuItem>
@@ -212,7 +269,7 @@ export default function VehicleProfile() {
               onChange={handleChange}
               label="Fuel Type"
             >
-              <MenuItem value="">-- Select Fuel Type --</MenuItem>
+              <MenuItem value="" disabled>-- Select Fuel Type --</MenuItem>
               <MenuItem value="Diesel">Diesel</MenuItem>
               <MenuItem value="Petrol">Petrol</MenuItem>
             </Select>
@@ -318,18 +375,47 @@ export default function VehicleProfile() {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
-            label="Driver"
-            name="DriverID"
-            value={vehicleData.DriverID || ''}
-            onChange={handleChange}
-            fullWidth
-            disabled={!editMode}
-            InputLabelProps={{ shrink: true }}
-            error={!!errorMessages.DriverSelection}
-            helperText={errorMessages.DriverSelection}
-          />
+                  {editMode ? (
+
+              <FormControl fullWidth error={!!errorMessages.DriverSelection}>
+                <InputLabel id="driver-label">Driver</InputLabel>
+                <Select
+                  labelId="driver-label"
+                  name="DriverID"
+                  value={vehicleData.DriverID || ''}
+                  onChange={handleChange}
+                  label="Driver"
+                >
+                  <MenuItem value="" disabled>-- Select Driver --</MenuItem>
+
+                  {drivers.map((driver) => (
+                    <MenuItem key={driver.fullName} value={driver.fullName}>
+                      {driver.fullName}
+                    </MenuItem>
+                  ))}
+
+                </Select>
+
+                  {errorMessages.DriverSelection && (
+                    <Typography variant="caption" color="error">
+                      {errorMessages.DriverSelection}
+                    </Typography>
+                  )}
+
+              </FormControl>
+            ) : (
+              <TextField
+                label="Driver"
+                name="DriverID"
+                value={vehicleData.DriverID || ''}
+                fullWidth
+                disabled
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
         </Grid>
+
+
       </Grid>
 
       <Box mt={4}>
@@ -358,6 +444,7 @@ export default function VehicleProfile() {
             >
               Save
             </Button>
+
             <Button variant="outlined" onClick={handleEditToggle} sx={{ mr: 2 ,borderRadius: '12px',}}>
               Cancel
             </Button>
@@ -378,8 +465,29 @@ export default function VehicleProfile() {
 
     <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5 ,borderRadius: 3}}>
 
-    <Typography variant="h5" sx={{ mb: 4 }}>Vehicle Maintainance</Typography>
-      
+     <Typography variant="h5" sx={{ mb: 2 }}>Vehicle Maintainance</Typography>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+
+        <Box>
+          <TotalCostPaper>
+            <TotalCostTypography>
+              Total Maintenance Cost: LKR {totalMaintenanceCost.toLocaleString()}
+            </TotalCostTypography>
+          </TotalCostPaper>
+        </Box>
+
+        <Box>
+            {/* The ReportDownloader component will render the download button */}
+          <ReportDownloader
+              vehicleData={vehicleData}
+              maintenanceData={maintenanceData}
+              totalMaintenanceCost={totalMaintenanceCost}
+            />
+        </Box>
+
+      </Box>
+
       <Box  sx={{ mb: '20px' }}>
 
       <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>

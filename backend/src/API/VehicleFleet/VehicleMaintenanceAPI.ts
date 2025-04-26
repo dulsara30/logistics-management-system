@@ -3,7 +3,7 @@
 import express from 'express';
 
 
-import { createMaintenance,updateMaintenance,deleteMaintenance,getMaintenanceById} from '../../Application/VehicleFleet/VehicleMaintenenaceApp';
+import { createMaintenance,updateMaintenance,deleteMaintenance,getMaintenanceById,getAllMaintenance} from '../../Application/VehicleFleet/VehicleMaintenenaceApp';
 
 const router = express.Router();
 
@@ -84,4 +84,18 @@ router.delete('/maintenance/:id', async (req, res) => {
   }
 });
 
+
+// New route to get all maintenance records
+router.get('/maintenance', async (req, res) => {
+    try {
+    const allMaintenance = await getAllMaintenance();
+    res.json(allMaintenance);
+   } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching all maintenance records', error: error.message });
+   }
+  });
+
+
+
 export default router;
+
