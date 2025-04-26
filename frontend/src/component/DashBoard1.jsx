@@ -4,6 +4,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
+
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -21,8 +22,8 @@ import {
 import { useState } from 'react';
 import Home from '../pages/Home/Home.jsx';
 import WarehouseManagement from '../pages/WarehouseManagement/WarehouseManagement';
-import VehicleFleetManagement from '../pages/DeliveryAndVehicleFleet/VehicleFleetManagement';
-import DeliveryManagement from '../pages/DeliveryAndVehicleFleet/DeliveryManagement';
+import VehicleFleetManagement from '../pages/VehicleFleet/VehicleFleetManagement.jsx';
+import DeliveryManagement from '../pages/DeliveryScheduling/DeliveryManagement.jsx';
 import InventoryManagement from '../pages/InventoryManagement/InventoryManagement';
 import StaffManagement from '../pages/StaffManagement/StaffManagement';
 import SupplierManagement from '../pages/SupplierManagement/SupplierManagement';
@@ -45,7 +46,9 @@ const NAVIGATION = [
   { path: '/staff', title: 'Staff Management', icon: Users },
   { path: '/suppliers', title: 'Supplier Management', icon: Factory },
   { path: '/returns', title: 'Return & Damage Handling', icon: RotateCcw },
-  { path: '/help', title: 'Help', icon: HelpCircle }
+  { path: '/help', title: 'Help', icon: HelpCircle },
+ // {path: '/fleet/vehicleRegistration', title:'Vehicle Registration',icon: HelpCircle},
+ 
 ];
 
 function DashboardLayout() {
@@ -106,9 +109,11 @@ function DashboardLayout() {
           </div>
         </div>
         </Link>
-        {/* Navigation */}
-        <nav className="p-4 space-y-2">
 
+
+        {/* Navigation */}
+
+        <nav className="p-4 space-y-2">
         <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-lg">
             
             <div>
@@ -164,11 +169,15 @@ function DashboardLayout() {
         ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
-     <HeaderSec/>
+        <HeaderSec/>
     
         {/* Page Content */}
         
-        <Outlet/>
+        <div className="p-6">
+         
+          <Outlet /> 
+        </div>
+
       </main>
     </div>
   );
