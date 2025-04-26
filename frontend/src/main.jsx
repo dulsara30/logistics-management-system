@@ -30,6 +30,9 @@ import StaffLayout from './layouts/staff.layout.jsx';
 import Dashboard from './pages/StaffMember/Dashboard.jsx';
 import Profile from './pages/StaffMember/Profile.jsx';
 import ProtectedRoute from './component/ProtectedRoute.jsx';
+import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
+import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
+import Items from './pages/Return&DamageHandling/items.jsx';
 
 const router = createBrowserRouter([
   {
@@ -171,38 +174,28 @@ const router = createBrowserRouter([
             ],
           },
           {
-            path: "returns",
+            path: "returns/",
             element: (
               <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                <ReturnDamageHandling />
+                <DamageHandling/>
               </ProtectedRoute>
             ),
             children: [
               {
-                path: "Damage-Form",
+                path: "add-damage",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                    <DamageForm />
+                    <AddDamage/>
                   </ProtectedRoute>
                 ),
               },
               {
-                path: "item-list/*",
+                path: "view-damage-reports",
                 element: (
-                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                    <ItemsList />
-                  </ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                  <Items/>
+                </ProtectedRoute>
                 ),
-                children: [
-                  {
-                    path: "Return-Form",
-                    element: (
-                      <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                        <ReturnForm />
-                      </ProtectedRoute>
-                    ),
-                  },
-                ],
               },
             ],
           },

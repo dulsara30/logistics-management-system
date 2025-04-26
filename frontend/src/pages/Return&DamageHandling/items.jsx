@@ -69,7 +69,7 @@ function Items({ items, type }) {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item[statusLabel]}</td>
                   <td className="px-6 py-4 text-center">
-                    <Link to="Return-Form">
+                    <Link to="/returns/add-damage">
                       <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
                         Return
                       </button>
