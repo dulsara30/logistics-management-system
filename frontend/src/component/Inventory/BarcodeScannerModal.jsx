@@ -13,7 +13,6 @@ const BarcodeScannerModal = ({ isOpen, onClose, onProductFound, setError }) => {
       setScannedData(null);
       setProduct(null);
       setError(null);
-      // Stop the scanner when the modal is closed
       codeReader.current.reset();
     }
   }, [isOpen, setError]);
@@ -23,23 +22,19 @@ const BarcodeScannerModal = ({ isOpen, onClose, onProductFound, setError }) => {
 
     const startScanner = async () => {
       try {
-        // Get access to the camera
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "environment" },
         });
         videoRef.current.srcObject = stream;
         videoRef.current.play();
 
-        // Start scanning
         codeReader.current.decodeFromVideoDevice(
-          null, // Use default video device
+          null,
           videoRef.current,
           (result, err) => {
             if (result) {
               setScannedData(result.getText());
-              // Stop the scanner once a barcode is detected
               codeReader.current.reset();
-              // Stop the video stream
               stream.getTracks().forEach(track => track.stop());
             }
             if (err) {
@@ -55,7 +50,6 @@ const BarcodeScannerModal = ({ isOpen, onClose, onProductFound, setError }) => {
     startScanner();
 
     return () => {
-      // Cleanup on unmount or when scanning stops
       codeReader.current.reset();
       if (videoRef.current && videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop());
@@ -114,7 +108,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onProductFound, setError }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
         <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Scan Barcode</h2>
           <button
@@ -143,9 +137,19 @@ const BarcodeScannerModal = ({ isOpen, onClose, onProductFound, setError }) => {
               ) : product ? (
                 <div>
                   <p className="text-gray-600 mb-4">Product found! You can now edit the details.</p>
-                  <p><strong>Product Name:</strong> {product.name}</p>
-                  <p><strong>Supplier ID:</strong> {product.supplierID}</p>
-                  <p><strong>Quantity:</strong> {product.quantity}</p>
+                  <div className="grid grid-cols-1 gap-2 text-gray-700">
+                    <p><strong>Product Name:</strong> {product.productName}</p>
+                    <p><strong>Brand Name:</strong> {product.brandName}</p>
+                    <p><strong>Description:</strong> {product.description}</p>
+                    <p><strong>Price:</strong> ${product.price.toFixed(2)}</p>
+                    <p><strong>Category:</strong> {product.category}</p>
+                    <p><strong>Quantity:</strong> {product.quantity}</p>
+                    <p><strong>Updated In:</strong> {product.updatedIn.split("T")[0]}</p>
+                    <p><strong>Created In:</strong> {product.createdIn.split("T")[0]}</p>
+                    <p><strong>Expiry Date:</strong> {product.expiryDate.split("T")[0]}</p>
+                    <p><strong>Supplier Name:</strong> {product.supplierName}</p>
+                    <p><strong>Reorder Level:</strong> {product.reorderLevel}</p>
+                  </div>
                   <button
                     onClick={onClose}
                     className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 transition focus:outline-none focus:ring-2 focus:ring-purple-500"

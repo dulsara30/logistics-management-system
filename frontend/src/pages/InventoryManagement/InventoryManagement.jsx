@@ -6,24 +6,26 @@ import ItemDetailsCard from "../../component/inventory/ItemDetailsCard";
 import SearchSortBar from "../../component/inventory/SearchSortBar";
 import InventoryTable from "../../component/inventory/InventoryTable";
 import CrudModal from "../../component/inventory/CrudModal";
-import BarcodeScannerModal from "../../component/inventory/BarcodeScannerModal";
+// import BarcodeScannerModal from "../../component/inventory/BarcodeScannerModal";
+import BarcodeScannerModal from "../../component/Inventory/BarCodeScannerModal";
 
 const InventoryManagementPage = () => {
   const [inventory, setInventory] = useState([]);
   const [filteredInventory, setFilteredInventory] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isScannerOpen, setIsScannerOpen] = useState(false); // State for barcode scanner modal
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    supplierID: "",
+    productName: "",
+    brandName: "",
+    description: "",
+    price: "",
     category: "",
     quantity: "",
-    location: "",
-    lastUpdated: new Date().toISOString().split("T")[0],
+    updatedIn: new Date().toISOString().split("T")[0],
+    createdIn: new Date().toISOString().split("T")[0],
+    expiryDate: "",
     supplierName: "",
-    unitPrice: "",
-    expirationDate: "",
-    notes: "",
+    reorderLevel: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -34,7 +36,6 @@ const InventoryManagementPage = () => {
   const [sortByQuantity, setSortByQuantity] = useState("none");
   const navigate = useNavigate();
 
-  // Fetch inventory items from the backend
   const fetchInventory = async () => {
     setIsLoading(true);
     setError(null);
@@ -87,16 +88,16 @@ const InventoryManagementPage = () => {
     if (searchTerm) {
       updatedInventory = updatedInventory.filter(
         (item) =>
-          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.supplierID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.brandName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (sortByDate === "oldest") {
-      updatedInventory.sort((a, b) => new Date(a.lastUpdated) - new Date(b.lastUpdated));
+      updatedInventory.sort((a, b) => new Date(a.updatedIn) - new Date(b.updatedIn));
     } else if (sortByDate === "latest") {
-      updatedInventory.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+      updatedInventory.sort((a, b) => new Date(b.updatedIn) - new Date(a.updatedIn));
     }
 
     if (sortByQuantity === "lowest") {
@@ -110,16 +111,17 @@ const InventoryManagementPage = () => {
 
   const openAddModal = () => {
     setFormData({
-      name: "",
-      supplierID: "",
+      productName: "",
+      brandName: "",
+      description: "",
+      price: "",
       category: "",
       quantity: "",
-      location: "",
-      lastUpdated: new Date().toISOString().split("T")[0],
+      updatedIn: new Date().toISOString().split("T")[0],
+      createdIn: new Date().toISOString().split("T")[0],
+      expiryDate: "",
       supplierName: "",
-      unitPrice: "",
-      expirationDate: "",
-      notes: "",
+      reorderLevel: "",
     });
     setIsEditing(false);
     setIsModalOpen(true);
@@ -130,17 +132,19 @@ const InventoryManagementPage = () => {
       ...item,
       id: item._id,
       quantity: item.quantity.toString(),
-      unitPrice: item.unitPrice.toString(),
-      lastUpdated: item.lastUpdated.split("T")[0],
+      price: item.price.toString(),
+      updatedIn: item.updatedIn.split("T")[0],
+      createdIn: item.createdIn.split("T")[0],
+      expiryDate: item.expiryDate.split("T")[0],
+      reorderLevel: item.reorderLevel.toString(),
     });
     setIsEditing(true);
     setIsModalOpen(true);
   };
 
-  // Handle product found from barcode scan
   const handleProductFound = (product) => {
-    setIsScannerOpen(false); // Close scanner modal
-    openEditModal(product); // Open edit modal with scanned product
+    setIsScannerOpen(false);
+    openEditModal(product);
   };
 
   const handleInputChange = (e) => {
@@ -151,30 +155,62 @@ const InventoryManagementPage = () => {
 
   const validateForm = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
-    if (!formData.name || formData.name.trim() === "") {
+    if (!formData.productName || formData.productName.trim() === "") {
       setError("Product name is required");
       return false;
     }
-    if (!nameRegex.test(formData.name)) {
+    if (!nameRegex.test(formData.productName)) {
       setError("Product name must contain only letters and spaces");
       return false;
     }
-    if (formData.name.length < 2 || formData.name.length > 50) {
+    if (formData.productName.length < 2 || formData.productName.length > 50) {
       setError("Product name must be between 2 and 50 characters");
       return false;
     }
 
-    const supplierIDRegex = /^[A-Za-z0-9]+$/;
-    if (!formData.supplierID || formData.supplierID.trim() === "") {
-      setError("Supplier ID is required");
+    if (!formData.brandName || formData.brandName.trim() === "") {
+      setError("Brand name is required");
       return false;
     }
-    if (!supplierIDRegex.test(formData.supplierID)) {
-      setError("Supplier ID must be alphanumeric (letters and numbers only)");
+    if (!nameRegex.test(formData.brandName)) {
+      setError("Brand name must contain only letters and spaces");
       return false;
     }
-    if (formData.supplierID.length < 3 || formData.supplierID.length > 10) {
-      setError("Supplier ID must be between 3 and 10 characters");
+    if (formData.brandName.length < 2 || formData.brandName.length > 50) {
+      setError("Brand name must be between 2 and 50 characters");
+      return false;
+    }
+
+    if (!formData.description || formData.description.trim() === "") {
+      setError("Description is required");
+      return false;
+    }
+    if (formData.description.length < 10 || formData.description.length > 500) {
+      setError("Description must be between 10 and 500 characters");
+      return false;
+    }
+    const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    if (scriptRegex.test(formData.description)) {
+      setError("Description must not contain script tags");
+      return false;
+    }
+
+    const price = parseFloat(formData.price);
+    if (!formData.price || isNaN(price)) {
+      setError("Price must be a valid number");
+      return false;
+    }
+    if (price < 0.01) {
+      setError("Price must be at least 0.01");
+      return false;
+    }
+    if (price > 10000) {
+      setError("Price must not exceed 10,000");
+      return false;
+    }
+    const decimalPlaces = (formData.price.toString().split(".")[1] || "").length;
+    if (decimalPlaces > 2) {
+      setError("Price must have at most 2 decimal places");
       return false;
     }
 
@@ -206,33 +242,43 @@ const InventoryManagementPage = () => {
       return false;
     }
 
-    const locationRegex = /^[A-Za-z0-9\s\-]+$/;
-    if (!formData.location || formData.location.trim() === "") {
-      setError("Location is required");
+    if (!formData.updatedIn) {
+      setError("Updated date is required");
       return false;
     }
-    if (!locationRegex.test(formData.location)) {
-      setError("Location must contain only letters, numbers, spaces, and hyphens");
+    const updatedDate = new Date(formData.updatedIn);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (isNaN(updatedDate.getTime())) {
+      setError("Updated date must be a valid date");
       return false;
     }
-    if (formData.location.length < 2 || formData.location.length > 100) {
-      setError("Location must be between 2 and 100 characters");
+    if (updatedDate > today) {
+      setError("Updated date cannot be in the future");
       return false;
     }
 
-    if (!formData.lastUpdated) {
-      setError("Last updated date is required");
+    if (!formData.createdIn) {
+      setError("Created date is required");
       return false;
     }
-    const lastUpdatedDate = new Date(formData.lastUpdated);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (isNaN(lastUpdatedDate.getTime())) {
-      setError("Last updated date must be a valid date");
+    const createdDate = new Date(formData.createdIn);
+    if (isNaN(createdDate.getTime())) {
+      setError("Created date must be a valid date");
       return false;
     }
-    if (lastUpdatedDate > today) {
-      setError("Last updated date cannot be in the future");
+
+    if (!formData.expiryDate) {
+      setError("Expiry date is required");
+      return false;
+    }
+    const expiryDate = new Date(formData.expiryDate);
+    if (isNaN(expiryDate.getTime())) {
+      setError("Expiry date must be a valid date");
+      return false;
+    }
+    if (expiryDate <= today) {
+      setError("Expiry date must be in the future");
       return false;
     }
 
@@ -250,49 +296,18 @@ const InventoryManagementPage = () => {
       return false;
     }
 
-    const unitPrice = parseFloat(formData.unitPrice);
-    if (!formData.unitPrice || isNaN(unitPrice)) {
-      setError("Unit price must be a valid number");
+    const reorderLevel = parseInt(formData.reorderLevel);
+    if (!formData.reorderLevel || isNaN(reorderLevel)) {
+      setError("Reorder level must be a valid number");
       return false;
     }
-    if (unitPrice < 0.01) {
-      setError("Unit price must be at least 0.01");
+    if (reorderLevel < 0) {
+      setError("Reorder level must be a non-negative number");
       return false;
     }
-    if (unitPrice > 10000) {
-      setError("Unit price must not exceed 10,000");
+    if (reorderLevel > 10000) {
+      setError("Reorder level must not exceed 10,000");
       return false;
-    }
-    const decimalPlaces = (formData.unitPrice.toString().split(".")[1] || "").length;
-    if (decimalPlaces > 2) {
-      setError("Unit price must have at most 2 decimal places");
-      return false;
-    }
-
-    if (!formData.expirationDate) {
-      setError("Expiration date is required");
-      return false;
-    }
-    const expirationDate = new Date(formData.expirationDate);
-    if (isNaN(expirationDate.getTime())) {
-      setError("Expiration date must be a valid date");
-      return false;
-    }
-    if (expirationDate <= today) {
-      setError("Expiration date must be in the future");
-      return false;
-    }
-
-    if (formData.notes) {
-      if (formData.notes.length > 500) {
-        setError("Notes must not exceed 500 characters");
-        return false;
-      }
-      const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-      if (scriptRegex.test(formData.notes)) {
-        setError("Notes must not contain script tags");
-        return false;
-      }
     }
 
     return true;
@@ -321,16 +336,17 @@ const InventoryManagementPage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: formData.name.trim(),
-          supplierID: formData.supplierID.trim(),
+          productName: formData.productName.trim(),
+          brandName: formData.brandName.trim(),
+          description: formData.description.trim(),
+          price: parseFloat(formData.price),
           category: formData.category.trim(),
           quantity: parseInt(formData.quantity),
-          location: formData.location.trim(),
-          lastUpdated: formData.lastUpdated,
+          updatedIn: formData.updatedIn,
+          createdIn: formData.createdIn,
+          expiryDate: formData.expiryDate,
           supplierName: formData.supplierName.trim(),
-          unitPrice: parseFloat(formData.unitPrice),
-          expirationDate: formData.expirationDate,
-          notes: formData.notes ? formData.notes.trim() : "",
+          reorderLevel: parseInt(formData.reorderLevel),
         }),
       });
 
@@ -403,39 +419,39 @@ const InventoryManagementPage = () => {
 
   const downloadItemDetails = (item) => {
     const content = `
-      Product Name: ${item.name}
-      Supplier ID: ${item.supplierID}
+      Product Name: ${item.productName}
+      Brand Name: ${item.brandName}
+      Description: ${item.description}
+      Price: $${item.price}
       Category: ${item.category}
       Quantity: ${item.quantity}
-      Location: ${item.location}
-      Last Updated: ${item.lastUpdated}
+      Updated In: ${item.updatedIn}
+      Created In: ${item.createdIn}
+      Expiry Date: ${item.expiryDate}
       Supplier Name: ${item.supplierName}
-      Unit Price: $${item.unitPrice.toFixed(2)}
-      Expiration Date: ${item.expirationDate}
-      Notes: ${item.notes}
+      Reorder Level: ${item.reorderLevel}
     `;
+    
     const blob = new Blob([content], { type: "text/plain" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${item.supplierID}_details.txt`;
+    link.download = `${item.productName}_details.txt`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
 
   const handleScanBarcode = () => {
-    setIsScannerOpen(true); // Open the barcode scanner modal
+    setIsScannerOpen(true);
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen bg-white">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Inventory Management</h1>
         <p className="text-gray-600 mt-2">Manage your warehouse inventory efficiently</p>
       </div>
 
-      {/* Main Content */}
       <div className="flex gap-6">
         <Sidebar
           onAddItem={openAddModal}
