@@ -1,9 +1,17 @@
-import QRCode  from "qrcode";
+import QRCode from "qrcode";
 import path from "path";
+import { uploadQRCodeToCloudinary } from "./cloudinary";
 
-export async function generateQRCode(params: {email: string; fullName: string; phoneNo: string}): Promise<string> {
-    const qrData = JSON.stringify(params);
-    const qrCodePath = path.join('uploads', `${params.email}-qrcode.png`);
-    await QRCode.toFile(qrCodePath, qrData);
-    return  `/uploads/${params.email}-qrcode.png`;
+export async function generateQRCode(params: { email: string; fullName: string; phoneNo: string; NIC: string }): Promise<string> {
+  const qrData = JSON.stringify(params);
+  const nic = params.NIC.trim().toUpperCase();
+
+  //Generate QR code as a buffer
+  const qrCodeBuffer = await QRCode.toBuffer(qrData);
+
+
+  const qrCodeFileName = `${nic}-qrcode`;
+  const qrCodeUrl = await uploadQRCodeToCloudinary(qrCodeBuffer, qrCodeFileName, "staff_qr_codes");
+
+  return qrCodeUrl;
 }

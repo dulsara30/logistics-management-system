@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 function SupplierDetails() {
   const navigate = useNavigate();
 
-  // State declarations
+  // State declarations (unchanged)
   const [suppliers, setSuppliers] = useState([]);
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,10 +22,9 @@ function SupplierDetails() {
   const [itemsPerPage] = useState(5);
   const [formErrors, setFormErrors] = useState({});
 
-  // Normalize data: Ensure all fields are properly formatted
+  // normalizeSupplierData function (unchanged)
   const normalizeSupplierData = (data) => {
     return data.map((supplier) => {
-      // Convert quantity to array of numbers
       let quantity = Array.isArray(supplier.quantity)
         ? supplier.quantity
         : typeof supplier.quantity === "string"
@@ -38,7 +37,6 @@ function SupplierDetails() {
             .filter((num) => num !== null)
         : [];
 
-      // Convert price to array of numbers
       let price = Array.isArray(supplier.price)
         ? supplier.price
         : typeof supplier.price === "string"
@@ -51,14 +49,12 @@ function SupplierDetails() {
             .filter((num) => num !== null)
         : [];
 
-      // Convert items to array of strings
       let items = Array.isArray(supplier.items)
         ? supplier.items
         : typeof supplier.items === "string"
         ? supplier.items.split(",").map((item) => item.trim())
         : [];
 
-      // Ensure email and contact are strings
       let email = typeof supplier.email === "string" ? supplier.email : "N/A";
       let contact = typeof supplier.contact === "string" ? supplier.contact : "N/A";
 
@@ -74,10 +70,9 @@ function SupplierDetails() {
     });
   };
 
-  // Validate form inputs in the edit modal
+  // validateForm function (unchanged)
   const validateForm = (supplier) => {
     const errors = {};
-
     if (Array.isArray(supplier.quantity)) {
       const invalidQuantity = supplier.quantity.some((qty) => isNaN(qty) || qty < 0);
       if (invalidQuantity) {
@@ -86,7 +81,6 @@ function SupplierDetails() {
     } else {
       errors.quantity = "Quantities must be provided";
     }
-
     if (Array.isArray(supplier.price)) {
       const invalidPrice = supplier.price.some((price) => isNaN(price) || price < 0);
       if (invalidPrice) {
@@ -95,38 +89,31 @@ function SupplierDetails() {
     } else {
       errors.price = "Prices must be provided";
     }
-
     if (!Array.isArray(supplier.items) || supplier.items.length === 0) {
       errors.items = "At least one item must be provided";
     }
-
     if (!supplier.name || supplier.name.trim() === "") {
       errors.name = "Name is required";
     }
-
     if (!supplier.email || supplier.email.trim() === "") {
       errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplier.email)) {
       errors.email = "Invalid email format";
     }
-
     if (!supplier.contact || supplier.contact.trim() === "") {
       errors.contact = "Contact is required";
     }
-
     if (!supplier.date || supplier.date.trim() === "") {
       errors.date = "Date is required";
     }
-
     return errors;
   };
 
-  // Fetch suppliers from backend on component mount
+  // Fetch suppliers useEffect (unchanged)
   useEffect(() => {
     const getSuppliers = async () => {
       setIsLoading(true);
       setError(null);
-
       try {
         const res = await fetch("http://localhost:8000/suppliers", {
           method: "GET",
@@ -134,13 +121,10 @@ function SupplierDetails() {
             "Content-Type": "application/json",
           },
         });
-
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        console.log("Fetched supplier data:", data);
-
         const normalizedData = normalizeSupplierData(data);
         setSuppliers(normalizedData);
         setFilteredSuppliers(normalizedData);
@@ -151,11 +135,10 @@ function SupplierDetails() {
         setIsLoading(false);
       }
     };
-
     getSuppliers();
   }, []);
 
-  // Apply search and sort when searchTerm or sortOrder changes
+  // Modified Search and Sort useEffect - Added quantity search
   useEffect(() => {
     if (!suppliers || !Array.isArray(suppliers)) return;
 
@@ -170,7 +153,8 @@ function SupplierDetails() {
           (supplier.email?.toLowerCase() || "").includes(lowerSearchTerm) ||
           (supplier.contact?.toLowerCase() || "").includes(lowerSearchTerm) ||
           (supplier.date?.toLowerCase() || "").includes(lowerSearchTerm) ||
-          supplier.items?.some((item) => item.toLowerCase().includes(lowerSearchTerm))
+          supplier.items?.some((item) => item.toLowerCase().includes(lowerSearchTerm)) ||
+          supplier.quantity?.some((qty) => qty.toString().includes(lowerSearchTerm))
         );
       });
     }
@@ -184,7 +168,7 @@ function SupplierDetails() {
     setFilteredSuppliers(results);
   }, [searchTerm, sortOrder, suppliers]);
 
-  // Pagination
+  // Rest of the pagination functions (unchanged)
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentSuppliers = filteredSuppliers.slice(indexOfFirstItem, indexOfLastItem);
@@ -205,6 +189,7 @@ function SupplierDetails() {
     setSortOrder(sortOrder === "latest" ? "oldest" : "latest");
   };
 
+  // Rest of the handler functions (unchanged)
   const handleEditClick = (supplier) => {
     setEditSupplier({ ...supplier });
     setFormErrors({});
@@ -217,7 +202,6 @@ function SupplierDetails() {
       setFormErrors(errors);
       return;
     }
-
     try {
       const res = await fetch(`http://localhost:8000/suppliers/${editSupplier.id}`, {
         method: "PUT",
@@ -234,13 +218,11 @@ function SupplierDetails() {
           date: editSupplier.date,
         }),
       });
-
       if (!res.ok) {
         throw new Error("Failed to update supplier");
       } else {
         alert(`Supplier: ${editSupplier.name} Update Successful!`);
       }
-
       const updatedSupplier = await res.json();
       const normalizedUpdatedSupplier = normalizeSupplierData([updatedSupplier])[0];
       setSuppliers(
@@ -275,11 +257,9 @@ function SupplierDetails() {
           "Content-Type": "application/json",
         },
       });
-
       if (!res.ok) {
         throw new Error("Failed to delete supplier");
       }
-
       setSuppliers(suppliers.filter((sup) => sup.id !== supplierToDelete.id));
       setFilteredSuppliers(
         filteredSuppliers.filter((sup) => sup.id !== supplierToDelete.id)
@@ -322,15 +302,13 @@ function SupplierDetails() {
     filteredSuppliers.forEach(downloadReport);
   };
 
+  // JSX Return (unchanged except placeholder text)
   return (
     <div className="space-y-6 px-5">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Manage Suppliers</h1>
-       
       </div>
 
-      {/* Search & Sort Controls */}
       <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow border border-gray-100">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
@@ -340,7 +318,7 @@ function SupplierDetails() {
             />
             <input
               type="text"
-              placeholder="Search by name, ID, date, or item..."
+              placeholder="Search by name, ID, date, item, or quantity..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -364,13 +342,11 @@ function SupplierDetails() {
         </div>
       </div>
 
-      {/* Loading and Error States */}
       {isLoading && <div className="text-center py-4">Loading suppliers...</div>}
       {error && (
         <div className="text-center py-4 text-red-600">Error: {error}</div>
       )}
 
-      {/* Supplier Table */}
       {!isLoading && !error && (
         <div className="bg-white rounded-lg shadow border border-gray-100 overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
@@ -420,7 +396,7 @@ function SupplierDetails() {
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {supplier.contact}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray- Linkgray-900">
                       {Array.isArray(supplier.items) && supplier.items.length > 0 ? (
                         supplier.items.map((item, idx) => (
                           <div key={idx}>{item}</div>
@@ -461,7 +437,7 @@ function SupplierDetails() {
                         <button
                           className="text-red-600 hover:text-red-900 inline-flex items-center"
                           onClick={() => handleDeleteClick(supplier)}
-                          style={{ display: "inline-flex" }} // Ensure visibility
+                          style={{ display: "inline-flex" }}
                         >
                           <Trash2 size={18} />
                         </button>
@@ -482,7 +458,6 @@ function SupplierDetails() {
             </tbody>
           </table>
 
-          {/* Pagination */}
           <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200 bg-white">
             <p className="text-sm text-gray-700">
               Showing <span className="font-medium">{indexOfFirstItem + 1}</span>{" "}
@@ -525,7 +500,6 @@ function SupplierDetails() {
         </div>
       )}
 
-      {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors duration-200"
@@ -534,7 +508,6 @@ function SupplierDetails() {
         Back
       </button>
 
-      {/* Edit Modal */}
       {isEditModalOpen && editSupplier && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
@@ -709,7 +682,6 @@ function SupplierDetails() {
         </div>
       )}
 
-      {/* View Modal */}
       {isViewModalOpen && selectedSupplier && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
@@ -794,7 +766,6 @@ function SupplierDetails() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && supplierToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
