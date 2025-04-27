@@ -28,6 +28,8 @@ import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx';
 import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
 import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
+import DeliveryManagementEmployee from './component/DeliveryScheduling/DeliveryManagementEmployee.jsx'
+
 
 // Staff Pages
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx';
@@ -111,11 +113,13 @@ const router = createBrowserRouter([
           {
             path: "delivery",
             element: (
-              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager","Driver"]}>
                 <DeliveryManagement />
               </ProtectedRoute>
             )
           },
+         
+
           {
             path: "delivery/NewDeliveryScheduling",
             element: <NewDeliverySchedule />
@@ -184,6 +188,11 @@ const router = createBrowserRouter([
       }
     ]
   },
+
+
+  
+
+
   {
     element: <StaffLayout />,
     children: [
@@ -195,16 +204,30 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
+  
+
           {
-            path: "profile/:id",
+            path: "delivery",
             element: (
-              <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
-                <Profile />
+              <ProtectedRoute allowedRoles={["Other Staff"]}>
+                <DeliveryManagementEmployee />
               </ProtectedRoute>
             )
           }
+
+
         ]
-      }
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
+            <Profile />
+          </ProtectedRoute>
+        )
+      },
+      
+
     ]
   }
 ]);
