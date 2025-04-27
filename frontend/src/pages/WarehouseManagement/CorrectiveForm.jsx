@@ -2,240 +2,265 @@ import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Stack,
   Typography,
   Box,
-  MenuItem,
+  Paper,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-const CombinedMaintenanceForm = () => {
+const MaintenanceForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Get ID from the URL
+  const { id } = useParams();
   const [formData, setFormData] = useState({
-    id: id || "",  // Pre-fill if ID exists in URL
+    id: id || "",
     warehouse: "",
     date: "",
+    maintenanceType: "",
     description: "",
-    otherCharges: "",
+    serviceProvider: "",
+    cost: "",
+    nextServiceDate: "",
+    status: "Pending",
+    remarks: "",
+    attachments: []
   });
 
-  const [items, setItems] = useState([{ name: "", qty: "", price: "" }]);
   const [errors, setErrors] = useState({});
-  const [maintenanceData, setMaintenanceData] = useState([]);
 
-  // Fetch maintenance data from backend
   useEffect(() => {
-    axios.get("http://localhost:8000/api/maintenance")
-      .then((response) => {
-        setMaintenanceData(response.data); // Set maintenance data
-      })
-      .catch((error) => console.error("Error fetching maintenance:", error));
-  }, []);
+    if (id) {
+      // Fetch existing maintenance record if editing
+      axios.get(`http://localhost:8000/api/maintenance/${id}`)
+        .then((response) => {
+          const data = response.data;
+          setFormData({
+            ...data,
+            date: data.date ? new Date(data.date).toISOString().split('T')[0] : '',
+            nextServiceDate: data.nextServiceDate ? new Date(data.nextServiceDate).toISOString().split('T')[0] : ''
+          });
+        })
+        .catch((error) => console.error("Error fetching maintenance:", error));
+    }
+  }, [id]);
 
-  // Handle input field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
   };
 
-  // Handle maintenance selection
-  const handleMaintenanceSelect = (e) => {
-    const selectedID = e.target.value;
-    const selectedMaintenance = maintenanceData.find((m) => m.ID === selectedID);
-
-    if (selectedMaintenance) {
-      setFormData({
-        id: selectedID,
-        warehouse: selectedMaintenance.warehouse || "",
-        date: selectedMaintenance.date || "",
-        description: selectedMaintenance.description || "",
-        otherCharges: selectedMaintenance.otherCharges || "",
-      });
-    }
-  };
-
-  // Handle item changes
-  const handleItemChange = (index, e) => {
-    const { name, value } = e.target;
-    const updatedItems = [...items];
-    updatedItems[index][name] = value;
-    setItems(updatedItems);
-  };
-
-  // Add new row to items
-  const addNewRow = () => {
-    setItems([...items, { name: "", qty: "", price: "" }]);
-  };
-
-  // Form validation
-  const validateForm = () => {
-    let newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      if (!formData[key] && key !== "otherCharges") {
-        newErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`;
-      }
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    // Here you would typically upload the files to your server/storage
+    // and get back URLs to store in the attachments array
+    // For now, we'll just store the file names
+    setFormData({
+      ...formData,
+      attachments: [...formData.attachments, ...files.map(file => file.name)]
     });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.warehouse) newErrors.warehouse = "Warehouse is required";
+    if (!formData.date) newErrors.date = "Date is required";
+    if (!formData.maintenanceType) newErrors.maintenanceType = "Maintenance type is required";
+    if (!formData.description) newErrors.description = "Description is required";
+    if (!formData.serviceProvider) newErrors.serviceProvider = "Service provider is required";
+    if (!formData.cost) newErrors.cost = "Cost is required";
+    if (!formData.nextServiceDate) newErrors.nextServiceDate = "Next service date is required";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!validateForm()) return;
 
-    console.log("Form Submitted:", formData, "Items:", items);
-    
-    // Send data to backend
-    axios.post("http://localhost:8000/api/submit-maintenance", {
-      ...formData,
-      items,
-    })
-    .then(() => navigate("/CorrectiveSubmit"))
-    .catch((error) => console.error("Error submitting form:", error));
+    try {
+      if (id) {
+        // Update existing record
+        await axios.put(`http://localhost:8000/api/maintenance/${id}`, formData);
+      } else {
+        // Create new record
+        await axios.post("http://localhost:8000/api/maintenance", formData);
+      }
+      navigate("/maintenance"); // Redirect to maintenance list
+    } catch (error) {
+      console.error("Error saving maintenance:", error);
+      alert("Error saving maintenance record");
+    }
   };
 
   return (
-    <Box sx={{ width: 600, margin: "auto", padding: 3, boxShadow: 3, bgcolor: "#FFFFFF", borderRadius: 2 }}>
-      <Typography variant="h6" gutterBottom sx={{ color: "#333333" }}>
-        Corrective Maintenance Form
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          {/* Maintenance Selection */}
-          <TextField
-            select
-            label="Select Maintenance ID"
-            name="id"
-            value={formData.id}
-            onChange={handleMaintenanceSelect}
-            fullWidth
-            error={!!errors.id}
-            helperText={errors.id}
-          >
-            {maintenanceData.map((m) => (
-              <MenuItem key={m.ID} value={m.ID}>
-                {m.ID} - {m.warehouse}
-              </MenuItem>
-            ))}
-          </TextField>
+    <Box sx={{ p: 3, maxWidth: 800, margin: "auto" }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          {id ? "Edit Maintenance Record" : "Create Maintenance Record"}
+        </Typography>
 
-          <TextField
-            label="Warehouse"
-            name="warehouse"
-            fullWidth
-            value={formData.warehouse}
-            onChange={handleChange}
-            error={!!errors.warehouse}
-            helperText={errors.warehouse}
-          />
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={2}>
+            <TextField
+              name="warehouse"
+              label="Warehouse"
+              value={formData.warehouse}
+              onChange={handleChange}
+              error={!!errors.warehouse}
+              helperText={errors.warehouse}
+              required
+            />
 
-          <TextField
-            label="Date"
-            type="date"
-            name="date"
-            fullWidth
-            value={formData.date}
-            onChange={handleChange}
-            error={!!errors.date}
-            helperText={errors.date}
-            InputLabelProps={{ shrink: true }}
-          />
+            <TextField
+              name="date"
+              label="Maintenance Date"
+              type="date"
+              value={formData.date}
+              onChange={handleChange}
+              error={!!errors.date}
+              helperText={errors.date}
+              InputLabelProps={{ shrink: true }}
+              required
+            />
 
-          <TextField
-            label="Maintenance Description"
-            name="description"
-            fullWidth
-            multiline
-            rows={4}
-            value={formData.description}
-            onChange={handleChange}
-            error={!!errors.description}
-            helperText={errors.description}
-          />
 
-          <TextField
-            label="Price of Other Service Charges"
-            name="otherCharges"
-            fullWidth
-            multiline
-            rows={3}
-            value={formData.otherCharges}
-            onChange={handleChange}
-          />
+            
 
-          {/* Items Table */}
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item Name</TableCell>
-                  <TableCell>Quantity</TableCell>
-                  <TableCell>Price per Item</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {items.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <TextField
-                        name="name"
-                        value={item.name}
-                        onChange={(e) => handleItemChange(index, e)}
-                        fullWidth
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        name="qty"
-                        type="number"
-                        value={item.qty}
-                        onChange={(e) => handleItemChange(index, e)}
-                        fullWidth
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        name="price"
-                        type="number"
-                        value={item.price}
-                        onChange={(e) => handleItemChange(index, e)}
-                        fullWidth
-                      />
-                    </TableCell>
-                  </TableRow>
+            <FormControl required error={!!errors.maintenanceType}>
+              <InputLabel>Maintenance Type</InputLabel>
+              <Select
+                name="maintenanceType"
+                value={formData.maintenanceType}
+                onChange={handleChange}
+                label="Maintenance Type"
+              >
+                <MenuItem value="Preventive">Preventive</MenuItem>
+                <MenuItem value="Corrective">Corrective</MenuItem>
+                <MenuItem value="Emergency">Emergency</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              name="description"
+              label="Description"
+              multiline
+              rows={4}
+              value={formData.description}
+              onChange={handleChange}
+              error={!!errors.description}
+              helperText={errors.description}
+              required
+            />
+
+            <TextField
+              name="serviceProvider"
+              label="Service Provider"
+              value={formData.serviceProvider}
+              onChange={handleChange}
+              error={!!errors.serviceProvider}
+              helperText={errors.serviceProvider}
+              required
+            />
+
+            <TextField
+              name="cost"
+              label="Cost"
+              type="number"
+              value={formData.cost}
+              onChange={handleChange}
+              error={!!errors.cost}
+              helperText={errors.cost}
+              required
+            />
+
+            <TextField
+              name="nextServiceDate"
+              label="Next Service Date"
+              type="date"
+              value={formData.nextServiceDate}
+              onChange={handleChange}
+              error={!!errors.nextServiceDate}
+              helperText={errors.nextServiceDate}
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+
+            <FormControl required error={!!errors.status}>
+              <InputLabel>Status</InputLabel>
+              <Select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                label="Status"
+              >
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              name="remarks"
+              label="Remarks"
+              multiline
+              rows={2}
+              value={formData.remarks}
+              onChange={handleChange}
+            />
+
+            <Button
+              variant="contained"
+              component="label"
+            >
+              Upload Attachments
+              <input
+                type="file"
+                hidden
+                multiple
+                onChange={handleFileChange}
+              />
+            </Button>
+
+            {formData.attachments.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2">Attachments:</Typography>
+                {formData.attachments.map((file, index) => (
+                  <Typography key={index} variant="body2">{file}</Typography>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </Box>
+            )}
 
-          {/* Add Item Button */}
-          <Button variant="contained" color="primary" onClick={addNewRow}>
-            Add more item
-          </Button>
-
-          {/* Submit Button */}
-          <Button type="submit" variant="contained" sx={{ bgcolor: "#ab47bc", color: "#FFF" }} fullWidth 
-          onClick={() => navigate('CorrectiveSubmit')}>
-            Submit
-          </Button>
-        </Stack>
-      </form>
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/maintenance")}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+              >
+                {id ? "Update" : "Create"}
+              </Button>
+            </Stack>
+          </Stack>
+        </form>
+      </Paper>
     </Box>
   );
 };
 
-export default CombinedMaintenanceForm;
+export default MaintenanceForm;
 
 
 

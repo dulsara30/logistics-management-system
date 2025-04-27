@@ -2,20 +2,19 @@ import mongoose from "mongoose";
 //const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const MaintainanceSchema = new mongoose.Schema({
-    //WarehouseID: { type: String, unique: true},
-    ID: { type: String, unique: true},
-    warehouse: { type: String, required: true },
-    date: { type: Number, required: true },
-    description: { type: String, required: true },
-    otherCharges: { type: Number, default: 0  },
-    itemName: { type: String, default: 0 },
-    Quantity: {type: Number, default: 0 },
-    PriceperItem: {type: Number, default: 0},
+  requestId: { type: String, unique: true, required: true },
+  warehouseId: { type: String, required: true },
+  issueDescription: { type: String, required: true },
+  priority: { type: String, required: true }, // e.g., Low, Medium, High
+  requestedBy: { type: String, required: true }, // could be a username or userId
+  status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' }, // default as 'Pending'
+  scheduledDate: { type: Date, required: true },
+  completionDate: { type: Date, required: true },
     
 });
 
 
-const maintainance = mongoose.model("maintainace", MaintainanceSchema);
+const maintainance = mongoose.model("maintainance", MaintainanceSchema);
 export default maintainance;
 
 // drop box

@@ -9,7 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
 } from '@mui/material';
 
 
@@ -32,10 +32,13 @@ export default function WarehouseForm() {
       });
   }, [WarehouseID]); // Re-fetch when WarehouseID changes
 
+
+
+
+
   // Handle input field changes (if editing)
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData((prev) => ({...prev,
       [e.target.name]: e.target.value,
     }));
   };
@@ -55,6 +58,10 @@ export default function WarehouseForm() {
   // Handle form submission (save data)
   const handleSubmit = () => {
 
+
+
+
+
     axios
     .put(`http://localhost:8000/api/warehouse/${WarehouseID}`, formData)
     .then((response) => {
@@ -67,6 +74,12 @@ export default function WarehouseForm() {
     });
 
   };
+
+
+
+
+
+
 
   // Handle delete action
   const handleDelete = () => {
@@ -89,6 +102,10 @@ export default function WarehouseForm() {
     }
   };
   
+
+
+
+
   return (
     <Grid container spacing={2} sx={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
       <Box sx={{ width: "100%" }}>
@@ -158,6 +175,9 @@ export default function WarehouseForm() {
           />
         </Box>
 
+
+
+
         <Box sx={{ mt: 4 }}>
   <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
     Section Sizes
@@ -208,6 +228,8 @@ export default function WarehouseForm() {
     </Table>
   </TableContainer>
 </Box>
+
+
 
 
         {/* Action buttons */}

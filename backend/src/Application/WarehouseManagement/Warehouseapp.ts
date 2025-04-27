@@ -5,6 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 
+
+
+
 // Read all Warehouse
 export const getAllWarehouses = async () => {
   try {
@@ -27,6 +30,10 @@ export const getWarehouseById = async (Wname: string) => {
     throw new Error("Error fetching warehouse");
   }
 }
+
+
+
+
 
 
 export const createWarehouse = async (
@@ -67,6 +74,9 @@ export const createWarehouse = async (
 
 
 
+
+
+
 // (update) update a warehouse by ID
 export const updateWarehouse = async (
   WarehouseID: string,
@@ -101,6 +111,10 @@ export const updateWarehouse = async (
     throw new Error("Error updating warehouse");
   }
 };
+
+
+
+
 
 
 

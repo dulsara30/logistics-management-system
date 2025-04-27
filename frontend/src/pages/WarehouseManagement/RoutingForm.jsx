@@ -21,7 +21,10 @@ export default function RoutingMaintenanceForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form Submitted:', formData);
-    // Add form submission logic here (e.g., API call)
+
+    // Simulate API call (optional: you can add fetch/axios here)
+    // After successful submission, then navigate
+    navi('/RoutingSubmit');
   };
 
   return (
@@ -95,9 +98,7 @@ export default function RoutingMaintenanceForm() {
             color="primary"
             fullWidth
             type="submit"
-            sx={{ mt: 2 ,bgcolor: '#ab47bc',color: '#FFF' }}
-            onClick={() => navi('RoutingSubmit')}
-            
+            sx={{ mt: 2, bgcolor: '#ab47bc', color: '#FFF' }}
           >
             Submit
           </Button>

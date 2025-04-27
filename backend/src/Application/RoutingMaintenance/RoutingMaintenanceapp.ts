@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import maintainanceR from "../../Infrastructure/schemas/RoutingMaintenance/RoutingMaintenanceSchema";
 
 
-// Read all Warehouse (create)
+// Read all Warehouse 
 export const getAllMaintenance = async () => {
   try {
     const RoutingMaintenance = await maintainanceR.find(); // fetch all warehouse from the collection
@@ -16,7 +16,7 @@ export const getAllMaintenance = async () => {
 };
 
 
-// (creat) a warehouse by ID
+// (read) a warehouse by ID
 export const getMaintenanceById = async (Mid: string) => {
   try {
     return await maintainanceR.find({RID:Mid});
@@ -26,6 +26,12 @@ export const getMaintenanceById = async (Mid: string) => {
   }}
 
 
+
+
+
+
+
+  
 export const createRoutingMaintenance = async (
   RID: String,
   warehouse: string,
@@ -52,6 +58,8 @@ export const createRoutingMaintenance = async (
 
   }
 };
+
+
 
 
 

@@ -3,55 +3,62 @@ import Maintenance from "../../Infrastructure/schemas/Maintenance/MaintenanceSch
 import { Request, Response } from 'express';
 
 
-// Read all Warehouse (create)
+
+
+
+// Read all Maintenance records
 export const getAllMaintenance = async () => {
   try {
-    const maintenance = await Maintenance.find(); // fetch all warehouse from the collection
+    const maintenance = await Maintenance.find();
     return maintenance;
   } catch (error) {
-    console.error("Error retrieving warehousemaintenance:", error);
-    throw new Error("Error retrieving Warehouse ");
+    console.error("Error retrieving maintenance records:", error);
+    throw new Error("Error retrieving maintenance records");
   }
 };
 
-
-// (creat) a warehouse by ID
+// Get a maintenance record by ID
 export const getMaintenanceById = async (Mid: string) => {
   try {
-    return await Maintenance.find({ID:Mid});
+    return await Maintenance.findOne({requestId: Mid});
   } catch (error) {
     console.error("Error fetching Maintenance:", error);
     throw new Error("Error fetching Maintenance");
-  }}
+  }
+}
+
+
+
+
 
 
 export const createMaintenance = async (
-  ID: String,
-  warehouse: string,
-  date: string,
-  description: string,
-  otherCharges: string,
-  items: string,
-  Quantity: Number,
-  PriceperItem: Number,
-  
-
+  requestId: string,
+  warehouseId: string,
+  issueDescription: string,
+  priority: string,
+  requestedBy: string,
+  status: string,
+  scheduledDate: Date,
+  completionDate: Date,
 ) => {
   try {
+    const maintenance = new Maintenance({
+    requestId,
+    warehouseId,
+    issueDescription,
+    priority,
+    requestedBy,
+    status,
+    scheduledDate,
+    completionDate
+    });
 
-    // Create a new warehouse instance or object with the provided data
-    const W = new Maintenance({ ID,warehouse,date,description,otherCharges,items,Quantity,PriceperItem
-     });
-
-    // Save the new warehouse to the database and return the result
-    const savedmaintenance = await W.save();
-    return savedmaintenance;
-
+    const savedMaintenance = await maintenance.save();
+    return savedMaintenance;
   } catch (error) {
-
     console.error("Error creating Maintenance:", error);
     throw new Error("Error creating Maintenance");
-
   }
 };
 
@@ -60,33 +67,33 @@ export const createMaintenance = async (
 
 
 
-// (update) update a warehouse by ID
+
+// Update maintenance record
 export const updateMaintenance = async (
-  ID: string,
+  requestId: string,
   updates: {
-    warehouse?: string,
-    date?: string,
-    description?: string,
-    otherCharges?: string,
-    items?: string,
-    Quantity?: number,
-    PriceperItem?: number,
+    warehouseId?: string,
+    issueDescription?: string,
+    priority?: string,
+    requestedBy?: string,
+    status?: string,
+    scheduledDate?: Date,
+    completionDate?: Date,
     
   }
 ) => {
   try {
-    // Find the warehouse by WarehouseID and update it with the new details
-    const updateMaintenance = await Maintenance.findOneAndUpdate(
-      { ID: ID }, // match by WarehouseID
-      { $set: updates },             // apply the updates
-      { new: true }                  // return the updated document
+    const updatedMaintenance = await Maintenance.findOneAndUpdate(
+      { requestId: requestId },
+      { $set: updates },
+      { new: true }
     );
 
-    if (!updateMaintenance) {
-      throw new Error("Maintenance not found");
+    if (!updatedMaintenance) {
+      throw new Error("Maintenance record not found");
     }
 
-    return updateMaintenance;
+    return updatedMaintenance;
   } catch (error) {
     console.error("Error updating Maintenance:", error);
     throw new Error("Error updating Maintenance");
@@ -99,18 +106,16 @@ export const updateMaintenance = async (
 
 
 
-
-// (delete) delete a warehouse by ID
-export const deletemaintenance = async (ID: string) => {
+// Delete maintenance record
+export const deleteMaintenance = async (requestId: string) => {
   try {
-    // Find the warehouse by WarehouseID and delete it
-    const deletedmaintenance = await Maintenance.findOneAndDelete({ ID });
+    const deletedMaintenance = await Maintenance.findOneAndDelete({ requestId });
 
-    if (!deletedmaintenance) {
-      throw new Error("Warehouse not found");
+    if (!deletedMaintenance) {
+      throw new Error("Maintenance record not found");
     }
 
-    return deletedmaintenance;
+    return deletedMaintenance;
   } catch (error) {
     console.error("Error deleting maintenance:", error);
     throw new Error("Error deleting maintenance");

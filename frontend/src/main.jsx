@@ -13,8 +13,11 @@ import SupplierManagement from './pages/SupplierManagement/SupplierManagement.js
 import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx'
 import Help from './pages/Help/Help.jsx'
 import DashboardLayout from './component/DashBoard1.jsx'
+import reportgenarate from './pages/WarehouseManagement/Report.jsx'
 
 import WarehouseForm from './pages/WarehouseManagement/WarehouseProfile.jsx'
+//import MaintenanceForm from './pages/maintainance/MaintenanceForm.jsx'
+
 
 import Maintainance from './pages/WarehouseManagement/Mantainance.jsx'
 import CorrectiveForm from './pages/WarehouseManagement/CorrectiveForm.jsx'
@@ -26,6 +29,9 @@ import MaintenanceDetails from './pages/WarehouseManagement/CorrectiveDetails.js
 
 //import WarehouseForm from './pages/WarehouseManagement/WarehouseForm.jsx'
 import CreateWarehouse from './pages/WarehouseManagement/CreateWarehouse.jsx'
+//import MaintenanceForm from './pages/WarehouseManagement/MaintenanceForm.jsx'
+import MaintenanceForm from './pages/WarehouseManagement/CreateMaintenance.jsx'
+import MaintenanceFormTwo from './pages/WarehouseManagement/MaintenanceProfile.jsx'
 
 const router = createBrowserRouter([
   {
@@ -41,7 +47,12 @@ const router = createBrowserRouter([
 
         //  {path:"warehouse/warehouse-form/WarehouseSubmit", element:<WarehouseSubmit/>, },
         
-          {path:"warehouse/Maintainance", element:<Maintainance/>, },
+          {path:"warehouse/Maintainance", element:<Maintainance/>, }, 
+          {path:"warehouse/Maintainance/Report", element:<Maintainance/>, }, 
+          {path:"warehouse/Maintainance/AddMaintenance", element:<MaintenanceForm/>, },
+          {path:"warehouse/Maintainance/AddMaintenance/:requestId", element:<MaintenanceFormTwo/>, },
+
+          
           {path:"warehouse/Maintainance/CorrectiveDetails", element:<MaintenanceDetails/>, },
           {path:"warehouse/Maintainance/Corrective-Form", element:<CorrectiveForm/>, },
           {path:"warehouse/Maintainance/Corrective-Form/CorrectiveSubmit", element:<SubmitPage/>, },

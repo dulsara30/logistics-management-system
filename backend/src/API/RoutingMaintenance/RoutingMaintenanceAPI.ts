@@ -48,15 +48,15 @@ router.post('/routingmaintenance', async (req, res) => {
 
   try {
     
-    // Call the service function to create and save the new vehicle
+    // Call the service function to create and save the new routing
     const newMaintenance = await createRoutingMaintenance(RID,warehouse,date,waterbill,currentbill,description);
 
-    // Return the created vehicle data as JSON
+    // Return the created routing data as JSON
     res.status(201).json(newMaintenance);
 
 
   } catch (error) {
-    res.status(400).json({ message: 'Error creating vehicle', error });
+    res.status(400).json({ message: 'Error creating routing', error });
   }
 });
 

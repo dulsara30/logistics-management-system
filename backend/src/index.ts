@@ -20,7 +20,12 @@ app.use(express.json());
 connectDB();
 
 // Use your routes for API handling
-app.use("/api", router,router2,router3);
+app.use("/api", router);
+app.use("/api", router2);
+app.use("/api", router3);
+    // handles routing maintenance
+
+
 
 // Start the server
 app.listen(8000, () => console.log("Server is listening on port 8000."));

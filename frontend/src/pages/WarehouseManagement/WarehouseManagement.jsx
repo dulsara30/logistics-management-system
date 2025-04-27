@@ -31,7 +31,7 @@ export default function WarehouseManagement() {
 
         console.error('Error fetching warehouse:', error);
 
-      });
+      },[]);
     })
 
   return (
@@ -51,8 +51,12 @@ export default function WarehouseManagement() {
 
       <Divider sx={{ my: 3 }} />
 
+
       <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-        {/* "Add Warehouse" Card */}
+
+
+
+        {/* "Add schedule" Card */}
         <Card
           variant="outlined"
           sx={{
@@ -77,6 +81,10 @@ export default function WarehouseManagement() {
             </Fab>
           </Tooltip>
         </Card>
+
+
+
+
 
         {/* Display Filtered Warehouses */}
         {warehouse.map((w) => (
