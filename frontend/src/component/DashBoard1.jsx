@@ -5,6 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
@@ -34,6 +35,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Link } from 'react-router-dom';
 
+import HeaderSec from './HeaderSec.jsx';
+import { jwtDecode  } from 'jwt-decode';
 
 
 const NAVIGATION = [
@@ -50,8 +53,36 @@ const NAVIGATION = [
 
 function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [fullName, setFullName] = useState();
   const location = useLocation();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if(!token){
+      navigate("/login");
+      return;
+    }
+
+    try{
+      const decoded = jwtDecode(token);
+      if(!decoded.fullName) {
+        alert("Somthing went wrong. Please try again");
+        navigate("/login");
+        return;
+      }
+
+      setFullName(decoded.fullName);
+    }catch(err){
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      navigate("/login");
+    }
+
+  }, [navigate]);
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,7 +112,13 @@ function DashboardLayout() {
         {/* Navigation */}
         <nav className="p-4 space-y-2">
 
-         
+        <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-lg">
+            
+            <div>
+              <p className="text-sm text-gray-600">Welcome back,</p>
+              <h2 className="text-lg font-semibold text-gray-800">{fullName}</h2>
+            </div>
+            </div>
 
             {NAVIGATION.map((item) => {
               const Icon = item.icon;
@@ -130,27 +167,8 @@ function DashboardLayout() {
         ${isSidebarOpen ? 'lg:ml-72' : 'ml-0'}
         min-h-screen bg-gray-50
       `}>
-        {/* Header */}
-        <header className="h-20 bg-white shadow-sm flex items-center px-6 justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
-              {NAVIGATION.find(item => item.path === location.pathname)?.title || 'Dashboard'}
-            </h1>
-          </div>
-
-          <div className='flex p-5'>
-            <div className='p-3'>
-            <Avatar>H</Avatar>
-            </div>
-            <div className='p-3'>
-              <Badge badgeContent={4} color="primary">
-                <MailIcon color="action" />
-              </Badge>
-            </div>
-
-          </div>
-        </header>
-
+     <HeaderSec/>
+    
         {/* Page Content */}
         
         <div className='p-6'>
