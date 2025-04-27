@@ -12,8 +12,10 @@ function AddDamage() {
     quantity: '',
     damageType: '',
     actionRequired: '',
+    supplierName: '',
     description: '',
-    searchTerm: '',
+    date: '',
+    reportedBy: ''
   });
   const [errors, setErrors] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -47,8 +49,10 @@ function AddDamage() {
         quantity: '',
         damageType: '',
         actionRequired: '',
+        supplierName: '',
         description: '',
-        searchTerm: '',
+        date: '',
+        reportedBy: ''
       });
     }, 2000);
   };
