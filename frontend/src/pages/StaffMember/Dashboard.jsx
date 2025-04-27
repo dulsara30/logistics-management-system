@@ -54,7 +54,7 @@ const quickAccessCardsBase = [
     icon: Package,
     title: 'Delivery Scheduling',
     description: 'Delivery Scheduling',
-    path: '/delivery',
+    path: '/deliveryEmp',
     color: 'from-gray-500 to-slate-600',
   },
 ];

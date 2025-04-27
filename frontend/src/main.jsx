@@ -29,7 +29,7 @@ import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
 import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
 import DeliveryManagementEmployee from './component/DeliveryScheduling/DeliveryManagementEmployee.jsx'
-
+import DeliveryScheduleUpdate from './component/DeliveryScheduling/DeliveryScheduleEmp.jsx'
 
 // Staff Pages
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx';
@@ -216,17 +216,26 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: "delivery",
+        path: "deliveryEmp",
         element: (
           <ProtectedRoute allowedRoles={["Driver"]}>
-            <DeliveryManagement />
+            <DeliveryManagementEmployee />
           </ProtectedRoute>
         )
-      }
+      },    {
+        path: "deliveryEmp/DeliveryProfile/:ScheduleID",
+        element: (
+          <ProtectedRoute allowedRoles={["Driver"]}>
+            <DeliveryScheduleUpdate />
+          </ProtectedRoute>
+        )
+      },
       
     ]
   }
 ]);
+
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
