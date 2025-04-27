@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-//const AutoIncrement = require("mongoose-sequence")(mongoose);
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const MaintenanceRSchema = new mongoose.Schema({
     RID: { type: String, unique: true},

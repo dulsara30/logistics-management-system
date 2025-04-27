@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Box, Button, Grid, TextField, Typography, CircularProgress } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography, CircularProgress, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -28,6 +28,14 @@ export default function WarehouseForm() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+// Sri Lanka provinces array
+const provinces = [
+  "Western", "Central", "Southern", "Northern", "Eastern", 
+  "North Western", "North Central", "Uva", "Sabaragamuwa"
+];
+
 
   // Validation function
   const validateForm = () => {
@@ -141,7 +149,9 @@ export default function WarehouseForm() {
             helperText={errors.City}
             required
           />
-          <TextField
+
+           <TextField
+            select
             label="Province"
             name="Province"
             value={formData.Province}
@@ -151,7 +161,15 @@ export default function WarehouseForm() {
             error={!!errors.Province}
             helperText={errors.Province}
             required
-          />
+          >
+            {provinces.map((province) => (
+              <MenuItem key={province} value={province}>
+                {province}
+              </MenuItem>
+            ))}
+          </TextField>
+
+
           <TextField
             label="Special Instruction"
             name="SpecialInstruction"

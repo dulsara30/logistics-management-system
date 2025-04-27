@@ -38,6 +38,8 @@ router.get('/maintenance/:requestId', async (req: Request, res: Response) => {
   }
 });
 
+
+
 // Create new maintenance record
 router.post('/maintenance', async (req: Request, res: Response) => {
   const { warehouseId, issueDescription, priority, requestedBy, status, scheduledDate, completionDate } = req.body;
@@ -63,6 +65,8 @@ router.post('/maintenance', async (req: Request, res: Response) => {
     }
   }
 });
+
+
 
 // Update maintenance record
 router.put('/maintenance/:requestId', async (req: Request, res: Response) => {

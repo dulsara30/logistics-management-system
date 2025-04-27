@@ -6,8 +6,6 @@ const MaintainanceSchema = new mongoose.Schema({
   warehouseId: { type: String, required: true },
   issueDescription: { type: String, required: true },
   priority: { type: String, required: true }, // e.g., Low, Medium, High
-  requestedBy: { type: String, required: true }, // could be a username or userId
-  status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' }, // default as 'Pending'
   scheduledDate: { type: Date, required: true },
   completionDate: { type: Date, required: true },
     

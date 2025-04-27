@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -22,7 +22,24 @@ export default function MaintenanceForm() {
     completionDate: '',
   });
 
+  const [warehouses, setWarehouses] = useState([]); // State to hold the list of warehouses
   const navigate = useNavigate(); // Initialize navigate hook
+
+
+  useEffect(() => {
+    // Fetch warehouses from the backend API when the component mounts
+    axios.get('http://localhost:8000/api/Warehouse')
+      .then(response => {
+        setWarehouses(response.data); // Set warehouses to state
+      })
+      .catch(error => {
+        console.error('Error fetching warehouses:', error);
+        alert('Failed to fetch warehouses.');
+      });
+  }, []); // Empty array ensures this runs only once when the component is mounted
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,13 +88,23 @@ export default function MaintenanceForm() {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          <TextField
+          
+        <TextField
+            select
             label="Warehouse ID"
             name="warehouseId"
             value={formData.warehouseId}
             onChange={handleChange}
             required
-          />
+          >
+            {/* Populate dropdown with all warehouses */}
+            {warehouses.map((warehouse) => (
+              <MenuItem key={warehouse.WarehouseID} value={warehouse.WarehouseID}>
+                {warehouse.WarehouseID}
+              </MenuItem>
+            ))}
+          </TextField>
+          
           <TextField
             label="Issue Description"
             name="issueDescription"
@@ -101,13 +128,7 @@ export default function MaintenanceForm() {
               </MenuItem>
             ))}
           </TextField>
-          <TextField
-            label="Requested By"
-            name="requestedBy"
-            value={formData.requestedBy}
-            onChange={handleChange}
-            required
-          />
+          
           <TextField
             label="Scheduled Date"
             name="scheduledDate"
@@ -127,7 +148,7 @@ export default function MaintenanceForm() {
 
           <Stack direction="row" spacing={2}>
             <Button type="submit" variant="contained" sx={{ bgcolor: '#7b1fa2', maxWidth: 200 }}>
-              Schedule
+              Done
             </Button>
             <Button
               type="button"

@@ -56,7 +56,7 @@ export default function WarehouseManagement() {
 
 
 
-        {/* "Add schedule" Card */}
+        {/* "Add completed" Card */}
         <Card
           variant="outlined"
           sx={{

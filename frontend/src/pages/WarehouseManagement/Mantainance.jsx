@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Box, Typography, Stack, Button, Divider } from '@mui/material';
+import { Card, Box, Typography, Stack, Button, Divider, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import reportgenarate from './Report'; // Import the report generation function
@@ -8,20 +8,15 @@ import AddIcon from '@mui/icons-material/Add';
 import MuiTooltip from '@mui/material/Tooltip';
 
 export default function Maintenance() {
-
-
-
-
   const navigate = useNavigate();
   const [maintenanceData, setMaintenanceData] = useState([]);
+  const [routingmaintenanceData, setRoutingData] = useState([]);
 
+  // Fetch maintenance and routing data when the component mounts
   useEffect(() => {
     fetchMaintenanceData();
+    fetchRoutingData();
   }, []);
-
-
-
-
 
 
   const fetchMaintenanceData = async () => {
@@ -34,20 +29,25 @@ export default function Maintenance() {
   };
 
 
-
-
-
-
-  const handleGenerateReportClick = async () => {
+  const fetchRoutingData = async () => {
     try {
-      await reportgenarate(); // Call the imported function
-    } catch (error) {
-      // Optionally handle any errors that might have been re-thrown
-      console.error('Error during report generation in component:', error);
+      const { data } = await axios.get('http://localhost:8000/api/routingmaintenance');
+      console.log('💡 routing maintenance raw data:', data);
+      setRoutingData(data);
+    } catch (err) {
+      console.error('Error fetching routing maintenance data:', err);
     }
   };
 
 
+  // Function to handle report generation
+  const handleGenerateReportClick = async () => {
+    try {
+      await reportgenarate();
+    } catch (error) {
+      console.error('Error during report generation in component:', error);
+    }
+  };
 
 
 
@@ -59,92 +59,119 @@ export default function Maintenance() {
       <Divider sx={{ my: 3 }} />
 
 
-
-      {/* Generate Report Button */}
+      {/* Buttons */}
       <Button
-      
-        variant="contained"
-        sx={{ bgcolor: '#2e7d32', color: 'white', marginBottom: 2, left: 310 }}
+        variant="filled"
+        sx={{ bgcolor: '#2e7d32', color: 'white', marginBottom: 2, mr: 2 }}
         onClick={handleGenerateReportClick}
       >
         Generate Report
       </Button>
 
+      <Button
+        variant="filled"
+        sx={{ bgcolor: '#2e7d32', color: 'white', marginBottom: 2 }}
+        onClick={() => navigate('Routing-Form')}
+      >
+        Routing
+      </Button>
 
 
 
+      {/* === Maintenance Section === */}
+      <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+        Maintenance Requests
+      </Typography>
 
-      {/* Display Maintenance Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-        <Card
-          variant="outlined"
-          sx={{
-            maxWidth: 300,
-            marginBottom: 2,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#ffffff',
-            border: '2px solid #CCCCCC',
-            cursor: 'pointer',
-          }}
-          onClick={() => navigate('/warehouse/Maintainance/AddMaintenance')}
-        >
-          <MuiTooltip title="Schedule">
-            <Fab
-              color="primary"
-              aria-label="add"
-              sx={{ backgroundColor: 'white', color: 'black' }}
-            >
-              <AddIcon />
-            </Fab>
-          </MuiTooltip>
-        </Card>
-
-
-
-
-
-
-
-        {/* Display Filtered Warehouses */}
-        {maintenanceData.map((m) => (
+      <Grid container spacing={2} justifyContent="center">
+        {/* Add Maintenance Button Card */}
+        <Grid item>
           <Card
-            key={m.requestId}
             variant="outlined"
-            onClick={() => navigate(`AddMaintenance/${m.requestId}`)}
             sx={{
-              maxWidth: 360,
-              marginBottom: 2,
+              width: 300,
+              height: 150,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#ffffff',
+              border: '2px solid #CCCCCC',
               cursor: 'pointer',
-              '&:hover': { boxShadow: 6, backgroundColor: '#f5f5f5' },
+              '&:hover': { boxShadow: 6 },
             }}
+            onClick={() => navigate('/warehouse/Maintainance/AddMaintenance')}
           >
-            <Box sx={{ p: 2 }}>
-              <Typography gutterBottom variant="h5">
-                {m.requestId}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {m.status}
-              </Typography>
-            </Box>
+            <MuiTooltip title="Schedule Maintenance">
+              <Fab color="primary" aria-label="add" sx={{ backgroundColor: 'white', color: 'black' }}>
+                <AddIcon />
+              </Fab>
+            </MuiTooltip>
           </Card>
+        </Grid>
+
+        {/* filter Maintenance Data  */}
+        {maintenanceData.map((m) => (
+          <Grid item key={m.requestId}>
+            <Card
+              variant="outlined"
+              onClick={() => navigate(`AddMaintenance/${m.requestId}`)}
+              sx={{
+                width: 360,
+                cursor: 'pointer',
+                '&:hover': { boxShadow: 6, backgroundColor: '#f5f5f5' },
+              }}
+            >
+              <Box sx={{ p: 2 }}>
+                <Typography gutterBottom variant="h6">
+                  {m.warehouseId}
+                </Typography>
+                <Typography variant="subtitle2" gutterBottom>
+                  Maintenance ID: {m.requestId}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {m.issueDescription}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
         ))}
-      </Box>
+      </Grid>
 
 
 
+      {/* === Routing Maintenance Section === */}
+      <Typography variant="h5" sx={{ mt: 6, mb: 2 }}>
+        Routing Maintenance Records
+      </Typography>
 
-
-      {/* Corrective & Routing Buttons on Right Side */}
-      <Stack spacing={2} direction="row" sx={{ position: 'absolute', bottom: 30, right: 50 }}>
-        <Button variant="contained" sx={{ bgcolor: '#ab47bc' }} onClick={() => navigate('Corrective-Form')}>
-          Corrective
-        </Button>
-        <Button variant="contained" sx={{ bgcolor: '#ab47bc' }} onClick={() => navigate('Routing-Form')}>
-          Routing
-        </Button>
-      </Stack>
+      <Grid container spacing={2} justifyContent="center">
+        {/* Routing Maintenance Cards */}
+        {routingmaintenanceData.map((r) => (
+          <Grid item key={r.RID}>
+            <Card
+              variant="outlined"
+              
+              sx={{
+                width: 360,
+                cursor: 'pointer',
+                '&:hover': { boxShadow: 6, backgroundColor: '#f5f5f5' },
+              }}
+            >
+              <Box sx={{ p: 2 }}>
+                <Typography gutterBottom variant="h6">
+                  {r.warehouse}
+                </Typography>
+                <Typography variant="subtitle2" gutterBottom>
+                  RoutingMaintenance ID: {r.RID}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Date: {new Date(r.date).toLocaleDateString()}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }

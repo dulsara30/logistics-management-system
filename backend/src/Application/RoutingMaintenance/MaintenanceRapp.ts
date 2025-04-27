@@ -1,11 +1,12 @@
 // Application/userService.ts
 //import Maintenance from "../../Infrastructure/schemas/Maintenance/MaintenanceSchema";
 import { Request, Response } from 'express';
-import maintainanceR from "../../Infrastructure/schemas/RoutingMaintenance/RoutingMaintenanceSchema";
+import maintainanceR from '../../Infrastructure/schemas/RoutingMaintenance/MaintenanceRSchema';
+
 
 
 // Read all Warehouse 
-export const getAllMaintenance = async () => {
+export const getAllRoutingMaintenance = async () => {
   try {
     const RoutingMaintenance = await maintainanceR.find(); // fetch all warehouse from the collection
     return RoutingMaintenance;
@@ -16,10 +17,12 @@ export const getAllMaintenance = async () => {
 };
 
 
+
+
 // (read) a warehouse by ID
-export const getMaintenanceById = async (Mid: string) => {
+export const getRoutingMaintenanceById = async (Mrid: string) => {
   try {
-    return await maintainanceR.find({RID:Mid});
+    return await maintainanceR.find({RID:Mrid});
   } catch (error) {
     console.error("Error fetching Maintenance:", error);
     throw new Error("Error fetching Maintenance");
@@ -33,7 +36,7 @@ export const getMaintenanceById = async (Mid: string) => {
 
   
 export const createRoutingMaintenance = async (
-  RID: String,
+  
   warehouse: string,
   date: number,
   waterbill: number,
@@ -42,6 +45,10 @@ export const createRoutingMaintenance = async (
 
 ) => {
   try {
+
+    //auto generated warehouse id
+    const RID = `RM-${Date.now()}`;
+
 
     // Create a new warehouse instance or object with the provided data
     const W = new maintainanceR({ RID,warehouse,date,waterbill,currentbill,description

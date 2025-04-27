@@ -26,11 +26,7 @@ import WarehouseForm from './pages/WarehouseManagement/WarehouseProfile.jsx';
 import Maintainance from './pages/WarehouseManagement/Mantainance.jsx';
 import MaintenanceForm from './pages/WarehouseManagement/CreateMaintenance.jsx';
 import MaintenanceFormTwo from './pages/WarehouseManagement/MaintenanceProfile.jsx';
-import CorrectiveForm from './pages/WarehouseManagement/CorrectiveForm.jsx';
-import SubmitPage from './pages/WarehouseManagement/CorrectiveSubmit.jsx';
 import RoutingMaintenanceForm from './pages/WarehouseManagement/RoutingForm.jsx';
-import RoutingSubmit from './pages/WarehouseManagement/RoutingSubmit.jsx';
-import MaintenanceDetails from './pages/WarehouseManagement/CorrectiveDetails.jsx';
 
 // Staff Management
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx';
@@ -70,11 +66,8 @@ const router = createBrowserRouter([
           { path: 'warehouse/Maintainance', element: <Maintainance /> },
           { path: 'warehouse/Maintainance/AddMaintenance', element: <MaintenanceForm /> },
           { path: 'warehouse/Maintainance/AddMaintenance/:requestId', element: <MaintenanceFormTwo /> },
-          { path: 'warehouse/Maintainance/CorrectiveDetails', element: <MaintenanceDetails /> },
-          { path: 'warehouse/Maintainance/Corrective-Form', element: <CorrectiveForm /> },
-          { path: 'warehouse/Maintainance/Corrective-Form/CorrectiveSubmit', element: <SubmitPage /> },
           { path: 'warehouse/Maintainance/Routing-Form', element: <RoutingMaintenanceForm /> },
-          { path: 'warehouse/Maintainance/Routing-Form/RoutingSubmit', element: <RoutingSubmit /> },
+          { path: 'warehouse/Maintainance/Routing-Form/:RID', element: <RoutingMaintenanceForm /> },
           { path: 'fleet', element: <VehicleFleetManagement /> },
           { path: 'delivery', element: <DeliveryManagement /> },
           { path: 'inventory', element: <InventoryManagement /> },

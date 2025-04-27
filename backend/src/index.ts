@@ -5,7 +5,7 @@ import cors from "cors";
 
 import router from "./API/WarehouseManagement/WarehouseAPI";
 import router2 from "./API/Maintenance/MaintenanceAPI";
-import router3 from "./API/RoutingMaintenance/RoutingMaintenanceAPI";
+import router3 from "./API/RoutingMaintenance/MaintenanceRAPI";
 import {
   getAllInventoryManagement,
   createInventoryManagement,

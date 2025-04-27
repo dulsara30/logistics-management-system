@@ -1,25 +1,21 @@
 // API/routes.ts
 import express from 'express';
 import { getMaintenanceById } from '../../Application/Maintenance/Maintenanceapp';
-import {  createRoutingMaintenance, deleteroutingmaintenance, getAllMaintenance, updateRoutingMaintenance } from '../../Application/RoutingMaintenance/RoutingMaintenanceapp';
+import {  createRoutingMaintenance, deleteroutingmaintenance, getAllRoutingMaintenance, updateRoutingMaintenance } from '../../Application/RoutingMaintenance/MaintenanceRapp';
 
 const router = express.Router();
-
-
-
-
 
 // Route to get all warehouses
 router.get('/routingmaintenance', async (req, res) => {
     try {
-      const RoutingMaintenance = await getAllMaintenance();
+      const RoutingMaintenance = await getAllRoutingMaintenance();
       res.status(200).json(RoutingMaintenance);
     } catch (error) {
       res.status(500).json({ message: 'Error fetching maintenance', error });
     }
   });
 
-  // Route to get a warehouse by ID
+  // Route to get a routingmaintenance by ID
   router.get('/routingmaintenance/:RID', async (req, res) => {
     const { RID } = req.params;
     try {
@@ -43,13 +39,13 @@ router.get('/routingmaintenance', async (req, res) => {
 //post(create)
 router.post('/routingmaintenance', async (req, res) => {
 
-  const {RID,warehouse,date,waterbill,currentbill,description
+  const {warehouse,date,waterbill,currentbill,description
    } = req.body;
 
   try {
     
     // Call the service function to create and save the new routing
-    const newMaintenance = await createRoutingMaintenance(RID,warehouse,date,waterbill,currentbill,description);
+    const newMaintenance = await createRoutingMaintenance(warehouse,date,waterbill,currentbill,description);
 
     // Return the created routing data as JSON
     res.status(201).json(newMaintenance);
@@ -108,3 +104,4 @@ router.delete('/routingmaintenance/:RID', async (req, res) => {
 
 
 export default router;
+
