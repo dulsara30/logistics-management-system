@@ -31,7 +31,7 @@ function ManageStaff(){
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const BACKEND_BASE_URL = 'http://localhost:5173';
+  const BACKEND_BASE_URL = 'http://localhost:8000';
 
   useEffect(() =>{
     const token = localStorage.getItem("token");
