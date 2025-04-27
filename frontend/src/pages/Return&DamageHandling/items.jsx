@@ -3,35 +3,35 @@ import { format } from "date-fns";
 import { Link } from "react-router-dom";
 
 function Items({ items, type }) {
-
   const defaultItems = [
     {
       id: 1,
       itemName: "Laptop",
       quantity: 2,
-      returnDate: new Date(),
-      condition: "Good",
       damageType: "N/A",
+      condition: "Good",
+      returnDate: new Date(),
       dateReported: new Date(),
+      reportedBy: "John Doe",
     },
     {
       id: 2,
       itemName: "Monitor",
       quantity: 1,
+      damageType: "Slightly Scratched",
+      condition: "Good",
       returnDate: new Date(),
-      condition: "Slightly Scratched",
-      damageType: "Screen Crack",
       dateReported: new Date(),
+      reportedBy: "Jane Smith",
     },
   ];
 
   const displayItems = items && items.length > 0 ? items : defaultItems;
   const title = type === "returns" ? "Recent Returns" : "Damage Reports";
-  const dateLabel = type === "returns" ? "returnDate" : "dateReported";
   const statusLabel = type === "returns" ? "condition" : "damageType";
+  const dateLabel = type === "returns" ? "returnDate" : "dateReported";
 
   return (
-    
     <div className="p-4 bg-white shadow rounded-lg">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
       {displayItems.length === 0 ? (
@@ -44,9 +44,10 @@ function Items({ items, type }) {
                 {[
                   "Item Name",
                   "Quantity",
-                  "Date",
                   type === "returns" ? "Condition" : "Damage Type",
-                  "Returning",
+                  "Date",
+                  "Reported By",
+                  "Action",
                 ].map((header) => (
                   <th
                     key={header}
@@ -59,17 +60,27 @@ function Items({ items, type }) {
             </thead>
             <tbody className="bg-white">
               {displayItems.map((item) => (
-                <tr key={item.id} className="border border-gray-200 hover:bg-gray-50">
+                <tr
+                  key={item.id}
+                  className="border border-gray-200 hover:bg-gray-50"
+                >
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                     {item.itemName}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.quantity}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {format(item[dateLabel], "MMM dd, yyyy")}
+                    {item.quantity}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item[statusLabel]}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {item[statusLabel]}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {format(new Date(item[dateLabel]), "MMM dd, yyyy")}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {item.reportedBy}
+                  </td>
                   <td className="px-6 py-4 text-center">
-                    <Link to="/returns/add-damage">
+                    <Link to="/returns/return-form">
                       <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
                         Return
                       </button>
@@ -82,7 +93,6 @@ function Items({ items, type }) {
         </div>
       )}
     </div>
-    
   );
 }
 

@@ -19,17 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
-import Home from '../pages/Home/Home.jsx';
-import WarehouseManagement from '../pages/WarehouseManagement/WarehouseManagement';
-import VehicleFleetManagement from '../pages/DeliveryAndVehicleFleet/VehicleFleetManagement';
-import DeliveryManagement from '../pages/DeliveryAndVehicleFleet/DeliveryManagement';
-import InventoryManagement from '../pages/InventoryManagement/InventoryManagement';
-import StaffManagement from '../pages/StaffManagement/StaffManagement';
-import SupplierManagement from '../pages/SupplierManagement/SupplierManagement';
-import ReturnDamageHandling from '../pages/Return&DamageHandling/ReturnDamageHandling';
-import Help from '../pages/Help/Help';
 import logo from '../assets/Picture1.png';
-import PageContent from './PageContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import HeaderSec from './HeaderSec.jsx';

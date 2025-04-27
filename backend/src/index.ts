@@ -16,6 +16,7 @@ import suppliersRouter from "./API/SpplierManagement/suppliers";
 import cors from "cors";
 import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
+import getItemRoutetr from "./API/Return&DamageHandling/damageForm";
 
 const app = express();
 app.use(express.json());
@@ -27,6 +28,7 @@ connectDB();
 app.use("/", loginRouter)
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
+app.use("/returns", getItemRoutetr);
 
 app
   .route("/inventory")

@@ -10,13 +10,10 @@ import DeliveryManagement from './pages/DeliveryAndVehicleFleet/DeliveryManageme
 import InventoryManagement from './pages/InventoryManagement/InventoryManagement.jsx';
 import StaffManagement from './pages/StaffManagement/StaffManagement.jsx';
 import SupplierManagement from './pages/SupplierManagement/SupplierManagement.jsx';
-import ReturnDamageHandling from './pages/Return&DamageHandling/ReturnDamageHandling.jsx';
 import Help from './pages/Help/Help.jsx';
 import DashboardLayout from './component/DashBoard1.jsx';
 import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx';
-import ItemsList from './pages/Return&DamageHandling/ItemList.jsx';
-import ReturnForm from './pages/Return&DamageHandling/ReturnList.jsx';
-import DamageForm from './pages/Return&DamageHandling/DamageForm.jsx';
+import ReturnForm from './pages/Return&DamageHandling/ReturnForm.jsx';
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx';
 import AddStaff from './pages/StaffManagement/SubPages/AddStaff.jsx';
 import AssignTask from './pages/StaffManagement/SubPages/AssignTask.jsx';
@@ -33,6 +30,7 @@ import ProtectedRoute from './component/ProtectedRoute.jsx';
 import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
 import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
+import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx'; 
 
 const router = createBrowserRouter([
   {
@@ -197,8 +195,25 @@ const router = createBrowserRouter([
                 </ProtectedRoute>
                 ),
               },
+              {
+                path: "return-form",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                    <ReturnForm/>
+                  </ProtectedRoute>
+                )
+              },
+              {
+                path: "view-returned-items",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                  <ReturnReport/>
+                </ProtectedRoute>
+                ),
+              },
             ],
           },
+
           {
             path: "help",
             element: (
