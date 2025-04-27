@@ -33,7 +33,7 @@ export const getMaintenanceById = async (Mid: string) => {
 
 
 export const createMaintenance = async (
-  requestId: string,
+  
   warehouseId: string,
   issueDescription: string,
   priority: string,
@@ -43,6 +43,9 @@ export const createMaintenance = async (
   completionDate: Date,
 ) => {
   try {
+
+    const requestId = `MN-${Date.now()}`;
+
     const maintenance = new Maintenance({
     requestId,
     warehouseId,
@@ -79,7 +82,7 @@ export const updateMaintenance = async (
     status?: string,
     scheduledDate?: Date,
     completionDate?: Date,
-    
+      
   }
 ) => {
   try {
@@ -121,5 +124,6 @@ export const deleteMaintenance = async (requestId: string) => {
     throw new Error("Error deleting maintenance");
   }
 };
+ 
 
-
+ 

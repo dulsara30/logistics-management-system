@@ -53,7 +53,7 @@ export const createWarehouse = async (
   try {
 
     //auto generated warehouse id
-    const WarehouseID = uuidv4();
+    const WarehouseID = `WH-${Date.now()}`;
 
     // Create a new warehouse instance or object with the provided data
     const W = new Warehouse({ WarehouseID,StreetName,City,Province,SpecialInstruction,Description,

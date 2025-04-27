@@ -14,7 +14,7 @@ const priorityOptions = ['Low', 'Medium', 'High'];
 
 export default function MaintenanceForm() {
   const [formData, setFormData] = useState({
-    requestId: '',
+    
     warehouseId: '',
     issueDescription: '',
     priority: '',
@@ -39,7 +39,7 @@ export default function MaintenanceForm() {
       console.log('Form submitted successfully:', response.data);
       // Optionally, reset the form or navigate to a success page
       setFormData({
-        requestId: '',
+        
         warehouseId: '',
         issueDescription: '',
         priority: '',
@@ -58,7 +58,7 @@ export default function MaintenanceForm() {
   const handleCancel = () => {
     // Reset the form data when cancel is clicked
     setFormData({
-      requestId: '',
+     
       warehouseId: '',
       issueDescription: '',
       priority: '',
@@ -78,13 +78,7 @@ export default function MaintenanceForm() {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          <TextField
-            label="Request ID"
-            name="requestId"
-            value={formData.requestId}
-            onChange={handleChange}
-            required
-          />
+  
           <TextField
             label="Warehouse ID"
             name="warehouseId"

@@ -43,14 +43,9 @@ router.get('/maintenance/:requestId', async (req, res) => {
 
 
 
-
-
-
-
 // Create new maintenance record
 router.post('/maintenance', async (req, res) => {
   const {
-    requestId,
     warehouseId,
     issueDescription,
     priority,
@@ -62,7 +57,6 @@ router.post('/maintenance', async (req, res) => {
 
   try {
     const newMaintenance = await createMaintenance(
-    requestId,
     warehouseId,
     issueDescription,
     priority,
