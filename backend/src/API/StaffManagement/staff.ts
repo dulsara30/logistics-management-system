@@ -4,6 +4,8 @@ import multer from "multer";
 import path from "path";
 import { authenticateToken, authorizeRole } from "../../middleware/authentication";
 import { getProfileById, updateProfile } from "../../Application/StaffManagement/profile";
+import { getUserByNic } from "../../Application/StaffManagement/getUserByNic";
+import { markAttendance } from "../../Application/StaffManagement/markAttendance";
 
 const staffRouter = express.Router();
 
@@ -46,6 +48,8 @@ staffRouter
   )
   .delete(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager"]), deleteStaff);
 
+staffRouter.route("/attendance/:nic").get(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager"]), getUserByNic);
 
+staffRouter.route("/attendance").post(authenticateToken, authorizeRole(["Business Owner", "Warehouse Manager", "Inventory Manager"]), markAttendance);
 
 export default staffRouter;

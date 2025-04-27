@@ -38,9 +38,9 @@ const quickAccessCardsBase = [
   },
   {
     icon: MessageSquare,
-    title: 'Any Concern',
-    description: 'Chat with management',
-    path: 'concerns',
+    title: 'Warehouse Maintenance',
+    description: 'Maintain Warehouse',
+    path: 'warehouse-maintenance',
     color: 'from-orange-500 to-red-600',
   },
   {
@@ -52,9 +52,16 @@ const quickAccessCardsBase = [
   },
   {
     icon: Package,
-    title: 'Something',
-    description: 'Coming soon',
-    path: 'something',
+    title: 'Vehicle Fleet',
+    description: 'Vehicle Fleet',
+    path: 'vehicle-fleet',
+    color: 'from-gray-500 to-slate-600',
+  },
+  {
+    icon: Package,
+    title: 'Delivery Scheduling',
+    description: 'Delivery Scheduling',
+    path: 'delivery-scheduling',
     color: 'from-gray-500 to-slate-600',
   },
 ];

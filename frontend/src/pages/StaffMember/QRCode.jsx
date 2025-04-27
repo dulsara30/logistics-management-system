@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function QRCode (){
+function QRCode() {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,8 +22,8 @@ function QRCode (){
       }
 
       try {
-        // Fetch QR code
-        const qrResponse = await fetch("http://localhost:8000/qrcode", {
+        // Fetch QR code and last 5 days of attendance in one request
+        const response = await fetch("http://localhost:8000/dashboard/my-qr", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -31,33 +31,17 @@ function QRCode (){
           },
         });
 
-        if (!qrResponse.ok) {
-          const errorData = await qrResponse.json();
-          if (qrResponse.status === 401 || qrResponse.status === 403) {
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (response.status === 401 || response.status === 403) {
             throw new Error("Unauthorized. Please log in again.");
           }
-          throw new Error(errorData.message || "Failed to fetch QR code");
+          throw new Error(errorData.message || "Failed to fetch data");
         }
 
-        const qrData = await qrResponse.json();
-        setQrCodeUrl(qrData.qrCodeUrl); // Assuming backend returns { qrCodeUrl: "..." }
-
-        // Fetch last 5 days of attendance
-        const attendanceResponse = await fetch("http://localhost:8000/attendance/last-five-days", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!attendanceResponse.ok) {
-          const errorData = await attendanceResponse.json();
-          throw new Error(errorData.message || "Failed to fetch attendance records");
-        }
-
-        const attendanceData = await attendanceResponse.json();
-        setAttendanceRecords(attendanceData); // Assuming backend returns [{ date, checkIn, checkOut, status }, ...]
+        const data = await response.json();
+        setQrCodeUrl(data.qrCode); // Set the QR code URL
+        setAttendanceRecords(data.attendanceRecords); // Set the attendance records
       } catch (err) {
         setError(err.message);
         if (err.message.includes("Unauthorized")) {
@@ -94,47 +78,74 @@ function QRCode (){
     });
   };
 
+  // Format overtime hours for display
+  const formatOvertime = (hours) => {
+    if (hours === 0) return "0 hrs";
+    return `${hours.toFixed(1)} hrs`;
+  };
+
+  // Handle QR code download
+  const handleDownload = async () => {
+    if (!qrCodeUrl) {
+      alert("No QR code available to download.");
+      return;
+    }
+
+    try {
+      // Fetch the image as a blob
+      const response = await fetch(qrCodeUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch QR code image");
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Create a temporary link to download the blob
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "qrcode.png"; // Ensure the file downloads as a .png
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error("Download error:", err.message);
+      alert("Failed to download QR code: " + err.message);
+    }
+  };
+
   // Loading state
   if (isLoading) {
-    return <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>Loading...</div>;
+    return <div className="text-center p-5 text-gray-600">Loading...</div>;
   }
 
   // Error state
   if (error) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <div style={{ color: "#dc2626", fontSize: "18px" }}>Error: {error}</div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-600 text-lg">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: "960px", margin: "0 auto", padding: "24px" }}>
+    <div className="max-w-4xl mx-auto p-6">
       {/* Header Section */}
-      <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#1f2937" }}>My QR Code</h1>
-        <p style={{ color: "#6b7280", marginTop: "8px" }}>Use this QR code to mark your attendance</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">My QR Code</h1>
+        <p className="text-gray-600 mt-2">Use this QR code to mark your attendance</p>
       </div>
 
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          color: "#4b5563",
-          marginBottom: "24px",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "14px",
-          transition: "color 0.2s",
-        }}
-        onMouseOver={(e) => (e.currentTarget.style.color = "#1f2937")}
-        onMouseOut={(e) => (e.currentTarget.style.color = "#4b5563")}
+        className="inline-flex items-center text-gray-600 mb-6 bg-none border-none cursor-pointer text-sm hover:text-gray-800 transition-colors"
       >
         <svg
-          style={{ width: "18px", height: "18px", marginRight: "8px" }}
+          className="w-4.5 h-4.5 mr-2"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -149,22 +160,14 @@ function QRCode (){
         Back
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* QR Code Section */}
         <div>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              padding: "24px",
-              textAlign: "center",
-            }}
-          >
-            <h3 style={{ fontSize: "18px", fontWeight: "500", color: "#1f2937", marginBottom: "8px" }}>
+          <div className="bg-white rounded-xl shadow-md p-6 text-center">
+            <h3 className="text-lg font-medium text-gray-800 mb-2">
               Attendance QR Code
             </h3>
-            <p style={{ color: "#6b7280", fontSize: "14px", marginBottom: "24px" }}>
+            <p className="text-gray-600 text-sm mb-6">
               Scan this code to mark your attendance
             </p>
 
@@ -172,37 +175,23 @@ function QRCode (){
               <img
                 src={qrCodeUrl}
                 alt="QR Code for attendance"
-                style={{ width: "256px", height: "256px", margin: "0 auto", objectFit: "contain" }}
+                className="w-64 h-64 mx-auto object-contain"
               />
             ) : (
-              <p style={{ color: "#dc2626", fontSize: "14px" }}>QR Code not available</p>
+              <p className="text-red-600 text-sm">QR Code not available</p>
             )}
 
             <button
-              onClick={() => {
-                const link = document.createElement("a");
-                link.href = qrCodeUrl;
-                link.download = "qrcode.png";
-                link.click();
-              }}
-              style={{
-                marginTop: "24px",
-                padding: "8px 16px",
-                background: "linear-gradient(to right, #6b46c1, #9f7aea)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                fontSize: "14px",
-                transition: "opacity 0.2s",
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.opacity = "0.9")}
-              onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
+              onClick={handleDownload}
+              disabled={!qrCodeUrl}
+              className={`mt-6 px-4 py-2 ${
+                qrCodeUrl
+                  ? "bg-gradient-to-r from-purple-600 to-purple-400 hover:opacity-90"
+                  : "bg-gray-300 cursor-not-allowed"
+              } text-white border-none rounded-md inline-flex items-center text-sm transition-opacity`}
             >
               <svg
-                style={{ width: "16px", height: "16px", marginRight: "8px" }}
+                className="w-4 h-4 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -219,64 +208,31 @@ function QRCode (){
           </div>
 
           {/* Instructions Section */}
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              padding: "24px",
-              marginTop: "24px",
-            }}
-          >
-            <h3 style={{ fontSize: "18px", fontWeight: "500", color: "#1f2937", marginBottom: "16px" }}>
+          <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
               How to Use Your QR Code
             </h3>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div
-                style={{
-                  padding: "12px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#f9fafb",
-                }}
-              >
-                <p style={{ fontWeight: "500", color: "#1f2937", marginBottom: "4px" }}>
+            <div className="flex flex-col gap-4">
+              <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="font-medium text-gray-800 mb-1">
                   Daily Check-In and Check-Out
                 </p>
-                <p style={{ fontSize: "14px", color: "#6b7280" }}>
+                <p className="text-sm text-gray-600">
                   Scan your QR code at the warehouse entrance scanner when you arrive to mark your check-in. Scan again when you leave to mark your check-out. If you forget to scan when leaving, the system will automatically set your check-out time to 6:00 PM.
                 </p>
               </div>
 
-              <div
-                style={{
-                  padding: "12px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#f9fafb",
-                }}
-              >
-                <p style={{ fontWeight: "500", color: "#1f2937", marginBottom: "4px" }}>
-                  Security
-                </p>
-                <p style={{ fontSize: "14px", color: "#6b7280" }}>
+              <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="font-medium text-gray-800 mb-1">Security</p>
+                <p className="text-sm text-gray-600">
                   Your QR code is unique and tied to your employee ID. Do not share it with others to prevent unauthorized attendance marking.
                 </p>
               </div>
 
-              <div
-                style={{
-                  padding: "12px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#f9fafb",
-                }}
-              >
-                <p style={{ fontWeight: "500", color: "#1f2937", marginBottom: "4px" }}>
-                  Troubleshooting
-                </p>
-                <p style={{ fontSize: "14px", color: "#6b7280" }}>
+              <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="font-medium text-gray-800 mb-1">Troubleshooting</p>
+                <p className="text-sm text-gray-600">
                   If the scanner doesn’t recognize your QR code, ensure your device screen brightness is high and the QR code image is clear. Contact HR if the issue persists.
                 </p>
               </div>
@@ -286,33 +242,22 @@ function QRCode (){
 
         {/* Attendance History Section */}
         <div>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              padding: "24px",
-            }}
-          >
-            <h3 style={{ fontSize: "18px", fontWeight: "500", color: "#1f2937", marginBottom: "16px" }}>
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
               Attendance History (Last 5 Days)
             </h3>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div className="flex flex-col gap-4">
               {attendanceRecords.length > 0 ? (
                 attendanceRecords.map((record, index) => (
                   <div
                     key={index}
-                    style={{
-                      padding: "12px",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                    }}
+                    className="p-3 border border-gray-200 rounded-lg"
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                      <div style={{ display: "flex", alignItems: "center" }}>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center">
                         <svg
-                          style={{ width: "16px", height: "16px", marginRight: "8px", color: "#6b7280" }}
+                          className="w-4 h-4 mr-2 text-gray-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -325,140 +270,60 @@ function QRCode (){
                           />
                         </svg>
                         <div>
-                          <p style={{ fontWeight: "500", color: "#1f2937" }}>
+                          <p className="font-medium text-gray-800">
                             {formatDate(record.date)}
                           </p>
                         </div>
                       </div>
                       <span
-                        style={{
-                          padding: "2px 8px",
-                          background:
-                            record.status === "Present"
-                              ? "#dcfce7"
-                              : record.status === "Late"
-                              ? "#fef9c3"
-                              : "#fee2e2",
-                          color:
-                            record.status === "Present"
-                              ? "#16a34a"
-                              : record.status === "Late"
-                              ? "#ca8a04"
-                              : "#dc2626",
-                          fontSize: "12px",
-                          fontWeight: "500",
-                          borderRadius: "999px",
-                        }}
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          record.status === "Present"
+                            ? "bg-green-100 text-green-600"
+                            : record.status === "Late"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-600"
+                        }`}
                       >
                         {record.status}
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        marginTop: "8px",
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: "8px",
-                        fontSize: "14px",
-                      }}
-                    >
+                    <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
                       <div>
-                        <p style={{ fontSize: "12px", color: "#6b7280" }}>Check In</p>
-                        <p style={{ color: "#1f2937" }}>{formatTime(record.checkIn)}</p>
+                        <p className="text-xs text-gray-600">Check In</p>
+                        <p className="text-gray-800">{formatTime(record.checkIn)}</p>
                       </div>
                       <div>
-                        <p style={{ fontSize: "12px", color: "#6b7280" }}>Check Out</p>
-                        <p style={{ color: "#1f2937" }}>{formatTime(record.checkOut)}</p>
+                        <p className="text-xs text-gray-600">Check Out</p>
+                        <p className="text-gray-800">{formatTime(record.checkOut)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-600">Overtime</p>
+                        <p className="text-gray-800">{formatOvertime(record.overTimeHours)}</p>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p style={{ color: "#6b7280", fontSize: "14px", textAlign: "center" }}>
+                <p className="text-gray-600 text-sm text-center">
                   No attendance records for the last 5 days.
                 </p>
               )}
             </div>
-
-            <button
-              onClick={() => navigate("/attendance-history")} // Assuming a full history page exists
-              style={{
-                marginTop: "16px",
-                background: "none",
-                border: "none",
-                color: "#6b46c1",
-                fontSize: "14px",
-                cursor: "pointer",
-                transition: "color 0.2s",
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.color = "#9f7aea")}
-              onMouseOut={(e) => (e.currentTarget.style.color = "#6b46c1")}
-            >
-              View Full History
-            </button>
           </div>
 
           {/* Attendance Status Legend */}
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              padding: "16px",
-              marginTop: "24px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", fontSize: "14px", color: "#6b7280" }}>
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: "#16a34a",
-                  marginRight: "8px",
-                }}
-              ></div>
+          <div className="bg-white rounded-xl shadow-md p-4 mt-6">
+            <div className="flex items-center text-sm text-gray-600">
+              <div className="w-3 h-3 rounded-full bg-green-600 mr-2"></div>
               <p>Present: On time</p>
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "14px",
-                color: "#6b7280",
-                marginTop: "8px",
-              }}
-            >
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: "#ca8a04",
-                  marginRight: "8px",
-                }}
-              ></div>
+            <div className="flex items-center text-sm text-gray-600 mt-2">
+              <div className="w-3 h-3 rounded-full bg-yellow-600 mr-2"></div>
               <p>Late: Arrived after 9:00 AM</p>
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "14px",
-                color: "#6b7280",
-                marginTop: "8px",
-              }}
-            >
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: "#dc2626",
-                  marginRight: "8px",
-                }}
-              ></div>
+            <div className="flex items-center text-sm text-gray-600 mt-2">
+              <div className="w-3 h-3 rounded-full bg-red-600 mr-2"></div>
               <p>Absent: No attendance record</p>
             </div>
           </div>
@@ -466,6 +331,6 @@ function QRCode (){
       </div>
     </div>
   );
-};
+}
 
 export default QRCode;
