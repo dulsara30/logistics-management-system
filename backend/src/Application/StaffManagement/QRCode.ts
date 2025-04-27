@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import 
-=======
 import { Request, Response } from "express";
 import staffMembers from "../../Infrastructure/schemas/staff";
 import Attendance from "../../Infrastructure/schemas/attendance";
@@ -76,4 +73,3 @@ export const fetchQRCodeAndData = async (req: Request, res: Response): Promise<v
     res.status(500).json({ message: error.message || "Server error" });
   }
 };
->>>>>>> staff-management
