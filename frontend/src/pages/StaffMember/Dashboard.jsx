@@ -52,16 +52,9 @@ const quickAccessCardsBase = [
   },
   {
     icon: Package,
-    title: 'Vehicle Fleet',
-    description: 'Vehicle Fleet',
-    path: 'vehicle-fleet',
-    color: 'from-gray-500 to-slate-600',
-  },
-  {
-    icon: Package,
     title: 'Delivery Scheduling',
     description: 'Delivery Scheduling',
-    path: 'delivery-scheduling',
+    path: '/delivery',
     color: 'from-gray-500 to-slate-600',
   },
 ];

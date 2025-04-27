@@ -113,7 +113,7 @@ const router = createBrowserRouter([
           {
             path: "delivery",
             element: (
-              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager","Driver"]}>
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager", "Driver"]}>
                 <DeliveryManagement />
               </ProtectedRoute>
             )
@@ -204,17 +204,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-  
-
-          {
-            path: "delivery",
-            element: (
-              <ProtectedRoute allowedRoles={["Other Staff"]}>
-                <DeliveryManagementEmployee />
-              </ProtectedRoute>
-            )
-          }
-
 
         ]
       },
@@ -226,8 +215,15 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
+      {
+        path: "delivery",
+        element: (
+          <ProtectedRoute allowedRoles={["Driver"]}>
+            <DeliveryManagement />
+          </ProtectedRoute>
+        )
+      }
       
-
     ]
   }
 ]);
