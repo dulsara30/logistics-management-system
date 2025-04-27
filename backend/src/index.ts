@@ -16,6 +16,9 @@ import suppliersRouter from "./API/SpplierManagement/suppliers";
 import cors from "cors";
 import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
+import profileRouter from "./API/StaffManagement/profile";
+import QRRouter from "./API/StaffManagement/QRCode";
+
 
 const app = express();
 app.use(express.json());
@@ -27,6 +30,8 @@ connectDB();
 app.use("/", loginRouter)
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
+app.use("/", profileRouter);
+app.use("/dashboard", QRRouter)
 
 app
   .route("/inventory")
