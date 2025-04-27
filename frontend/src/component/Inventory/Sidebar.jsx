@@ -16,12 +16,12 @@ const Sidebar = ({ onAddItem, onGenerateReport, onScanBarcode }) => {
         >
           <span className="mr-2">📊</span> Generate Report
         </button>
-        <button
+        {/* <button
           onClick={onScanBarcode}
           className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white py-2 rounded-lg hover:from-purple-600 hover:to-purple-800 transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
           <span className="mr-2">📷</span> Scan Barcode
-        </button>
+        </button> */}
       </div>
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-800">Category Breakdown</h3>

@@ -6,14 +6,11 @@ import ItemDetailsCard from "../../component/inventory/ItemDetailsCard";
 import SearchSortBar from "../../component/inventory/SearchSortBar";
 import InventoryTable from "../../component/inventory/InventoryTable";
 import CrudModal from "../../component/inventory/CrudModal";
-// import BarcodeScannerModal from "../../component/inventory/BarcodeScannerModal";
-import BarcodeScannerModal from "../../component/Inventory/BarCodeScannerModal";
 
 const InventoryManagementPage = () => {
   const [inventory, setInventory] = useState([]);
   const [filteredInventory, setFilteredInventory] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [formData, setFormData] = useState({
     productName: "",
     brandName: "",
@@ -140,11 +137,6 @@ const InventoryManagementPage = () => {
     });
     setIsEditing(true);
     setIsModalOpen(true);
-  };
-
-  const handleProductFound = (product) => {
-    setIsScannerOpen(false);
-    openEditModal(product);
   };
 
   const handleInputChange = (e) => {
@@ -282,13 +274,19 @@ const InventoryManagementPage = () => {
       return false;
     }
 
-    const supplierNameRegex = /^[A-Za-z\s]+$/;
+    // Updated supplierName validation
     if (!formData.supplierName || formData.supplierName.trim() === "") {
       setError("Supplier name is required");
       return false;
     }
+    // Allow letters, numbers, spaces, and safe symbols like - & @ # . , ( ) ' "
+    const supplierNameRegex = /^[A-Za-z0-9\s\-&@#.,()'"]+$/;
     if (!supplierNameRegex.test(formData.supplierName)) {
-      setError("Supplier name must contain only letters and spaces");
+      setError("Supplier name contains invalid characters");
+      return false;
+    }
+    if (scriptRegex.test(formData.supplierName)) {
+      setError("Supplier name must not contain script tags");
       return false;
     }
     if (formData.supplierName.length < 2 || formData.supplierName.length > 100) {
@@ -441,10 +439,6 @@ const InventoryManagementPage = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleScanBarcode = () => {
-    setIsScannerOpen(true);
-  };
-
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen bg-white">
       <div className="mb-8">
@@ -456,7 +450,6 @@ const InventoryManagementPage = () => {
         <Sidebar
           onAddItem={openAddModal}
           onGenerateReport={() => alert("Generate Report feature coming soon!")}
-          onScanBarcode={handleScanBarcode}
         />
 
         <section className="w-3/4">
@@ -508,13 +501,6 @@ const InventoryManagementPage = () => {
         isEditing={isEditing}
         isLoading={isLoading}
         error={error}
-      />
-
-      <BarcodeScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onProductFound={handleProductFound}
-        setError={setError}
       />
     </div>
   );
