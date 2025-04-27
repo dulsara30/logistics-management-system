@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const itemSchema = new mongoose.Schema({
+const InventoryManagementSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   brandName: { type: String, required: true },
   description: { type: String, required: true },
@@ -15,5 +15,5 @@ const itemSchema = new mongoose.Schema({
   supplierID: { type: String }, // Optional, if you still need it for barcode mapping
 });
 
-const Item = mongoose.models.Item || mongoose.model("Item", itemSchema);
-export default Item
+
+export default mongoose.model("InventoryManagement", InventoryManagementSchema);

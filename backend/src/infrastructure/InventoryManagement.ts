@@ -1,7 +1,3 @@
-
-
-
-
 const InventoryManagement = [
     { 
         id: "1", 
@@ -9,7 +5,7 @@ const InventoryManagement = [
         supplierID: 'MILK-001', 
         category: 'Dairy', 
         quantity: 150, 
-        location: 'Aisle 5, Bin 12', 
+        location: 'Aisle 5, Bin 12',
         lastUpdated: '03/19/25', 
         supplierName: 'DairyFresh Co.', 
         unitPrice: 2.99, 

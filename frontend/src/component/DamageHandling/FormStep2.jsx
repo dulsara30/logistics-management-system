@@ -1,3 +1,5 @@
+import React from 'react';
+
 function FormStep2({ formData, setFormData, onNext, onBack, errors, setErrors }) {
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -31,7 +33,7 @@ function FormStep2({ formData, setFormData, onNext, onBack, errors, setErrors })
             <input
               type="text"
               id="supplierName"
-              value="ABC Distributors"
+              value={formData.supplierName || 'N/A'}
               readOnly
               className="w-full p-2 border border-gray-300 rounded-lg bg-gray-100"
               aria-label="Supplier Name"

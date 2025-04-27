@@ -36,6 +36,7 @@ function App() {
         <Route path="/supplier-management" element={<SupplierManagement />} />
         <Route path="/return-damage" element={<ReturnDamageHandling />} />
         <Route path="/help" element={<Help />} />
+        
           </Routes>
         </main>
       </div>
