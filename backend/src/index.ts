@@ -7,15 +7,12 @@ import {
   deleteInventoryManagement,
   updateInventory,
 } from "./Application/InventoryManagement";
-import { Request, Response } from "express";
 import { connectDB } from "./Infrastructure/db";
-import { resolve } from "path";
-import { json } from "stream/consumers";
-import { create } from "domain";
 import suppliersRouter from "./API/SpplierManagement/suppliers";
 import cors from "cors";
 import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
+import getItemRoutetr from "./API/Return&DamageHandling/damageForm";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
 
@@ -30,6 +27,7 @@ connectDB();
 app.use("/", loginRouter)
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
+app.use("/returns", getItemRoutetr);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter)
 

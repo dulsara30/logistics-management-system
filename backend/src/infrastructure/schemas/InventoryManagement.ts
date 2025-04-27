@@ -14,3 +14,4 @@ const InventoryManagementSchema = new Schema({
 });
 
 export default mongoose.model("InventoryManagement", InventoryManagementSchema);
+

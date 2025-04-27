@@ -1,3 +1,4 @@
+import React from 'react';
 function FormStep3({ formData, onBack, onReview }) {
     const today = new Date().toISOString().split('T')[0];
   
