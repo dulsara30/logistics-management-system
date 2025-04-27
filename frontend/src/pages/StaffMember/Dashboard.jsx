@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
-// Define the quickAccessCards array without the dynamic path for now
+// Define the quickAccessCards array
 const quickAccessCardsBase = [
   {
     icon: UserCircle,
     title: 'Profile',
     description: 'View and edit your profile',
-    path: 'profile', // We'll append the ID dynamically in the component
+    path: '/profile', // Absolute path to /profile
     color: 'from-purple-500 to-violet-600',
   },
   {
@@ -38,23 +38,30 @@ const quickAccessCardsBase = [
   },
   {
     icon: MessageSquare,
-    title: 'Any Concern',
-    description: 'Chat with management',
-    path: 'concerns',
+    title: 'Warehouse Maintenance',
+    description: 'Maintain Warehouse',
+    path: 'warehouse-maintenance',
     color: 'from-orange-500 to-red-600',
   },
   {
     icon: QrCode,
     title: 'My QR',
     description: 'View attendance QR code',
-    path: 'my-qr',
+    path: 'dashboard/my-qr',
     color: 'from-pink-500 to-rose-600',
   },
   {
     icon: Package,
-    title: 'Something',
-    description: 'Coming soon',
-    path: 'something',
+    title: 'Vehicle Fleet',
+    description: 'Vehicle Fleet',
+    path: 'vehicle-fleet',
+    color: 'from-gray-500 to-slate-600',
+  },
+  {
+    icon: Package,
+    title: 'Delivery Scheduling',
+    description: 'Delivery Scheduling',
+    path: 'delivery-scheduling',
     color: 'from-gray-500 to-slate-600',
   },
 ];
@@ -85,7 +92,7 @@ export default function Dashboard() {
   const location = useLocation();
   const [error, setError] = useState(null);
   const [fullName, setFullName] = useState('');
-  const [userId, setUserId] = useState(''); // New state to store the user ID
+  const [userId, setUserId] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -110,7 +117,7 @@ export default function Dashboard() {
           throw new Error("User ID not found in token");
         }
         setFullName(decoded.fullName);
-        setUserId(decoded.id); // Store the user ID in state
+        setUserId(decoded.id);
       } catch (err) {
         console.error("Error decoding token:", err);
         setError("Invalid token");
@@ -125,7 +132,6 @@ export default function Dashboard() {
     getUserData();
   }, [navigate]);
 
-  // Early returns after all Hooks are called
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -142,22 +148,12 @@ export default function Dashboard() {
     );
   }
 
-  // Create a new quickAccessCards array with the dynamic profile path
-  const quickAccessCards = quickAccessCardsBase.map(card => {
-    if (card.title === 'Profile') {
-      return {
-        ...card,
-        path: `profile/${userId}`, // Append the user ID to the profile path
-      };
-    }
-    return card;
-  });
-
   const isBaseRoute = location.pathname === "/dashboard";
 
   return (
     <div className="px-8 py-5">
-      {isBaseRoute && (
+      {isBaseRoute ? (
+        // Render the dashboard UI only on the base route
         <div>
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-800">Welcome back, {fullName} 👋</h1>
@@ -165,10 +161,10 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quickAccessCards.map((card) => (
+            {quickAccessCardsBase.map((card) => (
               <Link
                 key={card.title}
-                to={`/dashboard/${card.path}`}
+                to={card.path}
                 className="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200"
               >
                 <div
@@ -224,8 +220,10 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      ) : (
+        // Render child routes when not on the base route
+        <Outlet />
       )}
-
     </div>
   );
 }

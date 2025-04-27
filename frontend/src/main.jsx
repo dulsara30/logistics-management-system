@@ -31,6 +31,8 @@ import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
 import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
 import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx'; 
+import QRCode from './pages/StaffMember/QRCode.jsx';
+import StaffAttendance from './pages/StaffManagement/SubPages/StaffAttendanceTracking.jsx';
 
 const router = createBrowserRouter([
   {
@@ -151,6 +153,14 @@ const router = createBrowserRouter([
                   </ProtectedRoute>
                 ),
               },
+              {
+                path: "attendance",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                    <StaffAttendance/>
+                  </ProtectedRoute>
+                ),
+              }
             ],
           },
           {
@@ -236,15 +246,23 @@ const router = createBrowserRouter([
             ),
             children: [
               {
-                path: "profile/:id",
-                element: (
-                  <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
-                    <Profile />
+                path: "my-qr",
+                element:(
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"]}>
+                    <QRCode/>
                   </ProtectedRoute>
                 ),
               },
             ],
           },
+          {
+            path: "profile",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff" , "Other Staff"]}>
+                <Profile />
+              </ProtectedRoute>
+            ),
+          }  
         ],
       },
     ],

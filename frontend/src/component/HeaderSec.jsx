@@ -83,7 +83,7 @@ export default function HeaderSec() {
       {/* Right Section: Avatar and Logout Button */}
       <div className="flex items-center space-x-4">
         {/* User Avatar */}
-        <Link to="/dashboard/profile">
+        <Link to="/profile">
           <Avatar className="bg-blue-600 text-white">{firstLetter}</Avatar>
         </Link>
 
