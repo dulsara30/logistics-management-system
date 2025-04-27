@@ -95,7 +95,7 @@ export default function WarehouseForm() {
           Sparesecsize: "",
           Otheritems: "",
         });
-        navigate("/WarehouseSubmit");
+        navigate("/Warehouse");
       })
       .catch((error) => {
         const message =

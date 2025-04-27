@@ -1,30 +1,25 @@
-// API/routes.ts
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createMaintenance, deleteMaintenance, getAllMaintenance, getMaintenanceById, updateMaintenance } from '../../Application/Maintenance/Maintenanceapp';
-import maintainance from '../../Infrastructure/schemas/Maintenance/MaintenanceSchema';
 
-
-const router = express.Router();
-
-
-
-
-
-
+const router = express.Router();  // Corrected initialization
 
 // Route to get all maintenance records
-router.get('/maintenance', async (req, res) => {
+router.get('/maintenance', async (req: Request, res: Response) => {
   try {
     const maintenance = await getAllMaintenance();
     res.status(200).json(maintenance);
-  } catch (error: any) {
-    console.error("Error fetching maintenance records:", error);
-    res.status(500).json({ message: "Error fetching maintenane records", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error fetching maintenance records:", error);
+      res.status(500).json({ message: "Error fetching maintenance records", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 });
 
 // Route to get a maintenance record by ID
-router.get('/maintenance/:requestId', async (req, res) => {
+router.get('/maintenance/:requestId', async (req: Request, res: Response) => {
   const { requestId } = req.params;
   try {
     const maintenance = await getMaintenanceById(requestId);
@@ -33,57 +28,44 @@ router.get('/maintenance/:requestId', async (req, res) => {
     } else {
       res.status(404).json({ message: "Maintenance record not found" });
     }
-  } catch (error: any) {
-    console.error("Error fetching maintenance record:", error);
-    res.status(500).json({ message: "Error fetching maintenance record", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error fetching maintenance record:", error);
+      res.status(500).json({ message: "Error fetching maintenance record", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 });
 
-
-
-
-
 // Create new maintenance record
-router.post('/maintenance', async (req, res) => {
-  const {
-    warehouseId,
-    issueDescription,
-    priority,
-    requestedBy,
-    status,
-    scheduledDate,
-    completionDate
-  } = req.body;
+router.post('/maintenance', async (req: Request, res: Response) => {
+  const { warehouseId, issueDescription, priority, requestedBy, status, scheduledDate, completionDate } = req.body;
 
   try {
     const newMaintenance = await createMaintenance(
-    warehouseId,
-    issueDescription,
-    priority,
-    requestedBy,
-    status,
-    scheduledDate,
-    completionDate
+      warehouseId,
+      issueDescription,
+      priority,
+      requestedBy,
+      status,
+      scheduledDate,
+      completionDate
     );
 
     res.status(201).json(newMaintenance);
-  } catch (error: any) {
-    console.error("Error creating maintenance record:", error);
-    res.status(500).json({ message: "Error creating maintenance record", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error creating maintenance record:", error);
+      res.status(500).json({ message: "Error creating maintenance record", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 });
 
-
-
-
-
-
-
-
-
-
 // Update maintenance record
-router.put('/maintenance/:requestId', async (req, res) => {
+router.put('/maintenance/:requestId', async (req: Request, res: Response) => {
   const { requestId } = req.params;
   const updates = req.body;
 
@@ -95,22 +77,18 @@ router.put('/maintenance/:requestId', async (req, res) => {
     } else {
       res.status(404).json({ message: "Maintenance record not found" });
     }
-  } catch (error: any) {
-    console.error("Error updating maintenance record:", error);
-    res.status(500).json({ message: "Error updating maintenance record", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error updating maintenance record:", error);
+      res.status(500).json({ message: "Error updating maintenance record", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 });
 
-
-
-
-
-
-
-
-
 // Delete maintenance record
-router.delete('/maintenance/:requestId', async (req, res) => {
+router.delete('/maintenance/:requestId', async (req: Request, res: Response) => {
   const { requestId } = req.params;
 
   try {
@@ -121,9 +99,13 @@ router.delete('/maintenance/:requestId', async (req, res) => {
     } else {
       res.status(404).json({ message: "Maintenance record not found" });
     }
-  } catch (error: any) {
-    console.error("Error deleting maintenance record:", error);
-    res.status(500).json({ message: "Error deleting maintenance record", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error deleting maintenance record:", error);
+      res.status(500).json({ message: "Error deleting maintenance record", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 });
 

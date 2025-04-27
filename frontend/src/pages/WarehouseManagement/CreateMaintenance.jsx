@@ -9,12 +9,12 @@ import {
   Paper
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const priorityOptions = ['Low', 'Medium', 'High'];
 
 export default function MaintenanceForm() {
   const [formData, setFormData] = useState({
-    
     warehouseId: '',
     issueDescription: '',
     priority: '',
@@ -22,16 +22,15 @@ export default function MaintenanceForm() {
     completionDate: '',
   });
 
+  const navigate = useNavigate(); // Initialize navigate hook
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    
 
     try {
       // Assuming the backend URL for posting data is 'http://localhost:8000/api/maintenance'
@@ -39,7 +38,6 @@ export default function MaintenanceForm() {
       console.log('Form submitted successfully:', response.data);
       // Optionally, reset the form or navigate to a success page
       setFormData({
-        
         warehouseId: '',
         issueDescription: '',
         priority: '',
@@ -47,18 +45,16 @@ export default function MaintenanceForm() {
         completionDate: '',
       });
       alert('Maintenance request submitted successfully!');
+      navigate('/warehouse/Maintainance');
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('There was an error submitting the request. Please try again.');
     }
   };
 
-
-
   const handleCancel = () => {
     // Reset the form data when cancel is clicked
     setFormData({
-     
       warehouseId: '',
       issueDescription: '',
       priority: '',
@@ -68,9 +64,6 @@ export default function MaintenanceForm() {
     alert('Form has been canceled and cleared.');
   };
 
-
-
-
   return (
     <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto', mt: 5 }}>
       <Typography variant="h5" gutterBottom>
@@ -78,7 +71,6 @@ export default function MaintenanceForm() {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-  
           <TextField
             label="Warehouse ID"
             name="warehouseId"
@@ -133,7 +125,6 @@ export default function MaintenanceForm() {
             InputLabelProps={{ shrink: true }}
           />
 
-
           <Stack direction="row" spacing={2}>
             <Button type="submit" variant="contained" sx={{ bgcolor: '#7b1fa2', maxWidth: 200 }}>
               Schedule
@@ -149,8 +140,6 @@ export default function MaintenanceForm() {
             </Button>
           </Stack>
         </Stack>
-
-        
       </form>
     </Paper>
   );
