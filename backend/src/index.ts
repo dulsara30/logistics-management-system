@@ -15,6 +15,7 @@ import loginRouter from "./API/login/login";
 import getItemRoutetr from "./API/Return&DamageHandling/damageForm";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
+import { deleteDamageReport, getInventoryItems, sendReturnReport, updateDamageReport } from "./Application/Return&DamageHandling/DamageReport";
 
 
 const app = express();
@@ -28,12 +29,17 @@ app.use("/", loginRouter)
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRoutetr);
+app.use("/returns", getItemRoutetr);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter)
 
+app.route("/returns/send-return-report").post(sendReturnReport);
+app.route("/returns/add-damage/:id").put(updateDamageReport);
+app.route("/returns/add-damage/:id").delete(deleteDamageReport);
+
 app
   .route("/inventory")
-  .get(getAllInventoryManagement)
+  .get(getAllInventoryManagement, getInventoryItems)
   .post(createInventoryManagement);
 
 app
