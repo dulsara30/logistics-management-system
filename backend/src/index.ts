@@ -22,6 +22,7 @@ import getItemRouter from "./API/Return&DamageHandling/damageForm";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
 import { getAllSuppliers } from "./Application/SupplierManagement/suppliers";
+import attendanceRoute from "./API/StaffManagement/attendance";
 
 const app: Express = express();
 
@@ -57,6 +58,8 @@ app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRouter);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter);
+app.use("/dashboard", QRRouter)
+app.use("/analytics", attendanceRoute);
 
 app
   .route("/inventory")
