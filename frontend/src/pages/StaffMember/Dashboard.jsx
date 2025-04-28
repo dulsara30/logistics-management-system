@@ -26,23 +26,23 @@ const quickAccessCardsBase = [
     icon: Calendar,
     title: 'Request Leave',
     description: 'Submit leave requests',
-    path: 'leave-request',
+    path: 'dashboard/leave-request',
     color: 'from-blue-500 to-cyan-600',
   },
-  {
-    icon: FileText,
-    title: 'Pay Sheet',
-    description: 'Access your payslips',
-    path: 'paysheet',
-    color: 'from-emerald-500 to-teal-600',
-  },
-  {
-    icon: MessageSquare,
-    title: 'Warehouse Maintenance',
-    description: 'Maintain Warehouse',
-    path: 'warehouse-maintenance',
-    color: 'from-orange-500 to-red-600',
-  },
+  // {
+  //   icon: FileText,
+  //   title: 'Pay Sheet',
+  //   description: 'Access your payslips',
+  //   path: 'paysheet',
+  //   color: 'from-emerald-500 to-teal-600',
+  // },
+  // {
+  //   icon: MessageSquare,
+  //   title: 'Warehouse Maintenance',
+  //   description: 'Maintain Warehouse',
+  //   path: 'warehouse-maintenance',
+  //   color: 'from-orange-500 to-red-600',
+  // },
   {
     icon: QrCode,
     title: 'My QR',
@@ -57,34 +57,34 @@ const quickAccessCardsBase = [
     path: 'vehicle-fleet',
     color: 'from-gray-500 to-slate-600',
   },
-  {
-    icon: Package,
-    title: 'Delivery Scheduling',
-    description: 'Delivery Scheduling',
-    path: 'delivery-scheduling',
-    color: 'from-gray-500 to-slate-600',
-  },
+  // {
+  //   icon: Package,
+  //   title: 'Delivery Scheduling',
+  //   description: 'Delivery Scheduling',
+  //   path: 'delivery-scheduling',
+  //   color: 'from-gray-500 to-slate-600',
+  // },
 ];
 
 const tasks = [
-  {
-    id: 1,
-    title: 'Inventory Check - Zone A',
-    status: 'completed',
-    time: '9:00 AM',
-  },
-  {
-    id: 2,
-    title: 'Package Sorting',
-    status: 'pending',
-    time: '11:00 AM',
-  },
-  {
-    id: 3,
-    title: 'Shipment Verification',
-    status: 'pending',
-    time: '2:00 PM',
-  },
+//   {
+//     id: 1,
+//     title: 'Inventory Check - Zone A',
+//     status: 'completed',
+//     time: '9:00 AM',
+//   },
+//   {
+//     id: 2,
+//     title: 'Package Sorting',
+//     status: 'pending',
+//     time: '11:00 AM',
+//   },
+//   {
+//     id: 3,
+//     title: 'Shipment Verification',
+//     status: 'pending',
+//     time: '2:00 PM',
+//   },
 ];
 
 export default function Dashboard() {

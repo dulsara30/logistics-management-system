@@ -35,6 +35,7 @@ import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
 import QRCode from './pages/StaffMember/QRCode.jsx';
 import StaffAttendance from './pages/StaffManagement/SubPages/StaffAttendanceTracking.jsx';
+import LeaveRequest from './pages/StaffMember/leaveRequest.jsx';
 
 const router = createBrowserRouter([
   {
@@ -235,6 +236,14 @@ const router = createBrowserRouter([
                 element:(
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"]}>
                     <QRCode/>
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path: "leave-request",
+                element:(
+                  <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
+                    <LeaveRequest/>
                   </ProtectedRoute>
                 ),
               },

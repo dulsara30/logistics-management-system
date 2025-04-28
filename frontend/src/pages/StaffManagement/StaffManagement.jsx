@@ -13,10 +13,10 @@ export default function StaffManagement(){
   const actionCards = [
       { icon: <Users size={24} />, title: "Manage Staff", desc: "View, Update, Delete Employees", path: "manage-staff" },
       { icon: <UserPlus size={24} />, title: "Add New Staff Member", desc: "Create new employee profiles", path: "add-staff" },
-      { icon: <ClipboardList size={24} />, title: "Assign Tasks to Staff", desc: "Delegate and track tasks", path: "assign-tasks" },
+    //   { icon: <ClipboardList size={24} />, title: "Assign Tasks to Staff", desc: "Delegate and track tasks", path: "assign-tasks" },
       { icon: <Calendar size={24} />, title: "Manage Leave Requests", desc: "Handle time-off requests", path: "leave-requests" },
       { icon: <DollarSign size={24} />, title: "Manage Salary", desc: "Process payroll and benefits", path: "manage-salary" },
-      { icon: <MessageCircle size={24} />, title: "Employee's Concerns", desc: "Address staff issues", path: "concerns" },
+    //   { icon: <MessageCircle size={24} />, title: "Employee's Concerns", desc: "Address staff issues", path: "concerns" },
   ];
 
   return (
