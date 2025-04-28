@@ -23,6 +23,7 @@ import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
 import { getAllSuppliers } from "./Application/SupplierManagement/suppliers";
 import attendanceRoute from "./API/StaffManagement/attendance";
+import leaveRoutes from "./API/StaffManagement/leaveRoutes";
 
 const app: Express = express();
 
@@ -60,6 +61,7 @@ app.use("/", profileRouter);
 app.use("/dashboard", QRRouter);
 app.use("/dashboard", QRRouter)
 app.use("/analytics", attendanceRoute);
+app.use("/leaves", leaveRoutes);
 
 app
   .route("/inventory")
