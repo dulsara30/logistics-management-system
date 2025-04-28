@@ -15,6 +15,7 @@ import loginRouter from "./API/login/login";
 import getItemRoutetr from "./API/Return&DamageHandling/damageForm";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
+import attendanceRoute from "./API/StaffManagement/attendance";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRoutetr);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter)
+app.use("/analytics", attendanceRoute);
 
 app
   .route("/inventory")
