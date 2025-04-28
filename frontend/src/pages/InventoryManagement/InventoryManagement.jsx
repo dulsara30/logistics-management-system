@@ -267,7 +267,7 @@ const InventoryManagementPage = () => {
     if (sortByQuantity === "lowest") {
       updatedInventory.sort((a, b) => Number(a.quantity) - Number(b.quantity));
     } else if (sortByQuantity === "highest") {
-      updatedInventory.sort((a, b) => Number(b.quantity) - Number(b.quantity));
+      updatedInventory.sort((a, b) => Number(b.quantity) - Number(a.quantity));
     }
 
     setFilteredInventory(updatedInventory);
