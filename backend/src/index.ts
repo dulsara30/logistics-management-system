@@ -18,6 +18,7 @@ import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
+import attendanceRoute from "./API/StaffManagement/attendance";
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter)
+app.use("/analytics", attendanceRoute);
 
 app
   .route("/inventory")
