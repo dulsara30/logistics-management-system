@@ -5,7 +5,7 @@ import {
   getInventoryById,
   updateInventory,
   deleteInventoryManagement,
-} from "../Application/InventoryManagement";
+} from "../Application/Inventory/InventoryManagement";
 import { authenticateToken, authorizeRole } from "../middleware/authentication"; // Add these middleware
 
 const inventoryRouter = express.Router();
