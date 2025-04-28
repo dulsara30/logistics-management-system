@@ -1,6 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const InventoryManagementSchema = new mongoose.Schema({
+interface IInventory extends Document {
+  productName: string;
+  brandName: string;
+  description: string;
+  price: number;
+  category: string;
+  quantity: number;
+  updatedIn: Date;
+  createdIn: Date;
+  expiryDate: Date;
+  supplierName: string;
+  reorderLevel: number;
+}
+
+const inventorySchema: Schema<IInventory> = new Schema({
   productName: { type: String, required: true },
   brandName: { type: String, required: true },
   description: { type: String, required: true },
@@ -12,8 +26,6 @@ const InventoryManagementSchema = new mongoose.Schema({
   expiryDate: { type: Date, required: true },
   supplierName: { type: String, required: true },
   reorderLevel: { type: Number, required: true },
-  supplierID: { type: String }, // Optional, if you still need it for barcode mapping
 });
 
-
-export default mongoose.model("InventoryManagement", InventoryManagementSchema);
+export default mongoose.model<IInventory>("Inventory", inventorySchema);

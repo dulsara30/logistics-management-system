@@ -1,18 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
-const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing, isLoading, error }) => {
-  const [supplierSearch, setSupplierSearch] = useState("");
-  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
-
-  // Mock list of suppliers (replace with API call to fetch actual suppliers)
-  const suppliers = [
-    "Dairy Farms Inc.",
-    "Fresh Produce Co.",
-    "Global Suppliers Ltd.",
-    "Organic Goods LLC",
-    "Sri Lankan Imports",
-  ];
-
+const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing, isLoading, error, suppliers, prices }) => {
   // Predefined categories for the dropdown
   const categories = [
     "Dairy",
@@ -24,23 +12,10 @@ const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing
     "Personal Care",
   ];
 
-  // Filter suppliers based on search term
-  const filteredSuppliers = suppliers.filter((supplier) =>
-    supplier.toLowerCase().includes(supplierSearch.toLowerCase())
-  );
-
-  // Handle supplier selection
-  const handleSupplierSelect = (supplier) => {
-    onInputChange({ target: { name: "supplierName", value: supplier } });
-    setSupplierSearch(supplier);
-    setShowSupplierDropdown(false);
-  };
-
   useEffect(() => {
-    // Reset supplier search when modal opens/closes
+    // Reset form data when modal opens/closes if needed
     if (!isOpen) {
-      setSupplierSearch("");
-      setShowSupplierDropdown(false);
+      // No need to reset supplierSearch since it's removed
     }
   }, [isOpen]);
 
@@ -106,15 +81,13 @@ const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing
             <div>
               <label className="block text-gray-700 font-medium mb-1">Price</label>
               <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={onInputChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Enter price"
-                step="0.01"
-                min="0"
+                    type="number"
+                    name="price"
+                   value={formData.price}
+                   onChange={onInputChange}
+                   placeholder="Price"
               />
+              <input type="number" name="price" id="price" />
             </div>
 
             <div>
@@ -181,35 +154,21 @@ const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing
               />
             </div>
 
-            <div className="relative">
+            <div>
               <label className="block text-gray-700 font-medium mb-1">Supplier Name</label>
-              <input
-                type="text"
-                value={supplierSearch}
-                onChange={(e) => {
-                  setSupplierSearch(e.target.value);
-                  setShowSupplierDropdown(true);
-                  if (!formData.supplierName || e.target.value === formData.supplierName) {
-                    onInputChange({ target: { name: "supplierName", value: e.target.value } });
-                  }
-                }}
-                onFocus={() => setShowSupplierDropdown(true)}
+              <select
+                name="supplierName"
+                value={formData.supplierName}
+                onChange={onInputChange}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Search for a supplier"
-              />
-              {showSupplierDropdown && filteredSuppliers.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-md">
-                  {filteredSuppliers.map((supplier) => (
-                    <li
-                      key={supplier}
-                      onClick={() => handleSupplierSelect(supplier)}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      {supplier}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              >
+                <option value="">Select a supplier</option>
+                {suppliers.map((supplier) => (
+                  <option key={supplier} value={supplier}>
+                    {supplier}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -236,7 +195,7 @@ const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing
             </button>
             <button
               onClick={onSave}
-              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 transition focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 transition focus outline-none focus:ring-2 focus:ring-purple-500"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : isEditing ? "Update Item" : "Add Item"}

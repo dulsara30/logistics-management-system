@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { authenticateToken, authorizeRole } from "../../middleware/authentication";
-import { getAllInventoryManagement } from "../../Application/InventoryManagement";
+import { getAllInventoryManagement } from "../../Application/Inventory/InventoryManagement";
 
 
 const getItemRoutetr = express.Router();

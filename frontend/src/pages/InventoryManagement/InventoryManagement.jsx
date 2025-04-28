@@ -6,11 +6,34 @@ import ItemDetailsCard from "../../component/inventory/ItemDetailsCard";
 import SearchSortBar from "../../component/inventory/SearchSortBar";
 import InventoryTable from "../../component/inventory/InventoryTable";
 import CrudModal from "../../component/inventory/CrudModal";
+import StockoutModal from "../../component/Inventory/StockoutModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/ToastStyles.css";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const InventoryManagementPage = () => {
   const [inventory, setInventory] = useState([]);
   const [filteredInventory, setFilteredInventory] = useState([]);
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [expiringSoonItems, setExpiringSoonItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isStockoutModalOpen, setIsStockoutModalOpen] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState({
     productName: "",
     brandName: "",
@@ -32,6 +55,50 @@ const InventoryManagementPage = () => {
   const [sortByDate, setSortByDate] = useState("latest");
   const [sortByQuantity, setSortByQuantity] = useState("none");
   const navigate = useNavigate();
+
+  // Calculate Low Stock and Expiring Soon items
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+    const tenDaysFromNow = new Date(today);
+    tenDaysFromNow.setDate(today.getDate() + 10);
+
+    console.log("Today:", today.toISOString());
+    console.log("Ten days from now:", tenDaysFromNow.toISOString());
+
+    // Low Stock: quantity <= reorderLevel
+    const lowStock = filteredInventory
+      .map((item) => ({
+        ...item,
+        isLowStock: Number(item.quantity) <= Number(item.reorderLevel),
+      }))
+      .filter((item) => item.isLowStock);
+
+    // Expiring Soon: within 10 days
+    const expiringSoon = filteredInventory
+      .map((item) => {
+        const expiryDate = new Date(item.expiryDate);
+        if (isNaN(expiryDate.getTime())) {
+          console.warn(`Invalid expiry date for item ${item.productName}: ${item.expiryDate}`);
+          return { ...item, isExpiringSoon: false, daysUntilExpiry: null };
+        }
+
+        const isExpiringSoon = expiryDate <= tenDaysFromNow && expiryDate >= today;
+        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+
+        console.log(`Item: ${item.productName}, Expiry: ${expiryDate.toISOString()}, Is Expiring Soon: ${isExpiringSoon}, Days Until Expiry: ${daysUntilExpiry}`);
+
+        return {
+          ...item,
+          isExpiringSoon,
+          daysUntilExpiry: isExpiringSoon ? daysUntilExpiry : null,
+        };
+      })
+      .filter((item) => item.isExpiringSoon);
+
+    setLowStockItems(lowStock);
+    setExpiringSoonItems(expiringSoon);
+  }, [filteredInventory]);
 
   const fetchInventory = async () => {
     setIsLoading(true);
@@ -60,6 +127,7 @@ const InventoryManagementPage = () => {
       }
 
       const data = await res.json();
+      console.log("Fetched inventory data:", data);
       setInventory(data);
       setFilteredInventory(data);
     } catch (err) {
@@ -75,8 +143,107 @@ const InventoryManagementPage = () => {
     }
   };
 
+  const fetchSuppliers = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const res = await fetch(`http://localhost:8000/suppliers`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to fetch suppliers");
+      }
+
+      const data = await res.json();
+      const supplierNames = [...new Set(data.map((supplier) => supplier.name))];
+      setSuppliers(supplierNames);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching suppliers:", err);
+      if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        navigate("/login");
+      }
+    }
+  };
+
+  const stockoutItem = async (stockoutData) => {
+    setIsLoading(true);
+    setError(null);
+    const token = localStorage.getItem("token");
+    try {
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await fetch(`http://localhost:8000/inventory/stockout/${stockoutData.itemId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          quantity: parseInt(stockoutData.quantity),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(errorData.message || "Unauthorized. Please log in again.");
+        }
+        throw new Error(errorData.message || "Failed to stockout item");
+      }
+
+      const updatedItem = await response.json();
+      toast.success(`Stock updated! New quantity for ${updatedItem.productName}: ${updatedItem.quantity}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
+
+      setInventory((prevInventory) =>
+        prevInventory.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        )
+      );
+      setFilteredInventory((prevFiltered) =>
+        prevFiltered.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        )
+      );
+
+      setIsStockoutModalOpen(false);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error during stockout:", err);
+      if (err.message.includes("Unauthorized")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        navigate("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchInventory();
+    fetchSuppliers();
   }, []);
 
   useEffect(() => {
@@ -117,11 +284,15 @@ const InventoryManagementPage = () => {
       updatedIn: new Date().toISOString().split("T")[0],
       createdIn: new Date().toISOString().split("T")[0],
       expiryDate: "",
-      supplierName: "",
+      supplierName: suppliers.length > 0 ? suppliers[0] : "",
       reorderLevel: "",
     });
     setIsEditing(false);
     setIsModalOpen(true);
+  };
+
+  const openStockoutModal = () => {
+    setIsStockoutModalOpen(true);
   };
 
   const openEditModal = (item) => {
@@ -141,6 +312,7 @@ const InventoryManagementPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Input changed: name=${name}, value=${value}, type=${typeof value}`);
     setFormData({ ...formData, [name]: value });
     setError(null);
   };
@@ -192,17 +364,12 @@ const InventoryManagementPage = () => {
       setError("Price must be a valid number");
       return false;
     }
-    if (price < 0.01) {
-      setError("Price must be at least 0.01");
+    if (price < 0) {
+      setError("Price must not be negative");
       return false;
     }
-    if (price > 10000) {
-      setError("Price must not exceed 10,000");
-      return false;
-    }
-    const decimalPlaces = (formData.price.toString().split(".")[1] || "").length;
-    if (decimalPlaces > 2) {
-      setError("Price must have at most 2 decimal places");
+    if (price > 100000) {
+      setError("Price must not exceed 100,000");
       return false;
     }
 
@@ -274,12 +441,10 @@ const InventoryManagementPage = () => {
       return false;
     }
 
-    // Updated supplierName validation
     if (!formData.supplierName || formData.supplierName.trim() === "") {
       setError("Supplier name is required");
       return false;
     }
-    // Allow letters, numbers, spaces, and safe symbols like - & @ # . , ( ) ' "
     const supplierNameRegex = /^[A-Za-z0-9\s\-&@#.,()'"]+$/;
     if (!supplierNameRegex.test(formData.supplierName)) {
       setError("Supplier name contains invalid characters");
@@ -415,28 +580,172 @@ const InventoryManagementPage = () => {
     setSelectedItem(selectedItem?._id === item._id ? null : item);
   };
 
+  const formatPrice = (price) => {
+    return typeof price === "number" ? `$${price.toFixed(2)}` : "$0.00";
+  };
+
   const downloadItemDetails = (item) => {
+    const formatDate = (dateString) => {
+      return dateString ? dateString.split("T")[0] : "N/A";
+    };
+
     const content = `
-      Product Name: ${item.productName}
-      Brand Name: ${item.brandName}
-      Description: ${item.description}
-      Price: $${item.price}
-      Category: ${item.category}
-      Quantity: ${item.quantity}
-      Updated In: ${item.updatedIn}
-      Created In: ${item.createdIn}
-      Expiry Date: ${item.expiryDate}
-      Supplier Name: ${item.supplierName}
-      Reorder Level: ${item.reorderLevel}
+      Product Name: ${item.productName || "N/A"}
+      Brand Name: ${item.brandName || "N/A"}
+      Description: ${item.description || "N/A"}
+      Price: ${formatPrice(item.price)}
+      Category: ${item.category || "N/A"}
+      Quantity: ${item.quantity ?? "N/A"}
+      Updated In: ${formatDate(item.updatedIn)}
+      Created In: ${formatDate(item.createdIn)}
+      Expiry Date: ${formatDate(item.expiryDate)}
+      Supplier Name: ${item.supplierName || "N/A"}
+      Reorder Level: ${item.reorderLevel ?? "N/A"}
     `;
     
     const blob = new Blob([content], { type: "text/plain" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${item.productName}_details.txt`;
+    link.download = `${item.productName || "item"}_details.txt`;
     link.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const generateReport = () => {
+    if (filteredInventory.length === 0) {
+      toast.info("No inventory items to generate a report for.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Inventory Report", 14, 20);
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${new Date().toISOString().split("T")[0]}`, 14, 30);
+
+      const columns = [
+        { header: "Product Name", dataKey: "productName" },
+        { header: "Brand Name", dataKey: "brandName" },
+        { header: "Category", dataKey: "category" },
+        { header: "Quantity", dataKey: "quantity" },
+        { header: "Price", dataKey: "price" },
+        { header: "Supplier Name", dataKey: "supplierName" },
+        { header: "Reorder Level", dataKey: "reorderLevel" },
+      ];
+
+      const data = filteredInventory.map((item) => ({
+        productName: item.productName || "N/A",
+        brandName: item.brandName || "N/A",
+        category: item.category || "N/A",
+        quantity: item.quantity ?? "N/A",
+        price: formatPrice(item.price),
+        supplierName: item.supplierName || "N/A",
+        reorderLevel: item.reorderLevel ?? "N/A",
+      }));
+
+      autoTable(doc, {
+        columns: columns,
+        body: data,
+        startY: 40,
+        theme: "striped",
+        headStyles: { fillColor: [100, 100, 255] },
+        styles: { fontSize: 10, cellPadding: 3 },
+        columnStyles: {
+          productName: { cellWidth: 30 },
+          brandName: { cellWidth: 30 },
+          category: { cellWidth: 20 },
+          quantity: { cellWidth: 20 },
+          price: { cellWidth: 20 },
+          supplierName: { cellWidth: 30 },
+          reorderLevel: { cellWidth: 20 },
+        },
+      });
+
+      doc.save("inventory_report.pdf");
+
+      toast.success("Inventory report generated and downloaded as PDF!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
+    } catch (error) {
+      console.error("Error generating PDF report:", error);
+      toast.error("Failed to generate PDF report: " + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
+    }
+  };
+
+  // Prepare data for the bar chart
+  const chartData = {
+    labels: filteredInventory.map((item) => item.productName),
+    datasets: [
+      {
+        label: "Quantity",
+        data: filteredInventory.map((item) => item.quantity),
+        backgroundColor: filteredInventory.map((item) =>
+          Number(item.quantity) <= Number(item.reorderLevel)
+            ? "rgba(255, 99, 132, 0.6)"
+            : "rgba(54, 162, 235, 0.6)"
+        ),
+        borderColor: filteredInventory.map((item) =>
+          Number(item.quantity) <= Number(item.reorderLevel)
+            ? "rgba(255, 99, 132, 1)"
+            : "rgba(54, 162, 235, 1)"
+        ),
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Inventory Quantities",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Quantity",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Product Name",
+        },
+      },
+    },
   };
 
   return (
@@ -449,7 +758,10 @@ const InventoryManagementPage = () => {
       <div className="flex gap-6">
         <Sidebar
           onAddItem={openAddModal}
-          onGenerateReport={() => alert("Generate Report feature coming soon!")}
+          onStockoutItem={openStockoutModal}
+          onGenerateReport={generateReport}
+          lowStockItems={lowStockItems}
+          expiringSoonItems={expiringSoonItems}
         />
 
         <section className="w-3/4">
@@ -464,7 +776,13 @@ const InventoryManagementPage = () => {
             </div>
           )}
 
-          <StatsCards filteredInventory={filteredInventory} />
+          <StatsCards
+            filteredInventory={filteredInventory.map((item) => ({
+              ...item,
+              isLowStock: Number(item.quantity) <= Number(item.reorderLevel),
+            }))}
+            expiringSoonItems={expiringSoonItems}
+          />
 
           {selectedItem && (
             <ItemDetailsCard
@@ -489,6 +807,13 @@ const InventoryManagementPage = () => {
             onEditItem={openEditModal}
             onDeleteItem={deleteItem}
           />
+
+          {/* Inventory Quantities Chart - Moved Below the Table */}
+          <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 mt-6">
+            <div style={{ height: "300px" }}>
+              <Bar data={chartData} options={chartOptions} />
+            </div>
+          </div>
         </section>
       </div>
 
@@ -501,7 +826,19 @@ const InventoryManagementPage = () => {
         isEditing={isEditing}
         isLoading={isLoading}
         error={error}
+        suppliers={suppliers}
       />
+
+      <StockoutModal
+        isOpen={isStockoutModalOpen}
+        onClose={() => setIsStockoutModalOpen(false)}
+        inventory={inventory}
+        onStockout={stockoutItem}
+        isLoading={isLoading}
+        error={error}
+      />
+
+      <ToastContainer />
     </div>
   );
 };
