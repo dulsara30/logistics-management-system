@@ -15,7 +15,7 @@ const deliveryScheduleSchema: Schema = new Schema(
       type: String,
       required: true,
     },
- 
+
     deliveryDate: {
       type: Date,
       required: true,
@@ -35,9 +35,9 @@ const deliveryScheduleSchema: Schema = new Schema(
     },
 
     driverUsername: {
-        type: String,
-        required: true,
-      },
+      type: String,
+      required: true,
+    },
 
     specialInstructions: {
       type: String,
@@ -60,9 +60,9 @@ const deliveryScheduleSchema: Schema = new Schema(
       default: null,
     },
 
-    status :{
-        type : String,
-        default: 'In pending'
+    status: {
+      type: String,
+      default: 'In pending'
     }
   }
 );

@@ -4,6 +4,34 @@ import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: 'http://localhost:8000/api', // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const StyledTableHead = styled(TableHead)(() => ({
   backgroundColor: '#f0f0f0',
 }));
@@ -22,21 +50,18 @@ const StyledTableRow = styled(TableRow)(() => ({
 }));
 
 const DeliveryManagement = () => {
-
   const [deliveryData, setDeliveryData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-
     const fetchDeliveryData = async () => {
-
       try {
-        const response = await axios.get('http://localhost:8000/api/Delivery');
+        const response = await api.get('/Delivery');
         setDeliveryData(response.data);
       } catch (error) {
         console.error('Error fetching delivery data:', error);
+        alert(`Failed to fetch deliveries: ${error.response?.data?.message || 'Unknown error'}`);
       }
-
     };
 
     fetchDeliveryData();
@@ -77,13 +102,13 @@ const DeliveryManagement = () => {
 
           <TableBody>
             {deliveryData.map((row) => (
-              <StyledTableRow key={row.deliveryScheduleId} onClick={() => navigate(`DeliveryProfile/${row.deliveryScheduleId}`)}>
+              <StyledTableRow key={row.deliveryScheduleId} onClick={() => navigate(`/delivery/DeliveryProfile/${row.deliveryScheduleId}`)}>
                 <TableCell>{row.deliveryScheduleId}</TableCell>
                 <TableCell>{row.packageType}</TableCell>
                 <TableCell>{row.driverName}</TableCell>
                 <TableCell>{row.pickupLocation}</TableCell>
                 <TableCell>{row.dropoffLocation}</TableCell>
-                <TableCell>{row.deliveryDate}</TableCell>
+                <TableCell>{new Date(row.deliveryDate).toLocaleString()}</TableCell>
                 <TableCell>
                   <Typography sx={{ color: getStatusColor(row.status), fontWeight: 500 }}>
                     {row.status}
@@ -98,7 +123,7 @@ const DeliveryManagement = () => {
       <Box sx={{ mt: 3, textAlign: 'right' }}>
         <Button
           variant="contained"
-          onClick={() => navigate('NewDeliveryScheduling')}
+          onClick={() => navigate('/delivery/NewDeliveryScheduling')}
           sx={{
             background: 'linear-gradient(to right, #8e2de2, #4a00e0)',
             color: '#FFFFFF',
@@ -112,7 +137,7 @@ const DeliveryManagement = () => {
             },
           }}
         >
-          + New Delivery schedule
+          + New Delivery Schedule
         </Button>
       </Box>
     </Box>

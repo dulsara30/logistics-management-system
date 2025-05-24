@@ -1,6 +1,6 @@
 
 import express from 'express';
-import {updateVehicleByID,createVehicle,getVehicles,getVehicleByID,deleteVehicleByID,getBriefStaffDetails} from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
+import { updateVehicleByID, createVehicle, getVehicles, getVehicleByID, deleteVehicleByID, getBriefStaffDetails } from '../../Application/VehicleFleet/VehicleApp'; // Import service methods
 
 
 
@@ -28,7 +28,7 @@ router.post('/vehicles', async (req, res) => {
   } = req.body;
 
   try {
-    
+
     // Call the service function to create and save the new vehicle
     const newVehicle = await createVehicle(
       OwnersNIC,
@@ -43,7 +43,7 @@ router.post('/vehicles', async (req, res) => {
       LoadCapacity,
       DriverID
     );
- 
+
     // Return the created vehicle data as JSON
     res.status(201).json(newVehicle);
   } catch (error) {
@@ -72,14 +72,14 @@ router.get("/vehicles", async (req, res) => {
 router.get('/vehicles/:vehicleId', async (req, res) => {
 
   const { vehicleId } = req.params; // Extract vehicleId from the route parameter
-  
+
   try {
 
-    const vehicle = await getVehicleByID(vehicleId); 
+    const vehicle = await getVehicleByID(vehicleId);
     res.json(vehicle); // Send the vehicle data as a response
 
   } catch (error) {
-    res.status(500).json({ message: "Error fetching vehicle", error}); 
+    res.status(500).json({ message: "Error fetching vehicle", error });
   }
 });
 
@@ -93,7 +93,7 @@ router.put('/vehicles/:vehicleId', async (req, res) => {
   const updateData = req.body; // Extract the fields to be updated from the request body
 
   try {
-    const result = await updateVehicleByID(vehicleId, updateData); 
+    const result = await updateVehicleByID(vehicleId, updateData);
     res.json(result); // Send a success message if the update is successful
   } catch (error) {
     res.status(500).json({ message: "Error updating vehicle", error });
@@ -129,12 +129,6 @@ router.get('/drivers', async (req, res) => {
     return res.status(500).json({ message: "Error fetching staff details", error: error.message });
   }
 });
-
-
-
-
-
-
 
 export default router;
 

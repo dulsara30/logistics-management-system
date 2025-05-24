@@ -12,10 +12,40 @@ import {
 } from "@mui/material";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+// Create axios instance with interceptor
+const api = axios.create({
+    baseURL: "http://localhost:8000/api", // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    }
+);
 
 const NewDeliverySchedule = () => {
     const { ScheduleID } = useParams();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         pickupLocation: "",
         dropoffLocation: "",
@@ -27,40 +57,41 @@ const NewDeliverySchedule = () => {
         driverName: "",
         driverUsername: "",
         specialInstructions: "",
-        pickupLatitude: 0,
-        pickupLongitude: 0,
-        dropoffLatitude: 0,
-        dropoffLongitude: 0,
+        pickupLatitude: 6.9271, // Default: Colombo, Sri Lanka
+        pickupLongitude: 79.8612,
+        dropoffLatitude: 6.9271,
+        dropoffLongitude: 79.8612,
         status: "",
     });
 
     const [isEditable, setIsEditable] = useState(false);
-    const [loading, setLoading] = useState(false); // For loading state
-    const [error, setError] = useState(""); // For error handling
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const [drivers, setDrivers] = useState([]);
     const [validationErrors, setValidationErrors] = useState({});
 
-    // Fetch existing data on component mount
+    // Fetch existing data and drivers on mount
     useEffect(() => {
         setLoading(true);
-        axios
-            .get(`http://localhost:8000/api/Delivery/${ScheduleID}`)
+        api
+            .get(`/Delivery/${ScheduleID}`)
             .then((response) => {
                 setFormData(response.data);
                 setLoading(false);
             })
             .catch((error) => {
-                setError("Error fetching data");
+                setError("Error fetching delivery schedule");
+                toast.error("Error fetching delivery schedule");
                 setLoading(false);
-                alert("Error fetching data", error);
             });
 
         const fetchDrivers = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/drivers');
+                const response = await api.get("/drivers");
                 setDrivers(response.data);
             } catch (error) {
                 console.error("Error fetching drivers:", error);
+                toast.error("Error fetching drivers");
             }
         };
 
@@ -70,40 +101,35 @@ const NewDeliverySchedule = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // First, update the driverUsername
         if (name === "driverUsername") {
-            const selectedDriver = drivers.find(driver => driver._id === value); // Assuming _id is the driver's unique ID
-            // Set driverName along with driverUsername in the formData
+            const selectedDriver = drivers.find((driver) => driver._id === value);
             setFormData((prevData) => ({
                 ...prevData,
                 driverUsername: value,
-                driverName: selectedDriver ? selectedDriver.fullName : "", // Assuming fullName is the driver's name
+                driverName: selectedDriver ? selectedDriver.fullName : "",
             }));
             setValidationErrors((prevErrors) => ({ ...prevErrors, driverUsername: "" }));
             return;
         }
 
-        // Update other fields normally
         setFormData((prevData) => ({ ...prevData, [name]: value }));
         setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
 
-        // Handle status update separately
-        if (name === "status" && !isEditable) { // Only allow status updates when not in edit mode
-            axios
-                .put(`http://localhost:8000/api/Delivery/${ScheduleID}`, { status: value })
+        if (name === "status" && !isEditable) {
+            api
+                .put(`/Delivery/${ScheduleID}`, { status: value })
                 .then(() => {
-                    alert("Status updated successfully");
+                    toast.success("Status updated successfully");
                 })
                 .catch((error) => {
                     setError("Error updating status");
-                    alert("Error updating status");
+                    toast.error("Error updating status");
                 });
         }
     };
 
-
     const handleMapClick = (event, isPickup) => {
-        if (!isEditable) return; // Prevent map clicks when not in edit mode
+        if (!isEditable) return;
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
         const geocoder = new window.google.maps.Geocoder();
@@ -171,25 +197,26 @@ const NewDeliverySchedule = () => {
 
         if (!hasErrors) {
             setLoading(true);
-            axios
-                .put(`http://localhost:8000/api/Delivery/${ScheduleID}`, formData)
+            api
+                .put(`/Delivery/${ScheduleID}`, formData)
                 .then(() => {
-                    setIsEditable(false); // Switch back to view mode
-                    alert("Schedule updated successfully!");
+                    setIsEditable(false);
+                    toast.success("Schedule updated successfully!");
                     setLoading(false);
                 })
                 .catch((error) => {
                     setError("Error updating delivery schedule");
-                    alert("Error updating delivery schedule");
+                    toast.error("Error updating delivery schedule");
                     setLoading(false);
                 });
         } else {
-            alert("Please fix the validation errors before saving.");
+            toast.error("Please fix the validation errors before saving.");
         }
     };
 
     const toggleEditMode = () => {
         setIsEditable(!isEditable);
+        setValidationErrors({});
     };
 
     const handleDelete = async () => {
@@ -198,12 +225,12 @@ const NewDeliverySchedule = () => {
 
         setLoading(true);
         try {
-            await axios.delete(`http://localhost:8000/api/Delivery/${ScheduleID}`);
-            alert("Delivery schedule deleted successfully");
-            window.location.href = "/delivery"; // Redirect after deletion
+            await api.delete(`/Delivery/${ScheduleID}`);
+            toast.success("Delivery schedule deleted successfully");
+            navigate("/delivery");
         } catch (error) {
             setError("Error deleting delivery schedule");
-            alert("Error deleting delivery schedule");
+            toast.error("Error deleting delivery schedule");
         } finally {
             setLoading(false);
         }
@@ -212,6 +239,8 @@ const NewDeliverySchedule = () => {
     const formattedDeliveryDate = formData.deliveryDate
         ? new Date(formData.deliveryDate).toISOString().slice(0, 16)
         : "";
+
+    const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A";
 
     return (
         <form style={{ padding: 20 }}>
@@ -225,7 +254,11 @@ const NewDeliverySchedule = () => {
                 </Grid>
             )}
 
-            {error && alert(error)}
+            {error && (
+                <Typography color="error" sx={{ mb: 2 }}>
+                    {error}
+                </Typography>
+            )}
 
             <Grid container spacing={2}>
                 {/* Pickup Location */}
@@ -262,27 +295,27 @@ const NewDeliverySchedule = () => {
 
                 {/* Google Map for Pickup and Dropoff Locations */}
                 <Grid item xs={12} sm={6} style={{ height: "400px" }}>
-                    <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
+                    <LoadScript googleMapsApiKey={googleMapsApiKey}>
                         <GoogleMap
                             mapContainerStyle={{ width: "100%", height: "100%" }}
-                            center={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }}
+                            center={{ lat: formData.pickupLatitude || 6.9271, lng: formData.pickupLongitude || 79.8612 }}
                             zoom={14}
                             onClick={(event) => handleMapClick(event, true)}
                         >
-                            <Marker position={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }} />
+                            <Marker position={{ lat: formData.pickupLatitude || 6.9271, lng: formData.pickupLongitude || 79.8612 }} />
                         </GoogleMap>
                     </LoadScript>
                 </Grid>
 
                 <Grid item xs={12} sm={6} style={{ height: "400px" }}>
-                    <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
+                    <LoadScript googleMapsApiKey={googleMapsApiKey}>
                         <GoogleMap
                             mapContainerStyle={{ width: "100%", height: "100%" }}
-                            center={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }}
+                            center={{ lat: formData.dropoffLatitude || 6.9271, lng: formData.dropoffLongitude || 79.8612 }}
                             zoom={14}
                             onClick={(event) => handleMapClick(event, false)}
                         >
-                            <Marker position={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }} />
+                            <Marker position={{ lat: formData.dropoffLatitude || 6.9271, lng: formData.dropoffLongitude || 79.8612 }} />
                         </GoogleMap>
                     </LoadScript>
                 </Grid>
@@ -299,7 +332,7 @@ const NewDeliverySchedule = () => {
                         onChange={handleChange}
                         disabled={!isEditable}
                         inputProps={{
-                            min: new Date().toISOString().slice(0, 16), // Set min value to the current date and time
+                            min: new Date().toISOString().slice(0, 16),
                         }}
                         error={!!validationErrors.deliveryDate}
                         helperText={validationErrors.deliveryDate}
@@ -343,24 +376,28 @@ const NewDeliverySchedule = () => {
                             <Select
                                 name="driverUsername"
                                 label="Driver"
-                                value={formData.driverUsername}
+                                value={formData.driverUsername || ""}
                                 onChange={handleChange}
                                 disabled={!isEditable}
                             >
                                 {drivers.map((driver) => (
-                                    <MenuItem key={driver._id} value={driver._id}> {/* Assuming _id is the unique identifier */}
-                                        {driver.fullName} ({driver.driverId || driver.username}) {/* Display fullName and a unique identifier */}
+                                    <MenuItem key={driver._id} value={driver._id}>
+                                        {driver.fullName} ({driver.driverId || driver.username})
                                     </MenuItem>
                                 ))}
                             </Select>
-                            {validationErrors.driverUsername && <Typography variant="caption" color="error">{validationErrors.driverUsername}</Typography>}
+                            {validationErrors.driverUsername && (
+                                <Typography variant="caption" color="error">
+                                    {validationErrors.driverUsername}
+                                </Typography>
+                            )}
                         </FormControl>
                     ) : (
                         <TextField
                             label="Driver"
-                            value={formData.driverName} // Display the driver's name
+                            value={formData.driverName || ""}
                             fullWidth
-                            disabled={!isEditable}
+                            disabled
                         />
                     )}
                 </Grid>
@@ -374,13 +411,12 @@ const NewDeliverySchedule = () => {
                             label="Status"
                             value={formData.status || ""}
                             onChange={handleChange}
-                            displayEmpty
-                            disabled={!isEditable} // Disable status editing when in edit mode
+                            disabled={isEditable}
                         >
-                            <MenuItem value="pending">Pending</MenuItem>
+                            <MenuItem value="Pending">Pending</MenuItem>
                             <MenuItem value="In Transit">In Transit</MenuItem>
-                            <MenuItem value="Delivered">Delivered</MenuItem>
-                            <MenuItem value="Cancel">Canceled</MenuItem>
+                            <MenuItem value="Done">Done</MenuItem>
+                            <MenuItem value="Canceled">Canceled</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -399,7 +435,6 @@ const NewDeliverySchedule = () => {
                             Cancel
                         </Button>
                     )}
-
                     <Button
                         variant="outlined"
                         color="error"

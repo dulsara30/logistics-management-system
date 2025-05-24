@@ -1,54 +1,94 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const StyledTextField = styled(TextField)(() => ({
-  marginBottom: '1rem',
+  marginBottom: "1rem",
 }));
 
 const StyledButton = styled(Button)(() => ({
-  background: 'linear-gradient(to right, #00b09b, #96c93d)',
-  color: '#FFFFFF',
-  fontWeight: 'bold',
-  borderRadius: '12px',
+  background: "linear-gradient(to right, #00b09b, #96c93d)",
+  color: "#FFFFFF",
+  fontWeight: "bold",
+  borderRadius: "12px",
   paddingX: 3,
   paddingY: 1,
-  textTransform: 'none',
-  '&:hover': {
-    background: 'linear-gradient(to right, #00897b, #8fbc8f)',
+  textTransform: "none",
+  "&:hover": {
+    background: "linear-gradient(to right, #00897b, #8fbc8f)",
   },
 }));
+
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 const VehicleMaintenanceForm = () => {
   const navigate = useNavigate();
   const { VehicleNumber } = useParams();
 
-  const [vehicleNumber, setVehicleNumber] = useState(VehicleNumber || '');
-  const [maintenanceDate, setMaintenanceDate] = useState('');
-  const [maintenanceType, setMaintenanceType] = useState('');
-  const [description, setDescription] = useState('');
-  const [cost, setCost] = useState(''); // Changed to string to handle input and validation
+  const [vehicleNumber, setVehicleNumber] = useState(VehicleNumber || "");
+  const [maintenanceDate, setMaintenanceDate] = useState("");
+  const [maintenanceType, setMaintenanceType] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setValidationErrors(prevErrors => ({ ...prevErrors, [name]: '' })); // Clear error on change
+    setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     switch (name) {
-      case 'vehicleNumber':
+      case "vehicleNumber":
         setVehicleNumber(value);
         break;
-      case 'maintenanceDate':
+      case "maintenanceDate":
         setMaintenanceDate(value);
         break;
-      case 'maintenanceType':
+      case "maintenanceType":
         setMaintenanceType(value);
         break;
-      case 'description':
+      case "description":
         setDescription(value);
         break;
-      case 'cost':
+      case "cost":
         setCost(value);
         break;
       default:
@@ -60,28 +100,25 @@ const VehicleMaintenanceForm = () => {
     event.preventDefault();
     const errors = {};
 
-    // Basic validations
     if (!vehicleNumber) {
-      errors.vehicleNumber = 'Vehicle Registration Number is required.';
+      errors.vehicleNumber = "Vehicle Registration Number is required.";
     }
     if (!maintenanceDate) {
-      errors.maintenanceDate = 'Maintenance Date is required.';
+      errors.maintenanceDate = "Maintenance Date is required.";
     }
     if (!maintenanceType) {
-      errors.maintenanceType = 'Maintenance Type is required.';
+      errors.maintenanceType = "Maintenance Type is required.";
     }
     if (!cost) {
-
-      errors.cost = 'Cost is required.';
-
+      errors.cost = "Cost is required.";
     } else if (isNaN(parseFloat(cost)) || parseFloat(cost) < 0) {
-      
-      errors.cost = 'Cost must be a valid non-negative number.';
+      errors.cost = "Cost must be a valid non-negative number.";
     }
 
     setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the validation errors before saving.");
       return;
     }
 
@@ -91,34 +128,45 @@ const VehicleMaintenanceForm = () => {
       Type: maintenanceType,
       Description: description,
       Cost: parseFloat(cost),
-      MaintenanceID: `M-${Date.now()}`, // Simple unique ID generation for now
     };
 
+    setLoading(true);
+    setError("");
     try {
-      const response = await axios.post('http://localhost:8000/api/maintenance', maintenanceData);
-      console.log('Maintenance details saved:', response.data);
-      alert('Maintenance details saved successfully!');
-      
-      navigate(-1);
-
+      const response = await api.post("/maintenance", maintenanceData);
+      console.log("Maintenance details saved:", response.data);
+      toast.success("Maintenance details saved successfully!");
+      navigate(`/vehicle/VehicleProfile/${vehicleNumber}`);
     } catch (error) {
-      console.error('Error saving maintenance details:', error);
-      alert('Error saving maintenance details.');
+      console.error("Error saving maintenance details:", error);
+      setError("Error saving maintenance details.");
+      toast.error("Error saving maintenance details.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(`/vehicle/VehicleProfile/${vehicleNumber}`);
   };
 
   return (
-    <Box sx={{ p: 4, bgcolor: '#FFFFFF', minHeight: '100vh' }}>
-      <Typography variant="h5" gutterBottom sx={{ color: '#2E2E2E', fontWeight: 'bold', mb: 3 }}>
+    <Box sx={{ p: 4, bgcolor: "#FFFFFF", minHeight: "100vh" }}>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ color: "#2E2E2E", fontWeight: "bold", mb: 3 }}
+      >
         Add Vehicle Maintenance Details
       </Typography>
 
+      {error && (
+        <Typography color="error" sx={{ mb: 2, textAlign: "center" }}>
+          {error}
+        </Typography>
+      )}
+
       <form onSubmit={handleSubmit}>
-        {/* Vehicle Number Input */}
         <StyledTextField
           fullWidth
           label="Vehicle Registration Number"
@@ -138,14 +186,16 @@ const VehicleMaintenanceForm = () => {
           value={maintenanceDate}
           onChange={handleInputChange}
           required
-          InputLabelProps={{
-            shrink: true,
-          }}
+          InputLabelProps={{ shrink: true }}
           error={!!validationErrors.maintenanceDate}
           helperText={validationErrors.maintenanceDate}
         />
 
-        <FormControl fullWidth sx={{ marginBottom: '1rem' }} error={!!validationErrors.maintenanceType}>
+        <FormControl
+          fullWidth
+          sx={{ marginBottom: "1rem" }}
+          error={!!validationErrors.maintenanceType}
+        >
           <InputLabel id="maintenance-type-label">Maintenance Type</InputLabel>
           <Select
             labelId="maintenance-type-label"
@@ -162,7 +212,11 @@ const VehicleMaintenanceForm = () => {
             <MenuItem value="Oil Change">Oil Change</MenuItem>
             <MenuItem value="Other">Other</MenuItem>
           </Select>
-          {validationErrors.maintenanceType && <Typography variant="caption" color="error">{validationErrors.maintenanceType}</Typography>}
+          {validationErrors.maintenanceType && (
+            <Typography variant="caption" color="error">
+              {validationErrors.maintenanceType}
+            </Typography>
+          )}
         </FormControl>
 
         <StyledTextField
@@ -173,7 +227,7 @@ const VehicleMaintenanceForm = () => {
           onChange={handleInputChange}
           multiline
           rows={4}
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: "1rem" }}
         />
 
         <StyledTextField
@@ -184,21 +238,22 @@ const VehicleMaintenanceForm = () => {
           value={cost}
           onChange={handleInputChange}
           required
-          sx={{ marginBottom: '2rem' }}
+          sx={{ marginBottom: "2rem" }}
           error={!!validationErrors.cost}
           helperText={validationErrors.cost}
         />
 
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
           <Button
             onClick={handleCancel}
             variant="outlined"
-            sx={{ borderRadius: '12px', textTransform: 'none' }}
+            sx={{ borderRadius: "12px", textTransform: "none" }}
+            disabled={loading}
           >
             Cancel
           </Button>
-          <StyledButton type="submit">
-            Save Maintenance Details
+          <StyledButton type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save Maintenance Details"}
           </StyledButton>
         </Box>
       </form>

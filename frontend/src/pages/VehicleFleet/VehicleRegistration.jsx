@@ -1,47 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  TextField, FormControl, MenuItem, Box, InputLabel,
-  Select, Autocomplete,
-  Typography, Paper, Button
-} from '@mui/material';
-import axios from 'axios';
+  TextField,
+  FormControl,
+  MenuItem,
+  Box,
+  InputLabel,
+  Select,
+  Autocomplete,
+  Typography,
+  Paper,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 import {
-  validateNIC, validateName, validateContactNumber, validateAddress,
-  validateEmail, validateVehicleNumber,
-  validateVehicleTypeAndFuelType, validateVehicleBrand,
-  validateLoadCapacity, validateDriverSelection
-} from './vehicleValidations';
+  validateNIC,
+  validateName,
+  validateContactNumber,
+  validateAddress,
+  validateEmail,
+  validateVehicleNumber,
+  validateVehicleTypeAndFuelType,
+  validateVehicleBrand,
+  validateLoadCapacity,
+  validateDriverSelection,
+} from "./vehicleValidations";
+
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 function VehicleRegistrationForm() {
-  // Vehicle owner details
-  const [ownersNIC, setOwnersNIC] = useState('');
-  const [ownersName, setOwnersName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
-
-  // Vehicle details
-  const [vehicleNumber, setVehicleNumber] = useState('');
-  const [vehicleType, setVehicleType] = useState('');
-  const [fuelType, setFuelType] = useState('');
-  const [vehicleBrand, setVehicleBrand] = useState('');
-  const [loadCapacity, setLoadCapacity] = useState('');
-
-  // Driver selection
-  const [drivers, setDrivers] = useState([]); // List of drivers
-  const [selectedDriver, setSelectedDriver] = useState('');
-
-  // Validation errors state
+  const navigate = useNavigate();
+  const [ownersNIC, setOwnersNIC] = useState("");
+  const [ownersName, setOwnersName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [fuelType, setFuelType] = useState("");
+  const [vehicleBrand, setVehicleBrand] = useState("");
+  const [loadCapacity, setLoadCapacity] = useState("");
+  const [drivers, setDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Fetch drivers on component mount
   useEffect(() => {
     const fetchDrivers = async () => {
+      setLoading(true);
+      setError("");
       try {
-        const response = await axios.get('http://localhost:8000/api/drivers');
+        const response = await api.get("/drivers");
         setDrivers(response.data);
       } catch (error) {
+        setError(error.response?.data?.message || "Error fetching drivers.");
+        toast.error("Error fetching drivers.");
         console.error("Error fetching drivers:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -50,34 +95,53 @@ function VehicleRegistrationForm() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setValidationErrors(prevErrors => ({ ...prevErrors, [name]: '' })); // Clear error on change
+    setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     switch (name) {
-      case 'ownersNIC': setOwnersNIC(value); break;
-      case 'ownersName': setOwnersName(value); break;
-      case 'contactNumber': setContactNumber(value); break;
-      case 'address': setAddress(value); break;
-      case 'email': setEmail(value); break;
-      case 'vehicleNumber': setVehicleNumber(value); break;
-      case 'vehicleType': setVehicleType(value); break;
-      case 'fuelType': setFuelType(value); break;
-      case 'vehicleBrand': setVehicleBrand(value); break;
-      case 'loadCapacity': setLoadCapacity(value); break;
-      default: break;
+      case "ownersNIC":
+        setOwnersNIC(value);
+        break;
+      case "ownersName":
+        setOwnersName(value);
+        break;
+      case "contactNumber":
+        setContactNumber(value);
+        break;
+      case "address":
+        setAddress(value);
+        break;
+      case "email":
+        setEmail(value);
+        break;
+      case "vehicleNumber":
+        setVehicleNumber(value);
+        break;
+      case "vehicleType":
+        setVehicleType(value);
+        break;
+      case "fuelType":
+        setFuelType(value);
+        break;
+      case "vehicleBrand":
+        setVehicleBrand(value);
+        break;
+      case "loadCapacity":
+        setLoadCapacity(value);
+        break;
+      default:
+        break;
     }
   };
 
-  const handleDriverChange = (event) => {
-    setSelectedDriver(event.target.value);
+  const handleDriverChange = (event, newValue) => {
+    setSelectedDriver(newValue);
+    setValidationErrors((prevErrors) => ({ ...prevErrors, selectedDriver: "" }));
   };
 
   const handleSubmit = async () => {
-    
-    // Clear previous errors before validating again
     setValidationErrors({});
+    setError("");
 
     const errors = {};
-
-    // Validating each field and saving errors
     errors.ownersNIC = validateNIC(ownersNIC);
     errors.ownersName = validateName(ownersName);
     errors.contactNumber = validateContactNumber(contactNumber);
@@ -87,12 +151,13 @@ function VehicleRegistrationForm() {
     errors.vehicleType = validateVehicleTypeAndFuelType(vehicleType, fuelType);
     errors.vehicleBrand = validateVehicleBrand(vehicleBrand);
     errors.loadCapacity = validateLoadCapacity(loadCapacity);
-    errors.selectedDriver = validateDriverSelection(selectedDriver);
+    errors.selectedDriver = validateDriverSelection(selectedDriver ? selectedDriver.fullName : "");
 
     setValidationErrors(errors);
 
-    if (Object.values(errors).some(error => error)) {
-      return; // Stop submission if there are validation errors
+    if (Object.values(errors).some((error) => error)) {
+      toast.error("Please fix the validation errors before submitting.");
+      return;
     }
 
     const vehicleData = {
@@ -105,29 +170,78 @@ function VehicleRegistrationForm() {
       VehicleType: vehicleType,
       FuelType: fuelType,
       VehicleBrand: vehicleBrand,
-      LoadCapacity: parseInt(loadCapacity),
-      DriverID: selectedDriver,
+      LoadCapacity: parseInt(loadCapacity) || 0,
+      DriverID: selectedDriver ? selectedDriver.fullName : "",
     };
 
+    setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/vehicles', vehicleData); 
-      console.log('Vehicle created:', response.data);
-      alert("Vehicle created successfully!");
-      window.location.href = "/fleet"; // Navigate to fleet page
+      const response = await api.post("/vehicles", vehicleData);
+      console.log("Vehicle created:", response.data);
+      toast.success("Vehicle created successfully!");
+      navigate("/vehicle");
     } catch (error) {
-      console.error('Error creating vehicle:', error);
-      alert("Failed to create vehicle!");
+      setError(error.response?.data?.message || "Failed to create vehicle.");
+      toast.error("Failed to create vehicle.");
+      console.error("Error creating vehicle:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const vehicleBrandOptions = ['Toyota', 'Nissan', 'Mitsubishi', 'Isuzu', 'Benz',
-    'Hyundai', 'Honda', 'Bajaj', 'TATA', 'Leyland', 'Piaggio'];
+  const handleReset = () => {
+    setOwnersNIC("");
+    setOwnersName("");
+    setContactNumber("");
+    setAddress("");
+    setEmail("");
+    setVehicleNumber("");
+    setVehicleType("");
+    setFuelType("");
+    setVehicleBrand("");
+    setLoadCapacity("");
+    setSelectedDriver(null);
+    setValidationErrors({});
+    setError("");
+  };
+
+  const vehicleBrandOptions = [
+    "Toyota",
+    "Nissan",
+    "Mitsubishi",
+    "Isuzu",
+    "Benz",
+    "Hyundai",
+    "Honda",
+    "Bajaj",
+    "TATA",
+    "Leyland",
+    "Piaggio",
+  ];
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <div className="p-16">
-      <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5, borderRadius: 3 }}>
-        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle owner details</Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+    <Box sx={{ p: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, margin: "auto", mt: 5, borderRadius: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Vehicle Owner Details
+        </Typography>
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2 }}>
           <TextField
             label="Vehicle Owner's NIC"
             variant="outlined"
@@ -149,7 +263,7 @@ function VehicleRegistrationForm() {
             helperText={validationErrors.ownersName}
           />
           <TextField
-            label="Contact number"
+            label="Contact Number"
             variant="outlined"
             type="tel"
             fullWidth
@@ -170,7 +284,7 @@ function VehicleRegistrationForm() {
             helperText={validationErrors.address}
           />
           <TextField
-            label="Email address"
+            label="Email Address"
             variant="outlined"
             fullWidth
             value={email}
@@ -182,9 +296,11 @@ function VehicleRegistrationForm() {
         </Box>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5, borderRadius: 3 }}>
-        <Typography variant='h6' sx={{ mb: 2 }}>Vehicle details</Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+      <Paper elevation={3} sx={{ p: 4, margin: "auto", mt: 5, borderRadius: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Vehicle Details
+        </Typography>
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2 }}>
           <TextField
             label="Vehicle Registration Number"
             variant="outlined"
@@ -207,13 +323,16 @@ function VehicleRegistrationForm() {
               <MenuItem value="">-- Select any vehicle type --</MenuItem>
               <MenuItem value="Lorry">Lorry</MenuItem>
               <MenuItem value="Van">Van</MenuItem>
-              <MenuItem value="Three wheeler">Three Wheeler</MenuItem>
+              <MenuItem value="Three Wheeler">Three Wheeler</MenuItem>
             </Select>
-            {validationErrors.vehicleType && <Typography variant="caption" color="error">{validationErrors.vehicleType}</Typography>}
+            {validationErrors.vehicleType && (
+              <Typography variant="caption" color="error">
+                {validationErrors.vehicleType}
+              </Typography>
+            )}
           </FormControl>
 
-          <FormControl fullWidth error={!!validationErrors.fuelType}>
-
+          <FormControl fullWidth error={!!validationErrors.vehicleType}>
             <InputLabel id="fuel-type-label">Fuel Type</InputLabel>
             <Select
               labelId="fuel-type-label"
@@ -227,8 +346,11 @@ function VehicleRegistrationForm() {
               <MenuItem value="Petrol">Petrol</MenuItem>
               <MenuItem value="EV">EV</MenuItem>
             </Select>
-            {validationErrors.fuelType && <Typography variant="caption" color="error">{validationErrors.fuelType}</Typography>}
-       
+            {validationErrors.vehicleType && (
+              <Typography variant="caption" color="error">
+                {validationErrors.vehicleType}
+              </Typography>
+            )}
           </FormControl>
 
           <FormControl fullWidth error={!!validationErrors.vehicleBrand}>
@@ -237,14 +359,16 @@ function VehicleRegistrationForm() {
               options={vehicleBrandOptions}
               value={vehicleBrand}
               onChange={(event, newValue) => {
-                setVehicleBrand(newValue);
-                setValidationErrors(prevErrors => ({ ...prevErrors, vehicleBrand: '' }));
+                setVehicleBrand(newValue || "");
+                setValidationErrors((prevErrors) => ({ ...prevErrors, vehicleBrand: "" }));
               }}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Vehicle Brand"
                   variant="outlined"
+                  name="vehicleBrand"
+                  onChange={handleInputChange}
                   error={!!validationErrors.vehicleBrand}
                   helperText={validationErrors.vehicleBrand}
                 />
@@ -266,42 +390,49 @@ function VehicleRegistrationForm() {
         </Box>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 4, margin: 'auto', mt: 5, borderRadius: 3 }}>
-        <Box mt={4}>
-
-        <Typography variant='h6' sx={{ mb: 2 }}>Assign Driver to the vehicle</Typography>
-
-        <FormControl fullWidth error={!!validationErrors.selectedDriver} sx={{ marginTop: 2 }}>
-          <InputLabel id="driver-select-label">Select Driver</InputLabel>
-          <Select
-            labelId="driver-select-label"
-            value={selectedDriver}
-            onChange={handleDriverChange}
-            name="selectedDriver"
-            label="Select Driver"
-          >
-            <MenuItem value="" disabled>
-              -- Select a driver --
-            </MenuItem>
-            {drivers.map((driver) => (
-              <MenuItem key={driver.fullName} value={driver.fullName}>
-                {driver.fullName}
-              </MenuItem>
-            ))}
-          </Select>
-
-          {validationErrors.selectedDriver && (
-            <Typography variant="caption" color="error">{validationErrors.selectedDriver}</Typography>
-          )}
-        </FormControl>
-        
+      <Paper elevation={3} sx={{ p: 4, margin: "auto", mt: 5, borderRadius: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Assign Driver to the Vehicle
+        </Typography>
+        <Box mt={2}>
+          <FormControl fullWidth error={!!validationErrors.selectedDriver}>
+            <Autocomplete
+              options={drivers}
+              getOptionLabel={(option) => option.fullName || ""}
+              value={selectedDriver}
+              onChange={handleDriverChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Driver"
+                  variant="outlined"
+                  error={!!validationErrors.selectedDriver}
+                  helperText={validationErrors.selectedDriver}
+                />
+              )}
+            />
+          </FormControl>
         </Box>
       </Paper>
 
-      <Box mt={4}>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>Register Vehicle</Button>
+      <Box mt={4} sx={{ display: "flex", gap: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          Register Vehicle
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={handleReset}
+          disabled={loading}
+        >
+          Reset
+        </Button>
       </Box>
-    </div>
+    </Box>
   );
 }
 
