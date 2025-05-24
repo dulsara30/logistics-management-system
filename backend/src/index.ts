@@ -1,3 +1,4 @@
+/// <reference path="./types/express.d.ts" />
 import "dotenv/config";
 import express, { Express, Request, Response, NextFunction } from "express";
 import VehicleFleetRoutes from "./API/VehicleFleet/VehiclefleetAPI"; // Import routes
@@ -18,6 +19,7 @@ import {
 
 import { connectDB } from "./Infrastructure/db";
 import suppliersRouter from "./API/SpplierManagement/suppliers";
+import cors from "cors";
 import staffRouter from "./API/StaffManagement/staff";
 import loginRouter from "./API/login/login";
 import getItemRouter from "./API/Return&DamageHandling/damageForm";
@@ -92,7 +94,5 @@ app
 const PORT: number = 8000;
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
-function cors(): any {
-  throw new Error("Function not implemented.");
-}
+
 
