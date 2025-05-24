@@ -1,60 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 const StyledTextField = styled(TextField)(() => ({
-  marginBottom: '1rem',
+  marginBottom: "1rem",
 }));
 
 const StyledButton = styled(Button)(() => ({
-  fontWeight: 'bold',
-  borderRadius: '12px',
+  fontWeight: "bold",
+  borderRadius: "12px",
   paddingX: 3,
   paddingY: 1,
-  textTransform: 'none',
-  '&:hover': {
-    // Inherit color to allow customization
+  textTransform: "none",
+  "&:hover": {
+    background: "linear-gradient(to right, #00897b, #8fbc8f)", // Consistent with VehicleMaintenanceForm
   },
 }));
 
 const UpdateVehicleMaintenanceForm = () => {
   const navigate = useNavigate();
-  const { MaintenanceID } = useParams(); // Get the maintenance record ID from the URL
-  const { VehicleNumber } = useParams(); // Optionally get VehicleNumber if needed for context
+  const { MaintenanceID, VehicleNumber } = useParams();
 
-  const [vehicleNumber, setVehicleNumber] = useState('');
-  const [maintenanceDate, setMaintenanceDate] = useState('');
-  const [maintenanceType, setMaintenanceType] = useState('');
-  const [description, setDescription] = useState('');
-  const [cost, setCost] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState(VehicleNumber || "");
+  const [maintenanceDate, setMaintenanceDate] = useState("");
+  const [maintenanceType, setMaintenanceType] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchMaintenanceData = async () => {
-
       setLoading(true);
-      setError('');
+      setError("");
 
       try {
-
-        const response = await axios.get(`http://localhost:8000/api/maintenance/${MaintenanceID}`);
+        const response = await api.get(`/maintenance/${MaintenanceID}`);
         const data = response.data;
-        setVehicleNumber(data.VehicleNumber);
-        setMaintenanceDate(data.MaintenanceDate ? data.MaintenanceDate.split('T')[0] : ''); // Extract only the date part
-        setMaintenanceType(data.Type);
-        setDescription(data.Description || '');
-        setCost(String(data.Cost));
-console.log(MaintenanceID);
-
+        setVehicleNumber(data.VehicleNumber || VehicleNumber || "");
+        setMaintenanceDate(data.MaintenanceDate ? data.MaintenanceDate.split("T")[0] : "");
+        setMaintenanceType(data.Type || "");
+        setDescription(data.Description || "");
+        setCost(String(data.Cost || ""));
       } catch (err) {
-        setError('Error fetching maintenance details.');
-        console.error('Error fetching maintenance details:', err);
-
-
+        setError(err.response?.data?.message || "Error fetching maintenance details.");
+        toast.error("Error fetching maintenance details.");
+        console.error("Error fetching maintenance details:", err);
       } finally {
         setLoading(false);
       }
@@ -63,27 +96,28 @@ console.log(MaintenanceID);
     if (MaintenanceID) {
       fetchMaintenanceData();
     } else {
-      setLoading(false); // If no MaintenanceID, we are not in update mode
+      setError("No Maintenance ID provided.");
+      setLoading(false);
     }
   }, [MaintenanceID]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     switch (name) {
-      case 'vehicleNumber':
+      case "vehicleNumber":
         setVehicleNumber(value);
         break;
-      case 'maintenanceDate':
+      case "maintenanceDate":
         setMaintenanceDate(value);
         break;
-      case 'maintenanceType':
+      case "maintenanceType":
         setMaintenanceType(value);
         break;
-      case 'description':
+      case "description":
         setDescription(value);
         break;
-      case 'cost':
+      case "cost":
         setCost(value);
         break;
       default:
@@ -96,20 +130,21 @@ console.log(MaintenanceID);
     const errors = {};
 
     if (!maintenanceDate) {
-      errors.maintenanceDate = 'Maintenance Date is required.';
+      errors.maintenanceDate = "Maintenance Date is required.";
     }
     if (!maintenanceType) {
-      errors.maintenanceType = 'Maintenance Type is required.';
+      errors.maintenanceType = "Maintenance Type is required.";
     }
     if (!cost) {
-      errors.cost = 'Cost is required.';
+      errors.cost = "Cost is required.";
     } else if (isNaN(parseFloat(cost)) || parseFloat(cost) < 0) {
-      errors.cost = 'Cost must be a valid non-negative number.';
+      errors.cost = "Cost must be a valid non-negative number.";
     }
 
     setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the validation errors before updating.");
       return;
     }
 
@@ -120,46 +155,68 @@ console.log(MaintenanceID);
       Cost: parseFloat(cost),
     };
 
+    setLoading(true);
+    setError("");
     try {
-      const response = await axios.put(`http://localhost:8000/api/maintenance/${MaintenanceID}`, updatedMaintenanceData);
-      console.log('Maintenance details updated:', response.data);
-      alert('Maintenance details updated successfully!');
-      navigate(-1);
+      const response = await api.put(`/maintenance/${MaintenanceID}`, updatedMaintenanceData);
+      console.log("Maintenance details updated:", response.data);
+      toast.success("Maintenance details updated successfully!");
+      navigate(`/vehicle/VehicleProfile/${vehicleNumber}`);
     } catch (error) {
-      console.error('Error updating maintenance details:', error);
-      alert('Error updating maintenance details.');
+      setError(error.response?.data?.message || "Error updating maintenance details.");
+      toast.error("Error updating maintenance details.");
+      console.error("Error updating maintenance details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this maintenance record?')) {
+    if (window.confirm("Are you sure you want to delete this maintenance record?")) {
+      setLoading(true);
+      setError("");
       try {
-        await axios.delete(`http://localhost:8000/api/maintenance/${MaintenanceID}`);
-        console.log('Maintenance record deleted successfully');
-        alert('Maintenance record deleted successfully!');
-        navigate(-1);
+        await api.delete(`/maintenance/${MaintenanceID}`);
+        console.log("Maintenance record deleted successfully");
+        toast.success("Maintenance record deleted successfully!");
+        navigate(`/vehicle/VehicleProfile/${vehicleNumber}`);
       } catch (error) {
-        console.error('Error deleting maintenance record:', error);
-        alert('Error deleting maintenance record.');
+        setError(error.response?.data?.message || "Error deleting maintenance record.");
+        toast.error("Error deleting maintenance record.");
+        console.error("Error deleting maintenance record:", error);
+      } finally {
+        setLoading(false);
       }
     }
   };
 
   const handleCancel = () => {
-    navigate(-1);
+    navigate(`/vehicle/VehicleProfile/${vehicleNumber}`);
   };
 
   if (loading) {
-    return <Typography variant="h6">Loading maintenance details...</Typography>;
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
-    return <Typography color="error">{error}</Typography>;
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
   }
 
   return (
-    <Box sx={{ p: 4, bgcolor: '#FFFFFF', minHeight: '100vh' }}>
-      <Typography variant="h5" gutterBottom sx={{ color: '#2E2E2E', fontWeight: 'bold', mb: 3 }}>
+    <Box sx={{ p: 4, bgcolor: "#FFFFFF", minHeight: "100vh" }}>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ color: "#2E2E2E", fontWeight: "bold", mb: 3 }}
+      >
         Update/Delete Vehicle Maintenance Details
       </Typography>
 
@@ -170,7 +227,7 @@ console.log(MaintenanceID);
           value={vehicleNumber}
           name="vehicleNumber"
           InputProps={{ readOnly: true }}
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: "1rem" }}
         />
 
         <StyledTextField
@@ -181,15 +238,18 @@ console.log(MaintenanceID);
           value={maintenanceDate}
           onChange={handleInputChange}
           required
-          InputLabelProps={{
-            shrink: true,
-          }}
+          InputLabelProps={{ shrink: true }}
           error={!!validationErrors.maintenanceDate}
           helperText={validationErrors.maintenanceDate}
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: "1rem" }}
+          inputProps={{ max: new Date().toISOString().split("T")[0] }}
         />
 
-        <FormControl fullWidth sx={{ marginBottom: '1rem' }} error={!!validationErrors.maintenanceType}>
+        <FormControl
+          fullWidth
+          sx={{ marginBottom: "1rem" }}
+          error={!!validationErrors.maintenanceType}
+        >
           <InputLabel id="maintenance-type-label">Maintenance Type</InputLabel>
           <Select
             labelId="maintenance-type-label"
@@ -221,7 +281,7 @@ console.log(MaintenanceID);
           onChange={handleInputChange}
           multiline
           rows={4}
-          sx={{ marginBottom: '1rem' }}
+          sx={{ marginBottom: "1rem" }}
         />
 
         <StyledTextField
@@ -232,29 +292,39 @@ console.log(MaintenanceID);
           value={cost}
           onChange={handleInputChange}
           required
-          sx={{ marginBottom: '2rem' }}
+          sx={{ marginBottom: "2rem" }}
           error={!!validationErrors.cost}
           helperText={validationErrors.cost}
         />
 
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={handleCancel} variant="outlined" sx={{ borderRadius: '12px', textTransform: 'none' }}>
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+          <Button
+            onClick={handleCancel}
+            variant="outlined"
+            sx={{ borderRadius: "12px", textTransform: "none" }}
+            disabled={loading}
+          >
             Cancel
           </Button>
           <StyledButton
             type="submit"
-            sx={{ background: 'linear-gradient(to right, #00b09b, #96c93d)', color: '#FFFFFF' }}
+            sx={{
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+              color: "#FFFFFF",
+            }}
+            disabled={loading}
           >
             Update Maintenance
           </StyledButton>
-          <Button
+          <StyledButton
             onClick={handleDelete}
             variant="outlined"
             color="error"
-            sx={{ borderRadius: '12px', textTransform: 'none' }}
+            sx={{ borderRadius: "12px", textTransform: "none" }}
+            disabled={loading}
           >
             Delete Maintenance
-          </Button>
+          </StyledButton>
         </Box>
       </form>
     </Box>

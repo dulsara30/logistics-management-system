@@ -11,8 +11,38 @@ import {
 } from "@mui/material";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+// Create axios instance with interceptor
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api', // Adjust to 3001 if backend uses that port
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
 
 const NewDeliverySchedule = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         pickupLocation: "",
         dropoffLocation: "",
@@ -24,7 +54,7 @@ const NewDeliverySchedule = () => {
         driverName: "",
         driverUsername: "",
         specialInstructions: "",
-        pickupLatitude: 6.9271,
+        pickupLatitude: 6.9271, // Default: Colombo, Sri Lanka
         pickupLongitude: 79.8612,
         dropoffLatitude: 6.9271,
         dropoffLongitude: 79.8612,
@@ -36,10 +66,11 @@ const NewDeliverySchedule = () => {
     useEffect(() => {
         const fetchDrivers = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/drivers');
+                const response = await api.get('/drivers');
                 setDrivers(response.data);
             } catch (error) {
                 console.error("Error fetching drivers:", error);
+                alert("Failed to fetch drivers. Please try again.");
             }
         };
 
@@ -133,18 +164,21 @@ const NewDeliverySchedule = () => {
         }
 
         try {
-            await axios.post("http://localhost:8000/api/Delivery", formData);
+            await api.post("/Delivery", formData);
             alert("Delivery schedule created successfully");
-            window.location.href = "/Delivery";
+            navigate("/delivery");
         } catch (error) {
-            console.error(error);
-            alert("Error creating delivery schedule");
+            console.error("Error creating delivery schedule:", error);
+            alert(`Error creating delivery schedule: ${error.response?.data?.message || 'Unknown error'}`);
         }
     };
 
     const formattedDeliveryDate = formData.deliveryDate
         ? new Date(formData.deliveryDate).toISOString().slice(0, 16)
         : "";
+
+    // Fallback API key (remove in production)
+    const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A";
 
     return (
         <form style={{ padding: 20 }}>
@@ -185,7 +219,7 @@ const NewDeliverySchedule = () => {
 
                 {/* Google Map for Pickup Location */}
                 <Grid item xs={12} sm={6} style={{ height: "400px" }}>
-                    <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
+                    <LoadScript googleMapsApiKey={googleMapsApiKey}>
                         <GoogleMap
                             mapContainerStyle={{ width: "100%", height: "100%" }}
                             center={{ lat: formData.pickupLatitude, lng: formData.pickupLongitude }}
@@ -199,7 +233,7 @@ const NewDeliverySchedule = () => {
 
                 {/* Google Map for Dropoff Location */}
                 <Grid item xs={12} sm={6} style={{ height: "400px" }}>
-                    <LoadScript googleMapsApiKey="AIzaSyD_lhBUF7rZ651jBwwIn6ZTmnxD5_1zd1A">
+                    <LoadScript googleMapsApiKey={googleMapsApiKey}>
                         <GoogleMap
                             mapContainerStyle={{ width: "100%", height: "100%" }}
                             center={{ lat: formData.dropoffLatitude, lng: formData.dropoffLongitude }}
@@ -272,16 +306,17 @@ const NewDeliverySchedule = () => {
                                 </MenuItem>
                             ))}
                         </Select>
-                        {errors.driverUsername && <Typography variant="caption" color="error">{errors.driverUsername}</Typography>}
+                        {errors.driverUsername && (
+                            <Typography variant="caption" color="error">
+                                {errors.driverUsername}
+                            </Typography>
+                        )}
                     </FormControl>
                 </Grid>
 
                 {/* Submit Button */}
                 <Grid item xs={12} display="flex" justifyContent="space-between">
-                    <Button
-                        variant="contained"
-                        onClick={handleSubmit}
-                    >
+                    <Button variant="contained" onClick={handleSubmit}>
                         Create Delivery Schedule
                     </Button>
                 </Grid>
