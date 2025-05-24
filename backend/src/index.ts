@@ -1,5 +1,9 @@
+/// <reference path="./types/express.d.ts" />
 import "dotenv/config";
 import express, { Express, Request, Response, NextFunction } from "express";
+import VehicleFleetRoutes from "./API/VehicleFleet/VehiclefleetAPI"; // Import routes
+import DeliverySchdeulingRoutes from "./API/DeliveryScheduling/DeliverySchedulingAPI";
+import MaintenenceRoute from "./API/VehicleFleet/VehicleMaintenanceAPI";
 import {
   getAllInventoryManagement,
   createInventoryManagement,
@@ -53,7 +57,8 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction): voi
 // Apply authentication middleware to protected routes
 app.use(authenticateToken);
 
-// Protected routes
+// Use your routes for API handling
+app.use("/api", VehicleFleetRoutes, DeliverySchdeulingRoutes, MaintenenceRoute);
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRouter);
@@ -69,6 +74,7 @@ app.route("/returns/send-return-report").post(sendReturnReport);
 app.route("/returns/add-damage/:id").put(updateDamageReport);
 app.route("/returns/add-damage/:id").delete(deleteDamageReport);
 
+// Inventory management routes
 app
   .route("/inventory")
   .get(getAllInventoryManagement, getInventoryItems)
@@ -88,3 +94,5 @@ app
 const PORT: number = 8000;
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+
+

@@ -52,9 +52,9 @@ const quickAccessCardsBase = [
   },
   {
     icon: Package,
-    title: 'Vehicle Fleet',
-    description: 'Vehicle Fleet',
-    path: 'vehicle-fleet',
+    title: 'Delivery Scheduling',
+    description: 'Delivery Scheduling',
+    path: '/deliveryEmp',
     color: 'from-gray-500 to-slate-600',
   },
   // {
@@ -66,26 +66,6 @@ const quickAccessCardsBase = [
   // },
 ];
 
-const tasks = [
-  //   {
-  //     id: 1,
-  //     title: 'Inventory Check - Zone A',
-  //     status: 'completed',
-  //     time: '9:00 AM',
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Package Sorting',
-  //     status: 'pending',
-  //     time: '11:00 AM',
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'Shipment Verification',
-  //     status: 'pending',
-  //     time: '2:00 PM',
-  //   },
-];
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -178,7 +158,7 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 mt-6 border border-gray-200">
+          {/* <div className="bg-white rounded-xl shadow-sm p-6 mt-6 border border-gray-200">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-800">Daily Tasks</h2>
               <Link
@@ -208,8 +188,8 @@ export default function Dashboard() {
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === 'completed'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-orange-100 text-orange-700'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-orange-100 text-orange-700'
                       }`}
                   >
                     {task.status}
@@ -217,7 +197,7 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       ) : (
         // Render child routes when not on the base route
