@@ -9,9 +9,12 @@
   },
   "author": "",
   "license": "ISC",
+  "type": "commonjs",
+  "keywords": [],
   "dependencies": {
     "@prisma/client": "^6.6.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
     "@types/multer": "^1.4.12",
     "@types/nodemailer": "^6.4.17",
@@ -28,11 +31,11 @@
     "mongoose": "^8.14.0",
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.0",
-    "nodemon": "^3.1.9",
     "prisma": "^6.6.0",
     "pdfkit": "^0.17.0",
     "qrcode": "^1.5.4",
     "react-chartjs-2": "^5.3.0",
+    "shortid": "^2.2.17",
     "twilio": "^5.5.1",
     "uuid": "^11.1.0"
   },
@@ -44,9 +47,9 @@
     "@types/node": "^20.17.31",
     "@types/uuid": "^10.0.0",
     "@types/pdfkit": "^0.13.9",
+    "@types/shortid": "^2.2.0",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
-  },
-  "keywords": [],
-  "type": "commonjs"
+  }
 }
