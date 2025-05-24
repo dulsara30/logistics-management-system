@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const AttendanceSchema =  new mongoose.Schema({
+const AttendanceSchema = new mongoose.Schema({
     nic: {
         type: String,
         required: true
@@ -9,17 +9,17 @@ const AttendanceSchema =  new mongoose.Schema({
         type: String,
         required: true
     },
-    checkInTime: { 
-        type: Date 
+    checkInTime: {
+        type: Date
     },
-    checkOutTime: { 
-        type: Date 
+    checkOutTime: {
+        type: Date
     },
-    isLate: { 
-        type: Boolean, default: false 
+    isLate: {
+        type: Boolean, default: false
     },
-    overTimeHours: { 
-        type: Number, default: 0 
+    overTimeHours: {
+        type: Number, default: 0
     },
 });
 

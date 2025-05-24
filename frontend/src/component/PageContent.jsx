@@ -11,23 +11,23 @@ import ReturnDamageHandling from '../pages/Return&DamageHandling/ReturnDamageHan
 import Help from '../pages/Help/Help';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
-function PageContent(){
-    return(
-        
-        <div className="p-6">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/warehouse" element={<WarehouseManagement />} />
-            <Route path="/fleet" element={<VehicleFleetManagement />} />
-            <Route path="/delivery" element={<DeliveryManagement />} />
-            <Route path="/inventory" element={<InventoryManagement />} />
-            <Route path="/staff" element={<StaffManagement />} />
-            <Route path="/suppliers" element={<SupplierManagement />} />
-            <Route path="/returns" element={<ReturnDamageHandling />} />
-            <Route path="/help" element={<Help />} />
-          </Routes>
-        </div>
-    )
+function PageContent() {
+  return (
+
+    <div className="p-6">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/warehouse" element={<WarehouseManagement />} />
+        <Route path="/fleet" element={<VehicleFleetManagement />} />
+        <Route path="/delivery" element={<DeliveryManagement />} />
+        <Route path="/inventory" element={<InventoryManagement />} />
+        <Route path="/staff" element={<StaffManagement />} />
+        <Route path="/suppliers" element={<SupplierManagement />} />
+        <Route path="/returns" element={<ReturnDamageHandling />} />
+        <Route path="/help" element={<Help />} />
+      </Routes>
+    </div>
+  )
 };
 
 export default PageContent;

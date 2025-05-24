@@ -126,7 +126,7 @@ export const stockoutInventory = async (req: Request, res: Response): Promise<Re
   try {
     const { quantity } = req.body;
     const item = await Inventory.findById(req.params.id);
-    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }

@@ -81,11 +81,11 @@ const CrudModal = ({ isOpen, onClose, formData, onInputChange, onSave, isEditing
             <div>
               <label className="block text-gray-700 font-medium mb-1">Price</label>
               <input
-                    type="number"
-                    name="price"
-                   value={formData.price}
-                   onChange={onInputChange}
-                   placeholder="Price"
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={onInputChange}
+                placeholder="Price"
               />
               <input type="number" name="price" id="price" />
             </div>

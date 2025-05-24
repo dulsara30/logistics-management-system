@@ -19,17 +19,17 @@ function StaffAttendance() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  
+
         console.log('Available cameras:', videoDevices); // Log available devices
-  
+
         const droidCamDevice = videoDevices.find(device =>
           device.label.toLowerCase().includes('droidcam')
         );
-  
+
         const constraints = droidCamDevice
           ? { video: { deviceId: droidCamDevice.deviceId } }
           : { video: { facingMode: 'environment' } }; // Fallback if not found
-  
+
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         setCameraStream(stream);
         if (videoRef.current) {
@@ -40,9 +40,9 @@ function StaffAttendance() {
         setError("Failed to access camera: " + err.message);
       }
     };
-  
+
     startCamera();
-  
+
     return () => {
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
@@ -263,13 +263,12 @@ function StaffAttendance() {
                 <div>
                   <p className="text-xs text-gray-600">Status</p>
                   <p
-                    className={`text-sm font-medium ${
-                      userDetails.status === "Present"
+                    className={`text-sm font-medium ${userDetails.status === "Present"
                         ? "text-green-600"
                         : userDetails.status === "Late"
-                        ? "text-yellow-600"
-                        : "text-red-600"
-                    }`}
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {userDetails.status || "N/A"}
                   </p>

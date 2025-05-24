@@ -1,15 +1,15 @@
 import { Outlet } from "react-router-dom";
 import DashboardLayout from "../component/DashBoard1";
 
-function AdminLayout(){
+function AdminLayout() {
 
-    return(
+    return (
 
         <div >
-            
-            <DashboardLayout/>
-                    
-      
+
+            <DashboardLayout />
+
+
         </div>
     )
 }

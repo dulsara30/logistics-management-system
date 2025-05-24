@@ -9,7 +9,7 @@ import {
   Plus,
   CheckCircle,
   Clock,
-  Package 
+  Package
 } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
@@ -67,24 +67,24 @@ const quickAccessCardsBase = [
 ];
 
 const tasks = [
-//   {
-//     id: 1,
-//     title: 'Inventory Check - Zone A',
-//     status: 'completed',
-//     time: '9:00 AM',
-//   },
-//   {
-//     id: 2,
-//     title: 'Package Sorting',
-//     status: 'pending',
-//     time: '11:00 AM',
-//   },
-//   {
-//     id: 3,
-//     title: 'Shipment Verification',
-//     status: 'pending',
-//     time: '2:00 PM',
-//   },
+  //   {
+  //     id: 1,
+  //     title: 'Inventory Check - Zone A',
+  //     status: 'completed',
+  //     time: '9:00 AM',
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Package Sorting',
+  //     status: 'pending',
+  //     time: '11:00 AM',
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'Shipment Verification',
+  //     status: 'pending',
+  //     time: '2:00 PM',
+  //   },
 ];
 
 export default function Dashboard() {
@@ -207,11 +207,10 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      task.status === 'completed'
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === 'completed'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-orange-100 text-orange-700'
-                    }`}
+                      }`}
                   >
                     {task.status}
                   </span>

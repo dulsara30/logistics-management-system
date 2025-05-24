@@ -184,11 +184,10 @@ function QRCode() {
             <button
               onClick={handleDownload}
               disabled={!qrCodeUrl}
-              className={`mt-6 px-4 py-2 ${
-                qrCodeUrl
+              className={`mt-6 px-4 py-2 ${qrCodeUrl
                   ? "bg-gradient-to-r from-purple-600 to-purple-400 hover:opacity-90"
                   : "bg-gray-300 cursor-not-allowed"
-              } text-white border-none rounded-md inline-flex items-center text-sm transition-opacity`}
+                } text-white border-none rounded-md inline-flex items-center text-sm transition-opacity`}
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -276,13 +275,12 @@ function QRCode() {
                         </div>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          record.status === "Present"
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${record.status === "Present"
                             ? "bg-green-100 text-green-600"
                             : record.status === "Late"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-red-100 text-red-600"
-                        }`}
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-600"
+                          }`}
                       >
                         {record.status}
                       </span>

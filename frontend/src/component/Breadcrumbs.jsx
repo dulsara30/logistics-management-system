@@ -12,7 +12,7 @@ function Breadcrumbs() {
         {pathnames.map((path, index) => {
           // Construct URL for each breadcrumb step
           const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
-          
+
           return (
             <li key={index} className="mx-2">
               <span className="text-gray-400"> &gt; </span>

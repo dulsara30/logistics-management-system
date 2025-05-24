@@ -83,7 +83,7 @@ const staffSchema = new mongoose.Schema({
     qrCode: {
         type: String,
         default: null
-    } 
+    }
 }, { timestamps: true });
 
 const staffMembers = mongoose.model("StaffMembers", staffSchema);

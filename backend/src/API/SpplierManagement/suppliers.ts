@@ -1,5 +1,5 @@
 import express from "express";
-import { createSupplierManagement, getAllSuppliers, getSupplierById, deleteSupplier, updateSupplier  } from "../../Application/SupplierManagement/suppliers";
+import { createSupplierManagement, getAllSuppliers, getSupplierById, deleteSupplier, updateSupplier } from "../../Application/SupplierManagement/suppliers";
 
 const suppliersRouter = express.Router();
 

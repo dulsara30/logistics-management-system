@@ -43,7 +43,6 @@
     "@types/mongoose": "^5.11.96",
     "@types/node": "^20.17.31",
     "@types/uuid": "^10.0.0",
-    "@types/node": "^20.17.24",
     "@types/pdfkit": "^0.13.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

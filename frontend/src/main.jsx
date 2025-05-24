@@ -30,7 +30,7 @@ import ProtectedRoute from './component/ProtectedRoute.jsx';
 import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
 import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
 import Items from './pages/Return&DamageHandling/items.jsx';
-import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx'; 
+import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx';
 import QRCode from './pages/StaffMember/QRCode.jsx';
 import StaffAttendance from './pages/StaffManagement/SubPages/StaffAttendanceTracking.jsx';
 import LeaveRequest from './pages/StaffMember/leaveRequest.jsx';
@@ -158,7 +158,7 @@ const router = createBrowserRouter([
                 path: "attendance",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
-                    <StaffAttendance/>
+                    <StaffAttendance />
                   </ProtectedRoute>
                 ),
               }
@@ -186,7 +186,7 @@ const router = createBrowserRouter([
             path: "returns/",
             element: (
               <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                <DamageHandling/>
+                <DamageHandling />
               </ProtectedRoute>
             ),
             children: [
@@ -194,7 +194,7 @@ const router = createBrowserRouter([
                 path: "add-damage",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                    <AddDamage/>
+                    <AddDamage />
                   </ProtectedRoute>
                 ),
               },
@@ -202,15 +202,15 @@ const router = createBrowserRouter([
                 path: "view-damage-reports",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
-                  <Items/>
-                </ProtectedRoute>
+                    <Items />
+                  </ProtectedRoute>
                 ),
               },
               {
                 path: "return-form",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
-                    <ReturnForm/>
+                    <ReturnForm />
                   </ProtectedRoute>
                 )
               },
@@ -218,8 +218,8 @@ const router = createBrowserRouter([
                 path: "view-returned-items",
                 element: (
                   <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
-                  <ReturnReport/>
-                </ProtectedRoute>
+                    <ReturnReport />
+                  </ProtectedRoute>
                 ),
               },
             ],
@@ -248,31 +248,31 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "my-qr",
-                element:(
-                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"]}>
-                    <QRCode/>
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"]}>
+                    <QRCode />
                   </ProtectedRoute>
                 ),
               },
               {
                 path: "leave-request",
-                element:(
+                element: (
                   <ProtectedRoute allowedRoles={["Driver", "Maintenance Staff", "Other Staff"]}>
-                    <LeaveRequest/>
+                    <LeaveRequest />
                   </ProtectedRoute>
                 ),
               },
-              
+
             ],
           },
           {
             path: "profile",
             element: (
-              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager","Inventory Manager", "Driver", "Maintenance Staff" , "Other Staff"]}>
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager", "Driver", "Maintenance Staff", "Other Staff"]}>
                 <Profile />
               </ProtectedRoute>
             ),
-          }  
+          }
         ],
       },
     ],

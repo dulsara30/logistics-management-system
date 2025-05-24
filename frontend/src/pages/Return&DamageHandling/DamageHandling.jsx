@@ -13,13 +13,13 @@ function DamageHandling() {
 
     <div>
 
-      {isBaseRoute &&(
+      {isBaseRoute && (
 
-        <DamageCards/>
+        <DamageCards />
       )}
-      
+
       <main className='p-5'>
-        <Outlet/>
+        <Outlet />
       </main>
 
     </div>

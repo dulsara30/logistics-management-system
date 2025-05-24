@@ -28,32 +28,32 @@ function SupplierDetails() {
       let quantity = Array.isArray(supplier.quantity)
         ? supplier.quantity
         : typeof supplier.quantity === "string"
-        ? supplier.quantity
+          ? supplier.quantity
             .split(",")
             .map((qty) => {
               const num = parseFloat(qty);
               return isNaN(num) ? 0 : num;
             })
             .filter((num) => num !== null)
-        : [];
+          : [];
 
       let price = Array.isArray(supplier.price)
         ? supplier.price
         : typeof supplier.price === "string"
-        ? supplier.price
+          ? supplier.price
             .split(",")
             .map((price) => {
               const num = parseFloat(price);
               return isNaN(num) ? 0 : num;
             })
             .filter((num) => num !== null)
-        : [];
+          : [];
 
       let items = Array.isArray(supplier.items)
         ? supplier.items
         : typeof supplier.items === "string"
-        ? supplier.items.split(",").map((item) => item.trim())
-        : [];
+          ? supplier.items.split(",").map((item) => item.trim())
+          : [];
 
       let email = typeof supplier.email === "string" ? supplier.email : "N/A";
       let contact = typeof supplier.contact === "string" ? supplier.contact : "N/A";
@@ -111,6 +111,14 @@ function SupplierDetails() {
 
   // Fetch suppliers useEffect (unchanged)
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("You must be looged in to view Supplier Details");
+      setIsLoading(false);
+      navigate("/login");
+      return;
+    }
+
     const getSuppliers = async () => {
       setIsLoading(true);
       setError(null);
@@ -118,7 +126,8 @@ function SupplierDetails() {
         const res = await fetch("http://localhost:8000/suppliers", {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
           },
         });
         if (!res.ok) {
@@ -377,9 +386,8 @@ function SupplierDetails() {
                 currentSuppliers.map((supplier, index) => (
                   <tr
                     key={supplier.id + index}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-gray-100 transition-colors`}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition-colors`}
                   >
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {supplier.id}
@@ -470,23 +478,21 @@ function SupplierDetails() {
             </p>
             <div className="flex space-x-2">
               <button
-                className={`px-4 py-2 ${
-                  currentPage === 1
-                    ? "bg-gray-200 text-gray-600"
-                    : "bg-gradient-to-r from-purple-400 to-purple-600 text-white hover:from-purple-500 hover:to-purple-700"
-                } rounded-lg transition-colors`}
+                className={`px-4 py-2 ${currentPage === 1
+                  ? "bg-gray-200 text-gray-600"
+                  : "bg-gradient-to-r from-purple-400 to-purple-600 text-white hover:from-purple-500 hover:to-purple-700"
+                  } rounded-lg transition-colors`}
                 onClick={prevPage}
                 disabled={currentPage === 1}
               >
                 Previous
               </button>
               <button
-                className={`px-4 py-2 ${
-                  currentPage >=
+                className={`px-4 py-2 ${currentPage >=
                   Math.ceil(filteredSuppliers.length / itemsPerPage)
-                    ? "bg-gray-200 text-gray-600"
-                    : "bg-gradient-to-r from-purple-400 to-purple-600 text-white hover:from-purple-500 hover:to-purple-700"
-                } rounded-lg transition-colors`}
+                  ? "bg-gray-200 text-gray-600"
+                  : "bg-gradient-to-r from-purple-400 to-purple-600 text-white hover:from-purple-500 hover:to-purple-700"
+                  } rounded-lg transition-colors`}
                 onClick={nextPage}
                 disabled={
                   currentPage >=
@@ -733,8 +739,8 @@ function SupplierDetails() {
                   <span className="font-medium text-gray-900">
                     {Array.isArray(selectedSupplier.quantity) && selectedSupplier.quantity.length > 0
                       ? selectedSupplier.quantity
-                          .map((qty) => (isNaN(qty) ? "N/A" : qty))
-                          .join(", ")
+                        .map((qty) => (isNaN(qty) ? "N/A" : qty))
+                        .join(", ")
                       : "N/A"}
                   </span>
                 </div>
@@ -743,8 +749,8 @@ function SupplierDetails() {
                   <span className="font-medium text-gray-900">
                     {Array.isArray(selectedSupplier.price) && selectedSupplier.price.length > 0
                       ? selectedSupplier.price
-                          .map((price) => (isNaN(price) ? "N/A" : price))
-                          .join(", ")
+                        .map((price) => (isNaN(price) ? "N/A" : price))
+                        .join(", ")
                       : "N/A"}
                   </span>
                 </div>

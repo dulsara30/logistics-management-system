@@ -8,14 +8,14 @@ import { Outlet } from "react-router-dom";
 
 
 function SupplierManagement() {
-const location = useLocation();
+  const location = useLocation();
 
-const isBaseRoute = location.pathname === "/suppliers";
+  const isBaseRoute = location.pathname === "/suppliers";
 
   const [formData, setFormData] = useState({
     name: "",
-    email:"",
-    contact:"",
+    email: "",
+    contact: "",
     itemsName: "",
     quantity: "",
     unitPrice: "",
@@ -38,25 +38,25 @@ const isBaseRoute = location.pathname === "/suppliers";
 
 
 
-    <div>
+        <div>
 
-    
-    <div className="p-5">
-    <Link to={'Add-Supplier'} >
-    <button className="bg-indigo-400 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">
-        + Add Suppliers
-</button>
-</Link>
-    </div>
 
-<SupplierDetails/>
+          <div className="p-5">
+            <Link to={'Add-Supplier'} >
+              <button className="bg-indigo-400 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">
+                + Add Suppliers
+              </button>
+            </Link>
+          </div>
 
-</div>
+          <SupplierDetails />
+
+        </div>
       )}
-<main className="p-3">
-  <Outlet/>
-</main>
-</div>
+      <main className="p-3">
+        <Outlet />
+      </main>
+    </div>
 
   );
 }

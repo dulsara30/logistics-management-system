@@ -37,9 +37,8 @@ const StatsCards = ({ filteredInventory, expiringSoonItems }) => {
               {expiringSoonItems.map((item) => (
                 <li
                   key={item._id}
-                  className={`p-1 text-sm ${
-                    item.isExpiringSoon ? "bg-red-100 text-red-800 rounded" : ""
-                  }`}
+                  className={`p-1 text-sm ${item.isExpiringSoon ? "bg-red-100 text-red-800 rounded" : ""
+                    }`}
                 >
                   {item.productName} - Expires in {item.daysUntilExpiry} days
                 </li>

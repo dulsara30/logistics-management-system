@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft  } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../../../component/ManageStaff/Header';
@@ -9,7 +9,7 @@ import EditModal from '../../../component/ManageStaff/EditModal';
 import DeleteModal from '../../../component/ManageStaff/DeleteModal';
 import DetailModal from '../../../component/ManageStaff/DetailModal';
 
-function ManageStaff(){
+function ManageStaff() {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,9 +33,9 @@ function ManageStaff(){
 
   const BACKEND_BASE_URL = 'http://localhost:8000';
 
-  useEffect(() =>{
+  useEffect(() => {
     const token = localStorage.getItem("token");
-    if(!token){
+    if (!token) {
       setError("You must be logged in to view staff members");
       setIsLoading(false);
       navigate("/login");
@@ -46,7 +46,7 @@ function ManageStaff(){
       setIsLoading(true);
       setError(null);
 
-      try{
+      try {
         const res = await fetch("http://localhost:8000/staff/manage-staff", {
           method: "GET",
           headers: {
@@ -54,7 +54,7 @@ function ManageStaff(){
           },
         });
 
-        if(!res.ok){
+        if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
         }
@@ -88,7 +88,7 @@ function ManageStaff(){
 
     if (searchTerm) {
       const searchTermLower = searchTerm.toLowerCase();
-      results = results.filter(employee => 
+      results = results.filter(employee =>
         (employee.fullName?.toLowerCase() || '').includes(searchTermLower) ||
         (employee._id?.toString().toLowerCase() || '').includes(searchTermLower) ||
         (employee.email?.toLowerCase() || '').includes(searchTermLower) ||
@@ -98,13 +98,13 @@ function ManageStaff(){
     }
 
     if (warehouseFilter) {
-      results = results.filter(employee => 
+      results = results.filter(employee =>
         employee.warehouseAssigned?.toLowerCase() === warehouseFilter.toLowerCase()
       );
     }
 
     if (status) {
-      results = results.filter(employee => 
+      results = results.filter(employee =>
         employee.status?.toLowerCase() === status.toLowerCase()
       );
     }
@@ -164,10 +164,10 @@ function ManageStaff(){
       }
 
       const updatedEmployee = await res.json();
-      setEmployees(employees.map(emp => 
+      setEmployees(employees.map(emp =>
         emp._id === updatedEmployee._id ? updatedEmployee : emp
       ));
-      setFilteredEmployees(filteredEmployees.map(emp => 
+      setFilteredEmployees(filteredEmployees.map(emp =>
         emp._id === updatedEmployee._id ? updatedEmployee : emp
       ));
       setIsEditModalOpen(false);
@@ -264,7 +264,7 @@ function ManageStaff(){
       - Relation: ${employee.emRelation || 'N/A'}
       - Number: ${employee.emNumber || 'N/A'}
     `;
-    
+
     const blob = new Blob([report], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -278,7 +278,7 @@ function ManageStaff(){
     <div className="space-y-6">
       <Header />
 
-      <FilterBar 
+      <FilterBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         warehouseFilter={warehouseFilter}
@@ -306,8 +306,8 @@ function ManageStaff(){
         />
       )}
 
-      <button 
-        onClick={() => navigate(-1)} 
+      <button
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors duration-200"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -344,5 +344,3 @@ function ManageStaff(){
 }
 
 export default ManageStaff;
-  
-

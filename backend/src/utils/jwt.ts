@@ -10,7 +10,7 @@ export const generateToken = (user: { id: string; email: string; role: string; f
     return jwt.sign(
         { id: user.id, email: user.email, role: user.role, fullName: user.fullName },
         JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN}
+        { expiresIn: JWT_EXPIRES_IN }
     );
 };
 

@@ -1,11 +1,11 @@
 import { X } from 'lucide-react';
 
-function DeleteModal({ 
-  isDeleteModalOpen, 
-  setIsDeleteModalOpen, 
-  employeeToDelete, 
-  confirmDelete, 
-  isDeleting 
+function DeleteModal({
+  isDeleteModalOpen,
+  setIsDeleteModalOpen,
+  employeeToDelete,
+  confirmDelete,
+  isDeleting
 }) {
   if (!isDeleteModalOpen || !employeeToDelete) return null;
 

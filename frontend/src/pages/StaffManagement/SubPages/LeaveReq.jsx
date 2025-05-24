@@ -352,21 +352,19 @@ function ManageLeave() {
 
       <div className="flex border-b border-gray-200 mb-6">
         <button
-          className={`py-2 px-4 border-b-2 ${
-            activeTab === "table"
+          className={`py-2 px-4 border-b-2 ${activeTab === "table"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-600"
-          }`}
+            }`}
           onClick={() => setActiveTab("table")}
         >
           Table View
         </button>
         <button
-          className={`py-2 px-4 border-b-2 ${
-            activeTab === "calendar"
+          className={`py-2 px-4 border-b-2 ${activeTab === "calendar"
               ? "border-blue-500 text-blue-600"
               : "border-transparent text-gray-600"
-          }`}
+            }`}
           onClick={() => setActiveTab("calendar")}
         >
           Calendar View
@@ -438,8 +436,8 @@ function ManageLeave() {
                           request.leaveType === "Annual Leave"
                             ? "text-blue-600"
                             : request.leaveType === "Sick Leave"
-                            ? "text-red-600"
-                            : "text-amber-600"
+                              ? "text-red-600"
+                              : "text-amber-600"
                         }
                       >
                         {request.leaveType}
@@ -560,19 +558,17 @@ function ManageLeave() {
                 {generateCalendarDays().map((day, i) => (
                   <div
                     key={i}
-                    className={`h-12 border rounded-md flex items-center justify-center cursor-pointer transition-colors ${
-                      !day
+                    className={`h-12 border rounded-md flex items-center justify-center cursor-pointer transition-colors ${!day
                         ? "border-transparent"
                         : isLeaveDay(day)
-                        ? "bg-purple-50 text-purple-700 font-medium"
-                        : "hover:bg-gray-50 text-gray-800"
-                    } ${
-                      day &&
-                      day.getDate() === date.getDate() &&
-                      day.getMonth() === date.getMonth()
+                          ? "bg-purple-50 text-purple-700 font-medium"
+                          : "hover:bg-gray-50 text-gray-800"
+                      } ${day &&
+                        day.getDate() === date.getDate() &&
+                        day.getMonth() === date.getMonth()
                         ? "ring-2 ring-purple-500"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleDayClick(day)}
                   >
                     {day && day.getDate()}
