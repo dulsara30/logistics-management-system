@@ -73,4 +73,4 @@ profileRouter
     }
   );
 
-  export default profileRouter;
+export default profileRouter;

@@ -32,7 +32,7 @@ function AddSupplier() {
     if (id === "name") {
       newValue = value.replace(/[^A-Za-z\s]/g, "").trimStart();
     }
-    
+
     // Special handling for contact field
     if (id === "contact") {
       newValue = value.replace(/[^0-9]/g, "").slice(0, 10);
@@ -297,7 +297,7 @@ function AddSupplier() {
             {errors.unitPrice && <p className="text-red-500 text-xs mt-1">{errors.unitPrice}</p>}
             <p className="text-xs text-gray-500">Enter prices as numbers, separated by commas</p>
           </div>
-          
+
 
           <div className="space-y-2">
             <label htmlFor="date" className="block text-sm font-medium text-gray-700">
@@ -324,9 +324,8 @@ function AddSupplier() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow transition ${
-              isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:from-purple-600 hover:to-purple-800"
-            }`}
+            className={`bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:from-purple-600 hover:to-purple-800"
+              }`}
           >
             {isSubmitting ? "Adding Supplier..." : "Add Supplier"}
           </button>

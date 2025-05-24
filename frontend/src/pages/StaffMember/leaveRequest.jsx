@@ -427,13 +427,12 @@ function LeaveRequest() {
                         </p>
                       </div>
                       <span
-                        className={`px-2 py-1 text-xs rounded-full font-medium ${
-                          request.status === "Approved"
+                        className={`px-2 py-1 text-xs rounded-full font-medium ${request.status === "Approved"
                             ? "bg-green-100 text-green-700"
                             : request.status === "Rejected"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
                       >
                         {request.status}
                       </span>

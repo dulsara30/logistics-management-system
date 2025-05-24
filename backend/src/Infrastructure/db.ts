@@ -7,13 +7,13 @@ export const connectDB = async () => {
 
     const uri = process.env.MONGO_URI;
 
-    try{
+    try {
         const connectionString = `${uri}`;
         await mongoose.connect(connectionString);
         console.log("DB connections successful!");
-    }catch (error){
+    } catch (error) {
         console.log("DB connections faild!");
     }
-    
+
 }
 

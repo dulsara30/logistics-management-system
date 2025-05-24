@@ -1,12 +1,12 @@
 import { X } from 'lucide-react';
 
-function EditModal({ 
-  isEditModalOpen, 
-  setIsEditModalOpen, 
-  editEmployee, 
-  setEditEmployee, 
-  handleSaveEdit, 
-  isSaving 
+function EditModal({
+  isEditModalOpen,
+  setIsEditModalOpen,
+  editEmployee,
+  setEditEmployee,
+  handleSaveEdit,
+  isSaving
 }) {
   if (!isEditModalOpen || !editEmployee) return null;
 
@@ -34,7 +34,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.fullName}
-              onChange={(e) => setEditEmployee({...editEmployee, fullName: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, fullName: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -43,7 +43,7 @@ function EditModal({
             <input
               type="email"
               value={editEmployee.email}
-              onChange={(e) => setEditEmployee({...editEmployee, email: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, email: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -52,7 +52,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.NIC}
-              onChange={(e) => setEditEmployee({...editEmployee, NIC: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, NIC: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -61,7 +61,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.phoneNo}
-              onChange={(e) => setEditEmployee({...editEmployee, phoneNo: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, phoneNo: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -70,7 +70,7 @@ function EditModal({
             <input
               type="date"
               value={editEmployee.DOB}
-              onChange={(e) => setEditEmployee({...editEmployee, DOB: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, DOB: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -78,7 +78,7 @@ function EditModal({
             <label className="block text-sm font-medium text-gray-700">Gender</label>
             <select
               value={editEmployee.gender}
-              onChange={(e) => setEditEmployee({...editEmployee, gender: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, gender: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Male">Male</option>
@@ -90,7 +90,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.address}
-              onChange={(e) => setEditEmployee({...editEmployee, address: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, address: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -99,7 +99,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.profilePic}
-              onChange={(e) => setEditEmployee({...editEmployee, profilePic: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, profilePic: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -108,7 +108,7 @@ function EditModal({
             <input
               type="date"
               value={editEmployee.dateJoined}
-              onChange={(e) => setEditEmployee({...editEmployee, dateJoined: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, dateJoined: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -117,7 +117,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.warehouseAssigned}
-              onChange={(e) => setEditEmployee({...editEmployee, warehouseAssigned: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, warehouseAssigned: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -125,7 +125,7 @@ function EditModal({
             <label className="block text-sm font-medium text-gray-700">Status</label>
             <select
               value={editEmployee.status}
-              onChange={(e) => setEditEmployee({...editEmployee, status: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, status: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Active">Active</option>
@@ -136,7 +136,7 @@ function EditModal({
             <label className="block text-sm font-medium text-gray-700">Role</label>
             <select
               value={editEmployee.role}
-              onChange={(e) => setEditEmployee({...editEmployee, role: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, role: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Inventory Manager">Inventory Manager</option>
@@ -150,7 +150,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.emName || ''}
-              onChange={(e) => setEditEmployee({...editEmployee, emName: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, emName: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -159,7 +159,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.emRelation || ''}
-              onChange={(e) => setEditEmployee({...editEmployee, emRelation: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, emRelation: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -168,7 +168,7 @@ function EditModal({
             <input
               type="text"
               value={editEmployee.emNumber || ''}
-              onChange={(e) => setEditEmployee({...editEmployee, emNumber: e.target.value})}
+              onChange={(e) => setEditEmployee({ ...editEmployee, emNumber: e.target.value })}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>

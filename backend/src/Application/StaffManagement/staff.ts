@@ -13,14 +13,14 @@ export const addStaff = async (req: Request, res: Response) => {
     console.log("Received file:", req.file);
 
     const {
-      fullName, 
-      email, 
-      phoneNo, 
-      DOB, 
-      gender, 
+      fullName,
+      email,
+      phoneNo,
+      DOB,
+      gender,
       address,
-      warehouseAssigned, 
-      status, 
+      warehouseAssigned,
+      status,
       role,
       NIC,
       dateJoined,
@@ -219,7 +219,7 @@ export const updateStaff = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Staff member not found" });
     }
 
-    if (req.body.NIC) { 
+    if (req.body.NIC) {
       const NIC = req.body.NIC.trim().toUpperCase();
       const oldNicRegex = /^[0-9]{9}[VX]$/;
       const newNicRegex = /^[0-9]{12}$/;

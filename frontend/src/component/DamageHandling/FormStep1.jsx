@@ -10,28 +10,32 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
 
-    if(name === 'itemName'){
-      updatedFormData.searchTerm = ''; // Clear search term on item selection
-      // Find the selected item to get its supplierName
-      const selectedItem = items.find((item) => item.name === value);
-      updatedFormData.supplierName = selectedItem ? selectedItem.supplierName : ''; // Store supplierName
+    if (name === 'itemName') {
+      updatedFormData.searchTerm = '';
+      const selectedItem = items.find(
+        (item) => `${item.productName} (${item.brandName})` === value
+      );
+      updatedFormData.supplierName = selectedItem ? selectedItem.supplierName : '';
+      updatedFormData.productName = selectedItem ? selectedItem.productName : '';
+      updatedFormData.brandName = selectedItem ? selectedItem.brandName : '';
     }
     setFormData(updatedFormData);
 
-    // Validate Quantity on both quantity and itemName changes
     if (name === 'quantity' || name === 'itemName') {
       const selectedItemName = name === 'itemName' ? value : updatedFormData.itemName;
       const quantityValue = name === 'quantity' ? value : updatedFormData.quantity;
 
-      const selectedItem = items.find((item) => item.name === selectedItemName);
+      const selectedItem = items.find(
+        (item) => `${item.productName} (${item.brandName})` === selectedItemName
+      );
       if (selectedItem && quantityValue) {
         const quantityNum = Number(quantityValue);
         if (quantityNum <= 0) {
           setErrors({ ...errors, quantity: 'Quantity must be greater than 0' });
-        } else if (quantityNum > selectedItem.availableQty) {
+        } else if (quantityNum > selectedItem.quantity) {
           setErrors({
             ...errors,
-            quantity: `Quantity cannot exceed ${selectedItem.availableQty}`,
+            quantity: `Quantity cannot exceed ${selectedItem.quantity}`,
           });
         } else {
           setErrors({ ...errors, quantity: '' });
@@ -47,14 +51,16 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
   };
 
   const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes((formData.searchTerm || '').toLowerCase())
+    (`${item.productName} (${item.brandName})` || '').toLowerCase().includes(
+      (formData.searchTerm || '').toLowerCase()
+    )
   );
 
   const validate = () => {
     const newErrors = {};
     if (!formData.itemName) newErrors.itemName = 'Item Name is required';
     if (!formData.quantity) newErrors.quantity = 'Quantity is required';
-    else if (errors.quantity) newErrors.quantity = errors.quantity; // Preserve quantity error
+    else if (errors.quantity) newErrors.quantity = errors.quantity;
     if (!formData.damageType) newErrors.damageType = 'Damage Type is required';
     if (!formData.actionRequired) newErrors.actionRequired = 'Action Required is required';
     setErrors(newErrors);
@@ -67,6 +73,7 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('FormStep1: useEffect running, token exists:', !!token);
     if (!token) {
       setErrors({ general: 'You must be logged in to view items' });
       setIsLoading(false);
@@ -79,7 +86,7 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
       setErrors({});
 
       try {
-        const res = await fetch('http://localhost:8000/returns/add-damage', {
+        const res = await fetch('http://localhost:8000/inventory', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -92,13 +99,21 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
         }
 
         const data = await res.json();
-        console.log('Fetching Items Data: ', data);
-
-        // Map API response to the expected shape ({ name, availableQty })
-        const mappedItems = data.map((item) => ({
-          name: item.name,
-          availableQty: item.quantity,
-        }));
+        console.log('FormStep1: Backend response:', data);
+        const mappedItems = data
+          .map((item) => {
+            if (!item.productName || !item.brandName) {
+              console.warn('Item missing productName or brandName:', item);
+              return null;
+            }
+            return {
+              productName: item.productName,
+              brandName: item.brandName,
+              quantity: item.quantity,
+              supplierName: item.supplierName,
+            };
+          })
+          .filter((item) => item !== null);
         setItems(mappedItems);
       } catch (err) {
         const errorMessage = err.message || 'An unknown error occurred';
@@ -160,8 +175,8 @@ function FormStep1({ formData, setFormData, onNext, errors, setErrors }) {
                 </option>
               ) : (
                 filteredItems.map((item) => (
-                  <option key={item.name} value={item.name}>
-                    {item.name} (Available: {item.availableQty})
+                  <option key={`${item.productName}-${item.brandName}`} value={`${item.productName} (${item.brandName})`}>
+                    {item.productName} ({item.brandName}) (Available: {item.quantity})
                   </option>
                 ))
               )}

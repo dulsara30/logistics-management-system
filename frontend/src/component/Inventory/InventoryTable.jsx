@@ -22,9 +22,8 @@ const InventoryTable = ({ filteredInventory, selectedItem, onSelectItem, onEditI
               <tr
                 key={item._id}
                 onClick={() => onSelectItem(item)}
-                className={`border-t border-gray-200 cursor-pointer ${
-                  selectedItem?._id === item._id ? "bg-gray-50" : "hover:bg-gray-50"
-                }`}
+                className={`border-t border-gray-200 cursor-pointer ${selectedItem?._id === item._id ? "bg-gray-50" : "hover:bg-gray-50"
+                  }`}
               >
                 <td className="p-4 text-gray-800">{item.productName}</td>
                 <td className="p-4 text-gray-800">{item.brandName}</td>

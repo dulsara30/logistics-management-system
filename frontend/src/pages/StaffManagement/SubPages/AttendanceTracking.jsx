@@ -255,13 +255,12 @@ function AttendanceTracking() {
                     <td key={index} className="px-4 py-2">
                       <div>
                         <p
-                          className={`font-medium ${
-                            record.status === "Present"
+                          className={`font-medium ${record.status === "Present"
                               ? "text-green-600"
                               : record.status === "Late"
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                            }`}
                         >
                           {record.status}
                         </p>

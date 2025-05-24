@@ -21,9 +21,9 @@ import loginRouter from "./API/login/login";
 import getItemRouter from "./API/Return&DamageHandling/damageForm";
 import profileRouter from "./API/StaffManagement/profile";
 import QRRouter from "./API/StaffManagement/QRCode";
-import { getAllSuppliers } from "./Application/SupplierManagement/suppliers";
 import attendanceRoute from "./API/StaffManagement/attendance";
 import leaveRoutes from "./API/StaffManagement/leaveRoutes";
+import { deleteDamageReport, getInventoryItems, sendReturnReport, updateDamageReport } from "./Application/Return&DamageHandling/DamageReport"
 
 const app: Express = express();
 
@@ -57,15 +57,21 @@ app.use(authenticateToken);
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRouter);
+app.use("/returns", getItemRouter);
+app.use("/returns", getItemRouter);
 app.use("/", profileRouter);
 app.use("/dashboard", QRRouter);
 app.use("/dashboard", QRRouter)
 app.use("/analytics", attendanceRoute);
 app.use("/leaves", leaveRoutes);
 
+app.route("/returns/send-return-report").post(sendReturnReport);
+app.route("/returns/add-damage/:id").put(updateDamageReport);
+app.route("/returns/add-damage/:id").delete(deleteDamageReport);
+
 app
   .route("/inventory")
-  .get(getAllInventoryManagement)
+  .get(getAllInventoryManagement, getInventoryItems)
   .post(createInventoryManagement);
 
 app

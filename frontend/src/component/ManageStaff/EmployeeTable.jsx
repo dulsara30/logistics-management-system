@@ -1,13 +1,13 @@
 import EmployeeRow from './EmployeeRow';
 import Pagination from './Pagination';
 
-function EmployeeTable({ 
-  employees, 
-  currentPage, 
-  itemsPerPage, 
-  handleDetailClick, 
-  handleEditClick, 
-  handleDeleteClick 
+function EmployeeTable({
+  employees,
+  currentPage,
+  itemsPerPage,
+  handleDetailClick,
+  handleEditClick,
+  handleDeleteClick
 }) {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

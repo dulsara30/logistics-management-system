@@ -149,9 +149,8 @@ function Login() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">

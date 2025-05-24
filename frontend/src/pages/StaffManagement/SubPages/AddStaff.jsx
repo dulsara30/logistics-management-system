@@ -555,13 +555,12 @@ function AddStaff() {
           <button
             type="submit"
             disabled={loading}
-            className={`flex items-center bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`flex items-center bg-gradient-to-r from-purple-500 to-purple-700 text-white px-6 py-2 rounded-lg shadow hover:from-purple-600 hover:to-purple-800 transition ${loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             {loading ? (
               <>
-                <Loader2 className="animate-spin h-5 w-5 mr-2"/>
+                <Loader2 className="animate-spin h-5 w-5 mr-2" />
                 Adding...
               </>
             ) : (

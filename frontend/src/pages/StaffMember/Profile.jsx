@@ -217,11 +217,10 @@ const Profile = () => {
       {/* Success/Error Message */}
       {message.text && (
         <div
-          className={`mt-4 p-3 rounded-md text-center ${
-            message.type === "success"
+          className={`mt-4 p-3 rounded-md text-center ${message.type === "success"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
-          }`}
+            }`}
         >
           {message.text}
         </div>
@@ -439,9 +438,8 @@ const Profile = () => {
             <button
               type="submit"
               disabled={isUpdated}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${
-                isUpdated ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${isUpdated ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               {isUpdated ? (
                 <div className="flex items-center justify-center">

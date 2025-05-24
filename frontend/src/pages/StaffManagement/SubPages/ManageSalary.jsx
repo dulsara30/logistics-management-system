@@ -6,64 +6,64 @@ import { useNavigate } from 'react-router-dom';
 
 // Mock data for employee salaries
 const salaryData = [
-  { 
-    id: '001', 
-    employee: 'Dulsara Manakal', 
-    position: 'Warehouse Manager', 
+  {
+    id: '001',
+    employee: 'Dulsara Manakal',
+    position: 'Warehouse Manager',
     email: 'dulsaramanakal@gmail.com',
     joinDate: '12 Jan 2022',
-    basicSalary: 5000, 
-    bonuses: 800, 
-    deductions: 200, 
-    netSalary: 5600 
+    basicSalary: 5000,
+    bonuses: 800,
+    deductions: 200,
+    netSalary: 5600
   },
-  { 
-    id: '002', 
-    employee: 'Thisaru Yasanjith', 
-    position: 'Business Owner', 
+  {
+    id: '002',
+    employee: 'Thisaru Yasanjith',
+    position: 'Business Owner',
     email: 'yasanjith365@gmail.com',
     joinDate: '03 Mar 2022',
-    basicSalary: 4000, 
-    bonuses: 500, 
-    deductions: 150, 
-    netSalary: 4350 
+    basicSalary: 4000,
+    bonuses: 500,
+    deductions: 150,
+    netSalary: 4350
   },
-  { 
-    id: '003', 
-    employee: 'Janeesha Malshani', 
-    position: 'Driver', 
+  {
+    id: '003',
+    employee: 'Janeesha Malshani',
+    position: 'Driver',
     email: 'janeeshamalshani@gmail.com',
     joinDate: '18 Jul 2023',
-    basicSalary: 3200, 
-    bonuses: 200, 
-    deductions: 100, 
-    netSalary: 3300 
+    basicSalary: 3200,
+    bonuses: 200,
+    deductions: 100,
+    netSalary: 3300
   },
-  { 
-    id: '004', 
-    employee: 'Kavindya Liyanaarachchi', 
-    position: 'Other Staff', 
+  {
+    id: '004',
+    employee: 'Kavindya Liyanaarachchi',
+    position: 'Other Staff',
     email: 'kavindyaliayanaarachchi@gmail.com',
     joinDate: '05 Apr 2021',
-    basicSalary: 6000, 
-    bonuses: 1000, 
-    deductions: 300, 
-    netSalary: 6700 
+    basicSalary: 6000,
+    bonuses: 1000,
+    deductions: 300,
+    netSalary: 6700
   },
-  { 
-    id: '005', 
-    employee: 'Dilani Kanchana', 
-    position: 'Inventory Manager', 
+  {
+    id: '005',
+    employee: 'Dilani Kanchana',
+    position: 'Inventory Manager',
     email: 'dilanikanchana@gmail.com',
     joinDate: '22 Sep 2023',
-    basicSalary: 3200, 
-    bonuses: 300, 
-    deductions: 100, 
-    netSalary: 3400 
+    basicSalary: 3200,
+    bonuses: 300,
+    deductions: 100,
+    netSalary: 3400
   },
 ];
 
-function ManageSalary  ()  {
+function ManageSalary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -87,7 +87,7 @@ function ManageSalary  ()  {
   const showToast = (title, description) => {
     const id = Date.now();
     setToasts(prevToasts => [...prevToasts, { id, title, description }]);
-    
+
     // Auto remove toast after 3 seconds
     setTimeout(() => {
       setToasts(prevToasts => prevToasts.filter(toast => toast.id !== id));
@@ -129,29 +129,29 @@ function ManageSalary  ()  {
       ...updateData,
       netSalary: calculateNetSalary(),
     };
-    
+
     console.log('Saving updated salary data:', updatedSalary);
-    
+
     showToast(
       "Salary information updated",
       `${selectedSalary.employee}'s salary details have been successfully updated.`
     );
-    
+
     setIsUpdateModalOpen(false);
   };
 
   const handleDownloadPayslip = (employee, employeeId) => {
     // Simulate download process
     setIsDownloading(true);
-    
+
     setTimeout(() => {
       console.log(`Downloading payslip for ${employee} (ID: ${employeeId})`);
-      
+
       showToast(
         "Payslip downloaded",
         `Payslip for ${employee} has been downloaded successfully.`
       );
-      
+
       setIsDownloading(false);
     }, 1500);
   };
@@ -184,28 +184,28 @@ function ManageSalary  ()  {
     } else {
       document.body.style.overflow = 'auto';
     }
-    
+
     return () => {
       document.body.style.overflow = 'auto';
     };
   }, [isViewModalOpen, isUpdateModalOpen]);
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Toast notifications */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
         {toasts.map(toast => (
-          <div 
-            key={toast.id} 
+          <div
+            key={toast.id}
             className="bg-white border border-gray-100 shadow-lg rounded-lg p-4 flex items-start gap-3 min-w-[320px] animate-slide-in-right"
           >
             <div className="flex-1">
               <h4 className="font-semibold text-gray-900">{toast.title}</h4>
               <p className="text-gray-600 text-sm">{toast.description}</p>
             </div>
-            <button 
+            <button
               onClick={() => setToasts(prevToasts => prevToasts.filter(t => t.id !== toast.id))}
               className="text-gray-400 hover:text-gray-600"
             >
@@ -239,7 +239,7 @@ const navigate = useNavigate();
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse">
               <thead>
@@ -253,8 +253,8 @@ const navigate = useNavigate();
               </thead>
               <tbody>
                 {filteredSalary.map((salary, index) => (
-                  <tr 
-                    key={salary.id} 
+                  <tr
+                    key={salary.id}
                     className={`border-b border-gray-50 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
                   >
                     <td className="px-4 py-3">
@@ -280,19 +280,19 @@ const navigate = useNavigate();
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex space-x-2">
-                        <button 
+                        <button
                           onClick={() => handleViewSalary(salary)}
                           className="h-8 w-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300"
                         >
                           <Eye className="h-4 w-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleUpdateSalary(salary)}
                           className="h-8 w-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDownloadPayslip(salary.employee, salary.id)}
                           className="h-8 w-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300"
                           disabled={isDownloading}
@@ -324,31 +324,29 @@ const navigate = useNavigate();
                 </div>
               </div>
             </div>
-            
+
             <div className="w-full">
               <div className="border-b border-gray-100 flex">
-                <button 
+                <button
                   onClick={() => setActiveTab('details')}
-                  className={`px-6 py-3 text-sm font-medium ${
-                    activeTab === 'details' 
-                      ? 'border-b-2 border-violet-600 text-violet-700' 
+                  className={`px-6 py-3 text-sm font-medium ${activeTab === 'details'
+                      ? 'border-b-2 border-violet-600 text-violet-700'
                       : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                    }`}
                 >
                   Employee Details
                 </button>
-                <button 
+                <button
                   onClick={() => setActiveTab('salary')}
-                  className={`px-6 py-3 text-sm font-medium ${
-                    activeTab === 'salary' 
-                      ? 'border-b-2 border-violet-600 text-violet-700' 
+                  className={`px-6 py-3 text-sm font-medium ${activeTab === 'salary'
+                      ? 'border-b-2 border-violet-600 text-violet-700'
                       : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                    }`}
                 >
                   Salary Breakdown
                 </button>
               </div>
-              
+
               {selectedSalary && (
                 <>
                   {activeTab === 'details' && (
@@ -367,7 +365,7 @@ const navigate = useNavigate();
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="border border-gray-100 rounded-lg shadow-sm bg-white">
                           <div className="p-4">
                             <div className="flex items-center gap-3">
@@ -381,12 +379,12 @@ const navigate = useNavigate();
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="border border-gray-100 rounded-lg shadow-sm bg-white">
                           <div className="p-4">
                             <div className="flex items-center gap-3">
                               <div className="bg-violet-100 p-2 rounded-lg">
-                                
+
                               </div>
                               <div>
                                 <p className="text-sm text-gray-500">Basic Salary</p>
@@ -395,7 +393,7 @@ const navigate = useNavigate();
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="border border-gray-100 rounded-lg shadow-sm bg-white">
                           <div className="p-4">
                             <div className="flex items-center gap-3">
@@ -410,7 +408,7 @@ const navigate = useNavigate();
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-4 text-gray-900">Personal Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4">
@@ -432,9 +430,9 @@ const navigate = useNavigate();
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-end mt-6">
-                        <button 
+                        <button
                           onClick={() => setActiveTab('salary')}
                           className="bg-gradient-to-r from-violet-500 to-violet-700 hover:from-violet-600 hover:to-violet-800 text-white px-4 py-2 rounded-lg"
                         >
@@ -443,14 +441,14 @@ const navigate = useNavigate();
                       </div>
                     </div>
                   )}
-                  
+
                   {activeTab === 'salary' && (
                     <div className="p-6">
                       <div className="space-y-6">
                         <div className="space-y-3">
                           <h3 className="font-medium text-gray-900 flex items-center">
                             <span className="bg-green-100 p-1 rounded-md mr-2">
-                             
+
                             </span>
                             Earnings
                           </h3>
@@ -473,11 +471,11 @@ const navigate = useNavigate();
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-3">
                           <h3 className="font-medium text-gray-900 flex items-center">
                             <span className="bg-red-100 p-1 rounded-md mr-2">
-                              <CreditCard className="h-4 w-4 text-red-600" /> 
+                              <CreditCard className="h-4 w-4 text-red-600" />
                             </span>
                             Deductions
                           </h3>
@@ -500,23 +498,23 @@ const navigate = useNavigate();
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="bg-violet-50 rounded-lg p-4 border border-violet-100">
                           <div className="grid grid-cols-2 gap-2 font-bold text-violet-900">
                             <div>Net Salary</div>
                             <div className="text-right">${selectedSalary.netSalary.toFixed(2)}</div>
                           </div>
                         </div>
-                        
+
                         <div className="flex justify-end space-x-3">
-                          <button 
+                          <button
                             onClick={() => handleUpdateSalary(selectedSalary)}
                             className="border border-violet-200 bg-white text-violet-700 hover:bg-violet-50 px-4 py-2 rounded-lg flex items-center"
                           >
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit Salary
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDownloadPayslip(selectedSalary.employee, selectedSalary.id)}
                             className="bg-gradient-to-r from-violet-500 to-violet-700 hover:from-violet-600 hover:to-violet-800 text-white px-4 py-2 rounded-lg flex items-center"
                             disabled={isDownloading}
@@ -532,7 +530,7 @@ const navigate = useNavigate();
               )}
 
               <div className="border-t border-gray-100 p-4 flex justify-end">
-                <button 
+                <button
                   onClick={() => setIsViewModalOpen(false)}
                   className="text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg flex items-center"
                 >
@@ -554,7 +552,7 @@ const navigate = useNavigate();
                 Update salary information for {selectedSalary?.employee}
               </p>
             </div>
-            
+
             {selectedSalary && (
               <div className="p-6 space-y-4">
                 <div className="space-y-2">
@@ -572,7 +570,7 @@ const navigate = useNavigate();
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-300"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label htmlFor="bonuses" className="block text-sm font-medium text-gray-700">
                     Bonuses ($)
@@ -588,7 +586,7 @@ const navigate = useNavigate();
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-300"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label htmlFor="deductions" className="block text-sm font-medium text-gray-700">
                     Deductions ($)
@@ -604,7 +602,7 @@ const navigate = useNavigate();
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-300"
                   />
                 </div>
-                
+
                 <div className="bg-violet-50 p-4 rounded-lg border border-violet-100 mt-4">
                   <div className="grid grid-cols-2 gap-2 font-medium text-violet-900">
                     <div>Net Salary:</div>
@@ -613,15 +611,15 @@ const navigate = useNavigate();
                 </div>
               </div>
             )}
-            
+
             <div className="border-t border-gray-100 p-4 flex justify-end space-x-3">
-              <button 
+              <button
                 onClick={() => setIsUpdateModalOpen(false)}
                 className="px-4 py-2 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleSaveUpdate}
                 className="bg-gradient-to-r from-violet-500 to-violet-700 hover:from-violet-600 hover:to-violet-800 text-white px-4 py-2 rounded-lg"
               >
@@ -632,12 +630,12 @@ const navigate = useNavigate();
         </div>
       )}
 
-{(isViewModalOpen || isUpdateModalOpen) && (
-  <div
-    className="fixed inset-0 bg-transparent z-40"
-    aria-hidden="true"
-  ></div>
-)}
+      {(isViewModalOpen || isUpdateModalOpen) && (
+        <div
+          className="fixed inset-0 bg-transparent z-40"
+          aria-hidden="true"
+        ></div>
+      )}
 
 
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 border border-gray-300  text-gray-700  px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
@@ -646,9 +644,9 @@ const navigate = useNavigate();
       </button>
 
 
-</div>
+    </div>
 
   )
 }
 
-export default  ManageSalary;
+export default ManageSalary;

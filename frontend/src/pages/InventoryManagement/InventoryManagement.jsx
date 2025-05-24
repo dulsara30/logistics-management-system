@@ -602,7 +602,7 @@ const InventoryManagementPage = () => {
       Supplier Name: ${item.supplierName || "N/A"}
       Reorder Level: ${item.reorderLevel ?? "N/A"}
     `;
-    
+
     const blob = new Blob([content], { type: "text/plain" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
