@@ -204,5 +204,3 @@ All rights reserved © 2025 by the original authors.
 * **SLIIT** – BSc (Hons) in Information Technology – Year 2, Semester II
 * Lecturers, mentors, and project advisors
 * The open-source community for libraries and inspiration
-
-```
