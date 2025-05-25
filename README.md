@@ -133,8 +133,8 @@ LOGISTICS-MANAGEMENT-SYSTEM/
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-username/GrocerEase-Lanka.git
-cd GrocerEase-Lanka
+git clone https://github.com/dulsara30/logistics-management-system.git
+cd LOGISTICS-MANAGEMENT-SYSTEM
 ```
 
 2. **Set up environment variables**
@@ -181,13 +181,13 @@ npm start
 
 ## 👨‍💻 Team Contributions
 
-| Name                      | Role                              | GitHub Username |
-| ------------------------- | --------------------------------- | --------------- |
-| **Paranagama P.W\.K.D.M** | Team Lead, Staff Management, Auth | [@dulsara30](#) |
-| **Maddumahewa T.Y**       | Fleet & Delivery Management       | [@thisaru](#)   |
-| **H.D.K Ariyadasa**       | Warehouse Management              | [@ariyadasa](#) |
-| **Liyanaarachchi K**      | Inventory Management              | [@kavindya](#)  |
-| **Malshani J.P.J**        | Supplier & Return/Damage Handling | [@malshani](#)  |
+| Name                      | Role                              | GitHub Username                |
+| ------------------------- | --------------------------------- | ------------------------------ |
+| **Paranagama P.W\.K.D.M** | Staff Management, Auth            | [@dulsara30](#)                |
+| **Maddumahewa T.Y**       | Fleet & Delivery Management       | [@ThisaruYasanjith](#)         |
+| **H.D.K Ariyadasa**       | Warehouse Management              | [@dilani365](#)                |
+| **Liyanaarachchi K**      | Inventory Management              | [@Kavindya-Liyanaarachchi](#)  |
+| **Malshani J.P.J**        | Supplier & Return/Damage Handling | [@Janeesha532](#)              |
 
 
 ---
