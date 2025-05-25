@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
 import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -10,101 +14,176 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@mui/material';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api",
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function WarehouseForm() {
-
   const navigate = useNavigate();
-  const { WarehouseID } = useParams(); // Get the WarehouseID from the URL params
+  const { WarehouseID } = useParams();
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({}); // Initialize as an empty object
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch warehouse data by ID from the backend
-    axios.get(`http://localhost:8000/api/warehouse/${WarehouseID}`)
-      .then((response) => {
-        setFormData(response.data); // Set the fetched data in state
-        console.log(response.data)
-      })
-      .catch((error) => {
-        console.error('Error fetching warehouse:', error);
-      });
-  }, [WarehouseID]); // Re-fetch when WarehouseID changes
+    if (!WarehouseID) {
+      setError("Invalid warehouse ID.");
+      setLoading(false);
+      return;
+    }
 
+    const fetchWarehouse = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await api.get(`/warehouse/${WarehouseID}`);
+        setFormData(response.data);
+        console.log("Fetched warehouse:", response.data);
+      } catch (error) {
+        setError(error.response?.data?.message || "Error fetching warehouse.");
+        toast.error("Error fetching warehouse.");
+        console.error("Error fetching warehouse:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWarehouse();
+  }, [WarehouseID]);
 
-
-
-
-  // Handle input field changes (if editing)
   const handleChange = (e) => {
-    setFormData((prev) => ({...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setValidationErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // Handle editing mode
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.StreetName) errors.StreetName = "Street Name is required.";
+    if (!formData.City) errors.City = "City is required.";
+    if (!formData.Province) errors.Province = "Province is required.";
+    const sectionFields = [
+      "Bulkysecsize",
+      "Hazardoussecsize",
+      "Perishablesecsize",
+      "Sparesecsize",
+      "Otheritems",
+    ];
+    sectionFields.forEach((field) => {
+      if (!formData[field] || isNaN(formData[field]) || parseFloat(formData[field]) < 0) {
+        errors[field] = `${field} must be a positive number.`;
+      }
+    });
+    return errors;
+  };
+
   const handleEdit = () => {
     setEditMode(true);
   };
 
-  // Handle canceling edit mode
   const handleCancel = () => {
     setEditMode(false);
+    setValidationErrors({});
   };
 
-  
+  const handleSubmit = async () => {
+    const errors = validateForm();
+    setValidationErrors(errors);
 
-  // Handle form submission (save data)
-  const handleSubmit = () => {
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the validation errors before submitting.");
+      return;
+    }
 
-
-
-
-
-    axios
-    .put(`http://localhost:8000/api/warehouse/${WarehouseID}`, formData)
-    .then((response) => {
-      alert("Warehouse updated successfully:", response.data);
+    try {
+      const response = await api.put(`/warehouse/${WarehouseID}`, {
+        streetName: formData.StreetName,
+        city: formData.City,
+        province: formData.Province,
+        specialInstruction: formData.SpecialInstruction,
+        description: formData.Description,
+        bulkysecsize: parseFloat(formData.Bulkysecsize),
+        hazardoussecsize: parseFloat(formData.Hazardoussecsize),
+        perishablesecsize: parseFloat(formData.Perishablesecsize),
+        sparesecsize: parseFloat(formData.Sparesecsize),
+        otheritems: parseFloat(formData.Otheritems),
+      });
+      toast.success("Warehouse updated successfully!");
       setEditMode(false);
-      navigate("/WarehouseSubmit"); // Navigate after successful update
-    })
-    .catch((error) => {
-      alert("Error updating warehouse:", error);
-    });
-
-  };
-
-
-
-
-
-
-
-  // Handle delete action
-  const handleDelete = () => {
-    const adminPassword = window.prompt("Enter Admin Password to delete:");
-  
-    if (adminPassword === "admin123") {
-      if (window.confirm("Are you sure you want to delete this warehouse profile?")) {
-        axios
-          .delete(`http://localhost:8000/api/warehouse/${WarehouseID}`)
-          .then(() => {
-            alert("Warehouse deleted successfully.");
-            navigate("/WarehouseSubmit");
-          })
-          .catch((error) => {
-            alert("Error deleting warehouse:", error);
-          });
-      }
-    } else if (adminPassword !== null) {
-      alert("Incorrect Admin Password!");
+      navigate("/WarehouseSubmit");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error updating warehouse.");
+      console.error("Error updating warehouse:", error);
     }
   };
-  
 
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/warehouse/${WarehouseID}`);
+      toast.success("Warehouse deleted successfully.");
+      navigate("/WarehouseSubmit");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error deleting warehouse.");
+      console.error("Error deleting warehouse:", error);
+    }
+  };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
+  if (error) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography color="error">{error}</Typography>
+        <Button
+          variant="contained"
+          sx={{ mt: 2 }}
+          onClick={() => navigate("/warehouse")}
+        >
+          Back to Warehouses
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Grid container spacing={2} sx={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
@@ -113,48 +192,55 @@ export default function WarehouseForm() {
           Warehouse Profile
         </Typography>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2 , 1fr)", gap: 2 }}>
-          {/* Display Warehouse ID */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2 }}>
           <TextField
             label="Warehouse ID"
             name="WarehouseID"
-            value={formData.WarehouseID || ''}
+            value={formData.WarehouseID || ""}
             variant="filled"
             disabled
             fullWidth
           />
-          {/* Editable fields */}
           <TextField
             label="Street Name"
             name="StreetName"
-            value={formData.StreetName || ''}
+            value={formData.StreetName || ""}
             onChange={handleChange}
             variant="filled"
             disabled={!editMode}
             fullWidth
+            error={!!validationErrors.StreetName}
+            helperText={validationErrors.StreetName}
+            required
           />
           <TextField
             label="City"
             name="City"
-            value={formData.City || ''}
+            value={formData.City || ""}
             onChange={handleChange}
             variant="filled"
             disabled={!editMode}
             fullWidth
+            error={!!validationErrors.City}
+            helperText={validationErrors.City}
+            required
           />
           <TextField
             label="Province"
             name="Province"
-            value={formData.Province || ''}
+            value={formData.Province || ""}
             onChange={handleChange}
             variant="filled"
             disabled={!editMode}
             fullWidth
+            error={!!validationErrors.Province}
+            helperText={validationErrors.Province}
+            required
           />
           <TextField
             label="Special Instruction"
             name="SpecialInstruction"
-            value={formData.SpecialInstruction || ''}
+            value={formData.SpecialInstruction || ""}
             onChange={handleChange}
             variant="filled"
             disabled={!editMode}
@@ -165,7 +251,7 @@ export default function WarehouseForm() {
           <TextField
             label="Description"
             name="Description"
-            value={formData.Description || ''}
+            value={formData.Description || ""}
             onChange={handleChange}
             variant="filled"
             disabled={!editMode}
@@ -175,77 +261,79 @@ export default function WarehouseForm() {
           />
         </Box>
 
-
-
-
         <Box sx={{ mt: 4 }}>
-  <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-    Section Sizes
-  </Typography>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+            Section Sizes
+          </Typography>
 
-  <TableContainer component={Paper}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell><strong>Section</strong></TableCell>
-          <TableCell><strong>Size (sq ft)</strong></TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {[
-          { label: "Bulky Items", field: "Bulkysecsize" },
-          { label: "Hazardous Items", field: "Hazardoussecsize" },
-          { label: "Perishables", field: "Perishablesecsize" },
-          { label: "Spare Parts", field: "Sparesecsize" },
-          { label: "Other Items", field: "Otheritems" }
-        ].map((row, index) => (
-          <TableRow key={index}>
-            <TableCell>{row.label}</TableCell>
-            <TableCell>
-              {editMode ? (
-                <TextField
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <strong>Section</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Size (sq ft)</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[
+                  { label: "Bulky Items", field: "Bulkysecsize" },
+                  { label: "Hazardous Items", field: "Hazardoussecsize" },
+                  { label: "Perishables", field: "Perishablesecsize" },
+                  { label: "Spare Parts", field: "Sparesecsize" },
+                  { label: "Other Items", field: "Otheritems" },
+                ].map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{row.label}</TableCell>
+                    <TableCell>
+                      {editMode ? (
+                        <TextField
+                          name={row.field}
+                          type="number"
+                          value={formData[row.field] || ""}
+                          onChange={handleChange}
+                          size="small"
+                          variant="outlined"
+                          error={!!validationErrors[row.field]}
+                          helperText={validationErrors[row.field]}
+                          inputProps={{ min: "0", step: "0.01" }}
+                          required
+                        />
+                      ) : (
+                        formData[row.field] || 0
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
-                  name={row.field}
-                  type="number"
-                  value={formData[row.field] || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      [row.field]: e.target.value
-                    }))
-                  }
-                  
-                  size="small"
-                  variant="outlined"
-                />
-              ) : (
-                formData[row.field] || 0
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-</Box>
-
-
-
-
-        {/* Action buttons */}
         <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
           {!editMode ? (
             <>
               <Button variant="contained" color="secondary" onClick={handleEdit}>
                 Edit
               </Button>
-              <Button variant="contained" color="error" onClick={handleDelete}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
                 Delete
               </Button>
             </>
           ) : (
             <>
-              <Button variant="contained" sx={{ backgroundColor: "#ab47bc" }} onClick={handleSubmit}>
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: "#ab47bc" }}
+                onClick={handleSubmit}
+              >
                 Save
               </Button>
               <Button variant="outlined" color="inherit" onClick={handleCancel}>
@@ -254,6 +342,30 @@ export default function WarehouseForm() {
             </>
           )}
         </Box>
+
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete warehouse {formData.WarehouseID}? This action cannot
+              be undone.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                handleDelete();
+                setDeleteDialogOpen(false);
+              }}
+              color="error"
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Grid>
   );

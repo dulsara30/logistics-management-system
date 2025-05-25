@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Box, Button, Grid, TextField, Typography, CircularProgress, MenuItem } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  CircularProgress,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -11,6 +16,36 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api",
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function WarehouseForm() {
   const navigate = useNavigate();
@@ -28,14 +63,20 @@ export default function WarehouseForm() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-
-// Sri Lanka provinces array
-const provinces = [
-  "Western", "Central", "Southern", "Northern", "Eastern", 
-  "North Western", "North Central", "Uva", "Sabaragamuwa"
-];
-
+  // Sri Lanka provinces array
+  const provinces = [
+    "Western",
+    "Central",
+    "Southern",
+    "Northern",
+    "Eastern",
+    "North Western",
+    "North Central",
+    "Uva",
+    "Sabaragamuwa",
+  ];
 
   // Validation function
   const validateForm = () => {
@@ -65,7 +106,7 @@ const provinces = [
     });
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return Object.keys(newErrors).length === 0;
   };
 
   // Handle input field changes
@@ -73,7 +114,7 @@ const provinces = [
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value.trimStart(), // Prevent leading spaces
+      [name]: value.trim(), // Trim all whitespace
     }));
 
     // Clear error for the field being edited
@@ -83,35 +124,76 @@ const provinces = [
   };
 
   // Handle form submission
-  const handleSubmit = () => {
-    if (!validateForm()) return; // Stop if validation fails
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors before submitting.");
+      return;
+    }
 
     setIsSubmitting(true);
-    axios
-      .post("http://localhost:8000/api/warehouse", formData)
-      .then((response) => {
-        alert("Warehouse created successfully!");
-        setFormData({ // Reset form
-          StreetName: "",
-          City: "",
-          Province: "",
-          SpecialInstruction: "",
-          Description: "",
-          Bulkysecsize: "",
-          Hazardoussecsize: "",
-          Perishablesecsize: "",
-          Sparesecsize: "",
-          Otheritems: "",
-        });
-        navigate("/Warehouse");
-      })
-      .catch((error) => {
-        const message =
-          error.response?.data?.message || "An error occurred while creating the warehouse";
-        setErrors({ submit: message });
-      })
-      .finally(() => setIsSubmitting(false));
+    setError("");
+    try {
+      const response = await api.post("/warehouse", formData);
+      toast.success("Warehouse created successfully!");
+      setFormData({
+        StreetName: "",
+        City: "",
+        Province: "",
+        SpecialInstruction: "",
+        Description: "",
+        Bulkysecsize: "",
+        Hazardoussecsize: "",
+        Perishablesecsize: "",
+        Sparesecsize: "",
+        Otheritems: "",
+      });
+      setErrors({});
+      navigate("/Warehouse");
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "An error occurred while creating the warehouse";
+      setError(message);
+      toast.error(message);
+      console.error("Error creating warehouse:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Handle cancel
+  const handleCancel = () => {
+    setFormData({
+      StreetName: "",
+      City: "",
+      Province: "",
+      SpecialInstruction: "",
+      Description: "",
+      Bulkysecsize: "",
+      Hazardoussecsize: "",
+      Perishablesecsize: "",
+      Sparesecsize: "",
+      Otheritems: "",
+    });
+    setErrors({});
+    setError("");
+    toast.info("Form has been canceled and cleared.");
+    navigate("/Warehouse");
+  };
+
+  if (error && !errors.submit) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography color="error">{error}</Typography>
+        <Button
+          variant="contained"
+          sx={{ mt: 2 }}
+          onClick={() => setError("")}
+        >
+          Try Again
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Grid container spacing={2} sx={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
@@ -150,7 +232,7 @@ const provinces = [
             required
           />
 
-           <TextField
+          <TextField
             select
             label="Province"
             name="Province"
@@ -168,7 +250,6 @@ const provinces = [
               </MenuItem>
             ))}
           </TextField>
-
 
           <TextField
             label="Special Instruction"
@@ -225,7 +306,7 @@ const provinces = [
                         variant="outlined"
                         error={!!errors[row.field]}
                         helperText={errors[row.field]}
-                        inputProps={{ min: 0 }} // Prevent negative numbers in UI
+                        inputProps={{ min: 0 }}
                       />
                     </TableCell>
                   </TableRow>
@@ -247,7 +328,7 @@ const provinces = [
           <Button
             variant="outlined"
             color="inherit"
-            onClick={() => navigate("/WarehouseSubmit")}
+            onClick={handleCancel}
             disabled={isSubmitting}
           >
             Cancel

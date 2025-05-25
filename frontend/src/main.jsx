@@ -136,7 +136,7 @@ const router = createBrowserRouter([
             path: "warehouse/Maintainance/AddMaintenance/:requestId",
             element: (
               <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
-                <MaintenanceFormTwo />
+                <MaintenanceForm />
               </ProtectedRoute>
             )
           },

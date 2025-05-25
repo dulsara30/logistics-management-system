@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Box,
   TextField,
@@ -7,131 +6,206 @@ import {
   Typography,
   MenuItem,
   Stack,
-  Paper
-} from '@mui/material';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+  Paper,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
+const priorityOptions = ["Low", "Medium", "High"];
 
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api",
+});
 
-const priorityOptions = ['Low', 'Medium', 'High'];
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function MaintenanceFormTwo() {
-
-
-  const [editMode, setEditMode] = useState(false); // Edit mode state   
-  const { requestId } = useParams(); // Get ID from URL
+  const [editMode, setEditMode] = useState(false);
+  const { requestId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    requestId: '',
-    warehouseId: '',
-    issueDescription: '',
-    priority: '',
-    requestedBy: '',
-    scheduledDate: '',
-    completionDate: '',
+    requestId: "",
+    warehouseId: "",
+    issueDescription: "",
+    priority: "",
+    scheduledDate: "",
+    completionDate: "",
   });
+  const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-
-
-
-  // Handle canceling edit mode
-  const handleCancel = () => {
-    setEditMode(false);
-  };
-
-
-
-
-// Handle editing mode
-const handleEdit = () => {
-    setEditMode(true);
-  };
-
-
-
-  
   // Fetch existing maintenance data
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/maintenance/${requestId}`)
-      .then((res) => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await api.get(`/maintenance/${requestId}`);
         const data = res.data;
 
-        // Function to format date to YYYY-MM-DD
         const formatDate = (dateString) => {
-          if (!dateString) return '';
+          if (!dateString) return "";
           const date = new Date(dateString);
           const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
           return `${year}-${month}-${day}`;
         };
 
         setFormData({
-          ...data,
+          requestId: data.requestId || "",
+          warehouseId: data.warehouseId || "",
+          issueDescription: data.issueDescription || "",
+          priority: data.priority || "",
           scheduledDate: formatDate(data.scheduledDate),
           completionDate: formatDate(data.completionDate),
         });
-      })
-      .catch((err) => {
-        console.error('Error fetching data:', err);
-        alert('Failed to load maintenance data.');
-      });
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load maintenance data.");
+        toast.error("Failed to load maintenance data.");
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [requestId]);
-
-
-
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setValidationErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.warehouseId) errors.warehouseId = "Warehouse ID is required.";
+    if (!formData.issueDescription) errors.issueDescription = "Issue description is required.";
+    if (!formData.priority) errors.priority = "Priority is required.";
+    if (!formData.scheduledDate) errors.scheduledDate = "Scheduled date is required.";
+    if (!formData.completionDate) errors.completionDate = "Completion date is required.";
+    return errors;
+  };
 
-
-
-
-
-  // Update existing record
   const handleUpdate = async (e) => {
     e.preventDefault();
+
+    const errors = validateForm();
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the validation errors before submitting.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
     try {
-      await axios.put(`http://localhost:8000/api/maintenance/${requestId}`, formData);
-      alert('Maintenance request updated successfully!');
-      navigate('/warehouse/Maintainance');
+      await api.put(`/maintenance/${requestId}`, formData);
+      toast.success("Maintenance request updated successfully!");
+      navigate("/warehouse/Maintainance");
     } catch (error) {
-      console.error('Update failed:', error);
-      alert('Failed to update request.');
+      setError(error.response?.data?.message || "Failed to update request.");
+      toast.error("Failed to update request.");
+      console.error("Update failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-
-
-
-
-
-  // Delete record
   const handleDelete = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this request?');
-    if (confirmDelete) {
-      try {
-        await axios.delete(`http://localhost:8000/api/maintenance/${requestId}`);
-        alert('Maintenance request deleted.');
-        navigate('/warehouse/Maintainance');
-      } catch (error) {
-        console.error('Delete failed:', error);
-        alert('Failed to delete request.');
-      }
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await api.delete(`/maintenance/${requestId}`);
+      toast.success("Maintenance request deleted.");
+      setDeleteDialogOpen(false);
+      navigate("/warehouse/Maintainance");
+    } catch (error) {
+      setError(error.response?.data?.message || "Failed to delete request.");
+      toast.error("Failed to delete request.");
+      console.error("Delete failed:", error);
+      setDeleteDialogOpen(false);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    setFormData({
+      requestId: formData.requestId,
+      warehouseId: formData.warehouseId,
+      issueDescription: formData.issueDescription,
+      priority: formData.priority,
+      scheduledDate: formData.scheduledDate,
+      completionDate: formData.completionDate,
+    });
+    setValidationErrors({});
+    setEditMode(false);
+    toast.info("Changes discarded.");
+  };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-
+  if (error) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography color="error">{error}</Typography>
+        <Button
+          variant="contained"
+          sx={{ mt: 2 }}
+          onClick={() => navigate("/warehouse/Maintainance")}
+        >
+          Go Back
+        </Button>
+      </Box>
+    );
+  }
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto', mt: 5 }}>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 5 }}>
       <Typography variant="h5" gutterBottom>
         Edit Maintenance Request
       </Typography>
@@ -142,7 +216,6 @@ const handleEdit = () => {
             name="requestId"
             value={formData.requestId}
             InputProps={{ readOnly: true }}
-
             fullWidth
           />
           <TextField
@@ -153,7 +226,8 @@ const handleEdit = () => {
             fullWidth
             required
             disabled={!editMode}
-
+            error={!!validationErrors.warehouseId}
+            helperText={validationErrors.warehouseId}
           />
           <TextField
             label="Issue Description"
@@ -165,7 +239,8 @@ const handleEdit = () => {
             fullWidth
             required
             disabled={!editMode}
-
+            error={!!validationErrors.issueDescription}
+            helperText={validationErrors.issueDescription}
           />
           <TextField
             select
@@ -176,7 +251,8 @@ const handleEdit = () => {
             fullWidth
             required
             disabled={!editMode}
-
+            error={!!validationErrors.priority}
+            helperText={validationErrors.priority}
           >
             {priorityOptions.map((option) => (
               <MenuItem key={option} value={option}>
@@ -184,8 +260,6 @@ const handleEdit = () => {
               </MenuItem>
             ))}
           </TextField>
-          
-          
           <TextField
             label="Scheduled Date"
             name="scheduledDate"
@@ -196,8 +270,9 @@ const handleEdit = () => {
             fullWidth
             disabled={!editMode}
             required
+            error={!!validationErrors.scheduledDate}
+            helperText={validationErrors.scheduledDate}
           />
-
           <TextField
             label="Completion Date"
             name="completionDate"
@@ -208,35 +283,79 @@ const handleEdit = () => {
             fullWidth
             disabled={!editMode}
             required
+            error={!!validationErrors.completionDate}
+            helperText={validationErrors.completionDate}
           />
 
-
-
-
-<Stack direction="row" spacing={2}>
-  {!editMode ? (
+          <Stack direction="row" spacing={2}>
+            {!editMode ? (
               <>
-                <Button variant="contained" color="secondary" onClick={handleEdit}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleEdit}
+                  disabled={loading}
+                >
                   Edit
                 </Button>
-                <Button variant="contained" color="error" onClick={handleDelete}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
                   Delete
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="contained" sx={{ backgroundColor: "#ab47bc" }} onClick={handleUpdate}>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: "#ab47bc" }}
+                  type="submit"
+                  disabled={loading}
+                >
                   Save
                 </Button>
-                <Button variant="outlined" color="inherit" onClick={handleCancel}>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={handleCancel}
+                  disabled={loading}
+                >
                   Cancel
                 </Button>
               </>
             )}
-</Stack>
-
+          </Stack>
         </Stack>
       </form>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="delete-dialog-title"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this maintenance request? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            disabled={loading}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 }

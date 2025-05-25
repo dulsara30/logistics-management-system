@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -6,105 +6,183 @@ import {
   Typography,
   MenuItem,
   Stack,
-  Paper
-} from '@mui/material';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+  Paper,
+  CircularProgress,
+} from "@mui/material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const priorityOptions = ['Low', 'Medium', 'High'];
+const priorityOptions = ["Low", "Medium", "High"];
+
+// Create axios instance with interceptor
+const api = axios.create({
+  baseURL: "http://localhost:8000/api",
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function MaintenanceForm() {
   const [formData, setFormData] = useState({
-    warehouseId: '',
-    issueDescription: '',
-    priority: '',
-    scheduledDate: '',
-    completionDate: '',
+    warehouseId: "",
+    issueDescription: "",
+    priority: "",
+    scheduledDate: "",
+    completionDate: "",
   });
-
-  const [warehouses, setWarehouses] = useState([]); // State to hold the list of warehouses
-  const navigate = useNavigate(); // Initialize navigate hook
-
+  const [warehouses, setWarehouses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch warehouses from the backend API when the component mounts
-    axios.get('http://localhost:8000/api/Warehouse')
-      .then(response => {
-        setWarehouses(response.data); // Set warehouses to state
-      })
-      .catch(error => {
-        console.error('Error fetching warehouses:', error);
-        alert('Failed to fetch warehouses.');
-      });
-  }, []); // Empty array ensures this runs only once when the component is mounted
+    const fetchWarehouses = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await api.get("/Warehouse");
+        setWarehouses(response.data);
+      } catch (error) {
+        setError(error.response?.data?.message || "Failed to fetch warehouses.");
+        toast.error("Failed to fetch warehouses.");
+        console.error("Error fetching warehouses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-
-
+    fetchWarehouses();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.warehouseId) errors.warehouseId = "Warehouse ID is required.";
+    if (!formData.issueDescription) errors.issueDescription = "Issue description is required.";
+    if (!formData.priority) errors.priority = "Priority is required.";
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const errors = validateForm();
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the validation errors before submitting.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
     try {
-      // Assuming the backend URL for posting data is 'http://localhost:8000/api/maintenance'
-      const response = await axios.post('http://localhost:8000/api/maintenance', formData);
-      console.log('Form submitted successfully:', response.data);
-      // Optionally, reset the form or navigate to a success page
+      const response = await api.post("/maintenance", formData);
+      console.log("Form submitted successfully:", response.data);
       setFormData({
-        warehouseId: '',
-        issueDescription: '',
-        priority: '',
-        scheduledDate: '',
-        completionDate: '',
+        warehouseId: "",
+        issueDescription: "",
+        priority: "",
+        scheduledDate: "",
+        completionDate: "",
       });
-      alert('Maintenance request submitted successfully!');
-      navigate('/warehouse/Maintainance');
+      toast.success("Maintenance request submitted successfully!");
+      navigate("/warehouse/Maintainance");
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('There was an error submitting the request. Please try again.');
+      setError(error.response?.data?.message || "Error submitting the request.");
+      toast.error("Error submitting the request.");
+      console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Reset the form data when cancel is clicked
     setFormData({
-      warehouseId: '',
-      issueDescription: '',
-      priority: '',
-      scheduledDate: '',
-      completionDate: '',
+      warehouseId: "",
+      issueDescription: "",
+      priority: "",
+      scheduledDate: "",
+      completionDate: "",
     });
-    alert('Form has been canceled and cleared.');
+    setValidationErrors({});
+    toast.info("Form has been canceled and cleared.");
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto', mt: 5 }}>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 5 }}>
       <Typography variant="h5" gutterBottom>
         Add Maintenance Request
       </Typography>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          
-        <TextField
+          <TextField
             select
             label="Warehouse ID"
             name="warehouseId"
             value={formData.warehouseId}
             onChange={handleChange}
             required
+            error={!!validationErrors.warehouseId}
+            helperText={validationErrors.warehouseId}
+            disabled={warehouses.length === 0}
           >
-            {/* Populate dropdown with all warehouses */}
-            {warehouses.map((warehouse) => (
-              <MenuItem key={warehouse.WarehouseID} value={warehouse.WarehouseID}>
-                {warehouse.WarehouseID}
+            {warehouses.length === 0 ? (
+              <MenuItem value="" disabled>
+                No warehouses available
               </MenuItem>
-            ))}
+            ) : (
+              warehouses.map((warehouse) => (
+                <MenuItem key={warehouse.WarehouseID} value={warehouse.WarehouseID}>
+                  {warehouse.WarehouseID}
+                </MenuItem>
+              ))
+            )}
           </TextField>
-          
+
           <TextField
             label="Issue Description"
             name="issueDescription"
@@ -113,6 +191,8 @@ export default function MaintenanceForm() {
             multiline
             rows={3}
             required
+            error={!!validationErrors.issueDescription}
+            helperText={validationErrors.issueDescription}
           />
           <TextField
             select
@@ -121,6 +201,8 @@ export default function MaintenanceForm() {
             value={formData.priority}
             onChange={handleChange}
             required
+            error={!!validationErrors.priority}
+            helperText={validationErrors.priority}
           >
             {priorityOptions.map((option) => (
               <MenuItem key={option} value={option}>
@@ -128,7 +210,7 @@ export default function MaintenanceForm() {
               </MenuItem>
             ))}
           </TextField>
-          
+
           <TextField
             label="Scheduled Date"
             name="scheduledDate"
@@ -147,7 +229,12 @@ export default function MaintenanceForm() {
           />
 
           <Stack direction="row" spacing={2}>
-            <Button type="submit" variant="contained" sx={{ bgcolor: '#7b1fa2', maxWidth: 200 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ bgcolor: "#7b1fa2", maxWidth: 200 }}
+              disabled={loading}
+            >
               Done
             </Button>
             <Button
@@ -156,6 +243,7 @@ export default function MaintenanceForm() {
               color="secondary"
               onClick={handleCancel}
               sx={{ maxWidth: 200 }}
+              disabled={loading}
             >
               Cancel
             </Button>
