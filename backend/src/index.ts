@@ -4,6 +4,9 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import VehicleFleetRoutes from "./API/VehicleFleet/VehiclefleetAPI"; // Import routes
 import DeliverySchdeulingRoutes from "./API/DeliveryScheduling/DeliverySchedulingAPI";
 import MaintenenceRoute from "./API/VehicleFleet/VehicleMaintenanceAPI";
+import router from "./API/WarehouseManagement/WarehouseAPI";
+import router2 from "./API/Maintenance/MaintenanceAPI";
+import router3 from "./API/RoutingMaintenance/MaintenanceRAPI";
 import {
   getAllInventoryManagement,
   createInventoryManagement,
@@ -59,6 +62,11 @@ app.use(authenticateToken);
 
 // Use your routes for API handling
 app.use("/api", VehicleFleetRoutes, DeliverySchdeulingRoutes, MaintenenceRoute);
+
+// Routes for API handling
+app.use("/api", router);
+app.use("/api", router2);
+app.use("/api", router3); // Handles routing maintenance
 app.use("/staff", staffRouter);
 app.use("/suppliers", suppliersRouter);
 app.use("/returns", getItemRouter);

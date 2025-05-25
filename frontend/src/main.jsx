@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import RootLayout from './layouts/root.layout.jsx';
 import DashboardLayout from './component/DashBoard1.jsx';
 import StaffLayout from './layouts/staff.layout.jsx';
+import ProtectedRoute from './component/ProtectedRoute.jsx';
 
 // Pages
 import Home from './pages/Home/Home.jsx';
@@ -17,22 +18,30 @@ import InventoryManagement from './pages/InventoryManagement/InventoryManagement
 import StaffManagement from './pages/StaffManagement/StaffManagement.jsx';
 import SupplierManagement from './pages/SupplierManagement/SupplierManagement.jsx';
 import Help from './pages/Help/Help.jsx';
+import Login from './pages/login/login.jsx';
+import Unauthorized from './pages/login/Unauthorized.jsx';
+
+// Vehicle Fleet Management
 import VehicleRegistrationForm from './pages/VehicleFleet/VehicleRegistration.jsx';
 import Vehicleprofile from './pages/VehicleFleet/VehicleProfile.jsx';
-import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx';
-import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx';
 import VehicleMaintenanceForm from './pages/VehicleFleet/VehicleMaintainance.jsx';
 import UpdateVehicleMaintenanceForm from './pages/VehicleFleet/VehicleMaintenanceUpdate.jsx';
-import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx';
-import ReturnForm from './pages/Return&DamageHandling/ReturnForm.jsx';
-import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
-import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
-import Items from './pages/Return&DamageHandling/items.jsx';
-import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx';
-import DeliveryManagementEmployee from './component/DeliveryScheduling/DeliveryManagementEmployee.jsx'
-import DeliveryScheduleUpdate from './component/DeliveryScheduling/DeliveryScheduleEmp.jsx'
 
-// Staff Pages
+// Delivery Management
+import NewDeliverySchedule from './pages/DeliveryScheduling/SchedulingForm.jsx';
+import DeliveryScheduleProfile from './pages/DeliveryScheduling/ScheduleDetailProfile.jsx';
+import DeliveryManagementEmployee from './component/DeliveryScheduling/DeliveryManagementEmployee.jsx';
+import DeliveryScheduleUpdate from './component/DeliveryScheduling/DeliveryScheduleEmp.jsx';
+
+// Warehouse Management
+import CreateWarehouse from './pages/WarehouseManagement/CreateWarehouse.jsx';
+import WarehouseForm from './pages/WarehouseManagement/WarehouseProfile.jsx';
+import Maintainance from './pages/WarehouseManagement/Mantainance.jsx';
+import MaintenanceForm from './pages/WarehouseManagement/CreateMaintenance.jsx';
+import MaintenanceFormTwo from './pages/WarehouseManagement/MaintenanceProfile.jsx';
+import RoutingMaintenanceForm from './pages/WarehouseManagement/RoutingForm.jsx';
+
+// Staff Management
 import ManageStaff from './pages/StaffManagement/SubPages/ManageStaff.jsx';
 import AddStaff from './pages/StaffManagement/SubPages/AddStaff.jsx';
 import AssignTask from './pages/StaffManagement/SubPages/AssignTask.jsx';
@@ -42,18 +51,21 @@ import Concerns from './pages/StaffManagement/SubPages/Concerns.jsx';
 import AttendanceTracking from './pages/StaffManagement/SubPages/AttendanceTracking.jsx';
 import StaffAttendance from './pages/StaffManagement/SubPages/StaffAttendanceTracking.jsx';
 
-// Authentication Pages
-import Login from './pages/login/login.jsx';
-import Unauthorized from './pages/login/Unauthorized.jsx';
+// Supplier Management
+import AddSupplier from './pages/SupplierManagement/AddSupplier.jsx';
+
+// Return & Damage Handling
+import ReturnForm from './pages/Return&DamageHandling/ReturnForm.jsx';
+import DamageHandling from './pages/Return&DamageHandling/DamageHandling.jsx';
+import AddDamage from './pages/Return&DamageHandling/AddDamage.jsx';
+import Items from './pages/Return&DamageHandling/items.jsx';
+import ReturnReport from './pages/Return&DamageHandling/ReturnReport.jsx';
 
 // Staff Member Pages
 import Dashboard from './pages/StaffMember/Dashboard.jsx';
 import Profile from './pages/StaffMember/Profile.jsx';
 import QRCode from './pages/StaffMember/QRCode.jsx';
 import LeaveRequest from './pages/StaffMember/leaveRequest.jsx';
-
-// Components
-import ProtectedRoute from './component/ProtectedRoute.jsx';
 
 const router = createBrowserRouter([
   {
@@ -65,6 +77,7 @@ const router = createBrowserRouter([
     element: <Unauthorized />
   },
   {
+    path: "/",
     element: <RootLayout />,
     children: [
       {
@@ -78,6 +91,7 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             )
           },
+          // Warehouse Management Routes
           {
             path: "warehouse",
             element: (
@@ -86,6 +100,63 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             )
           },
+          {
+            path: "warehouse/Addwarehouse",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <CreateWarehouse />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/WarehouseDetails/:WarehouseID",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                <WarehouseForm />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/Maintainance",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <Maintainance />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/Maintainance/AddMaintenance",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <MaintenanceForm />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/Maintainance/AddMaintenance/:requestId",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <MaintenanceFormTwo />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/Maintainance/Routing-Form",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <RoutingMaintenanceForm />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: "warehouse/Maintainance/Routing-Form/:RID",
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <RoutingMaintenanceForm />
+              </ProtectedRoute>
+            )
+          },
+          // Vehicle Fleet Management Routes
           {
             path: "fleet",
             element: (
@@ -96,24 +167,45 @@ const router = createBrowserRouter([
           },
           {
             path: "fleet/vehicleRegistration",
-            element: <VehicleRegistrationForm />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <VehicleRegistrationForm />
+              </ProtectedRoute>
+            )
           },
           {
             path: "fleet/VehicleProfile/:VehicleNumber",
-            element: <Vehicleprofile />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                <Vehicleprofile />
+              </ProtectedRoute>
+            )
           },
           {
             path: "fleet/vehicleMaintenance",
-            element: <VehicleMaintenanceForm />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <VehicleMaintenanceForm />
+              </ProtectedRoute>
+            )
           },
           {
             path: "fleet/VehicleProfile/:VehicleNumber/vehicleMaintenance",
-            element: <VehicleMaintenanceForm />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <VehicleMaintenanceForm />
+              </ProtectedRoute>
+            )
           },
           {
             path: "fleet/VehicleProfile/:VehicleNumber/vehicleMaintenance/:MaintenanceID",
-            element: <UpdateVehicleMaintenanceForm />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                <UpdateVehicleMaintenanceForm />
+              </ProtectedRoute>
+            )
           },
+          // Delivery Management Routes
           {
             path: "delivery",
             element: (
@@ -124,12 +216,21 @@ const router = createBrowserRouter([
           },
           {
             path: "delivery/NewDeliveryScheduling",
-            element: <NewDeliverySchedule />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                <NewDeliverySchedule />
+              </ProtectedRoute>
+            )
           },
           {
             path: "delivery/DeliveryProfile/:ScheduleID",
-            element: <DeliveryScheduleProfile />
+            element: (
+              <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager", "Inventory Manager"]}>
+                <DeliveryScheduleProfile />
+              </ProtectedRoute>
+            )
           },
+          // Inventory Management Routes
           {
             path: "inventory",
             element: (
@@ -138,6 +239,7 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             )
           },
+          // Staff Management Routes
           {
             path: "staff",
             element: (
@@ -212,6 +314,7 @@ const router = createBrowserRouter([
               }
             ],
           },
+          // Supplier Management Routes
           {
             path: "suppliers",
             element: (
@@ -220,9 +323,17 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             ),
             children: [
-              { path: "Add-Supplier", element: <AddSupplier /> }
+              {
+                path: "Add-Supplier",
+                element: (
+                  <ProtectedRoute allowedRoles={["Business Owner", "Warehouse Manager"]}>
+                    <AddSupplier />
+                  </ProtectedRoute>
+                )
+              }
             ]
           },
+          // Return & Damage Handling Routes
           {
             path: "returns",
             element: (
@@ -265,6 +376,7 @@ const router = createBrowserRouter([
               },
             ],
           },
+          // Help Route
           {
             path: "help",
             element: (
@@ -277,6 +389,7 @@ const router = createBrowserRouter([
       }
     ]
   },
+  // Staff Layout Routes
   {
     element: <StaffLayout />,
     children: [
@@ -337,5 +450,5 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
