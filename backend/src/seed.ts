@@ -1,0 +1,146 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import staffMembers from "./Infrastructure/schemas/staff";
+
+const BCRYPT_ROUNDS = 12;
+
+/**
+ * Development/demo accounts only.
+ *
+ * SECURITY: these passwords are well-known and must never be enabled in a
+ * production or internet-facing deployment. Rotate or remove them before any
+ * real deployment. `login.ts` only ever accepts them when creating a user for
+ * the first time — it never treats them as a universal fallback.
+ */
+export const DEFAULT_ACCOUNTS = [
+  {
+    fullName: "Business Owner",
+    email: "owner@grocerease.com",
+    password: "Password123!",
+    role: "Business Owner",
+    phoneNo: "0000000000",
+    DOB: new Date("2000-01-01"),
+    gender: "Male",
+    address: "Company Headquarters",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "Main HQ",
+    status: "Active",
+    NIC: "TEST-OWNER-001"
+  },
+  {
+    fullName: "Warehouse Manager",
+    email: "warehouse@grocerease.com",
+    password: "Password123!",
+    role: "Warehouse Manager",
+    phoneNo: "0000000001",
+    DOB: new Date("2000-01-01"),
+    gender: "Male",
+    address: "Warehouse A",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "Warehouse A",
+    status: "Active",
+    NIC: "TEST-WAREHOUSE-001"
+  },
+  {
+    fullName: "Inventory Manager",
+    email: "inventory@grocerease.com",
+    password: "Password123!",
+    role: "Inventory Manager",
+    phoneNo: "0000000002",
+    DOB: new Date("2000-01-01"),
+    gender: "Female",
+    address: "Warehouse B",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "Warehouse B",
+    status: "Active",
+    NIC: "TEST-INVENTORY-001"
+  },
+  {
+    fullName: "Delivery Driver",
+    email: "driver@grocerease.com",
+    password: "Password123!",
+    role: "Driver",
+    phoneNo: "0000000003",
+    DOB: new Date("2000-01-01"),
+    gender: "Male",
+    address: "Delivery Hub 1",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "Delivery Hub 1",
+    status: "Active",
+    NIC: "TEST-DRIVER-001"
+  },
+  {
+    fullName: "Maintenance Staff",
+    email: "maintenance@grocerease.com",
+    password: "Password123!",
+    role: "Maintenance Staff",
+    phoneNo: "0000000004",
+    DOB: new Date("2000-01-01"),
+    gender: "Male",
+    address: "Maintenance Unit",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "Maintenance Unit",
+    status: "Active",
+    NIC: "TEST-MAINTENANCE-001"
+  },
+  {
+    fullName: "General Staff",
+    email: "staff@grocerease.com",
+    password: "Password123!",
+    role: "Other Staff",
+    phoneNo: "0000000005",
+    DOB: new Date("2000-01-01"),
+    gender: "Female",
+    address: "General Operations",
+    profilePic: "https://via.placeholder.com/150",
+    warehouseAssigned: "General Operations",
+    status: "Active",
+    NIC: "TEST-STAFF-001"
+  }
+
+  
+];
+
+export const seedDefaultUsers = async () => {
+  try {
+    const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/logistics_db";
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(mongoUri);
+    }
+
+    console.log("Seeding default staff users...");
+
+    if (process.env.NODE_ENV === "production") {
+      console.warn(
+        "WARNING: seeding well-known default passwords in production. Rotate them immediately."
+      );
+    }
+
+    for (const account of DEFAULT_ACCOUNTS) {
+      const existingUser = await staffMembers.findOne({ email: account.email.toLowerCase() });
+      if (!existingUser) {
+        const hashedPassword = await bcrypt.hash(account.password, BCRYPT_ROUNDS);
+        await staffMembers.create({
+          ...account,
+          email: account.email.toLowerCase(),
+          password: hashedPassword
+        });
+        console.log(`Created default user: ${account.email} (${account.role})`);
+      } else {
+        console.log(`User already exists: ${account.email}`);
+      }
+    }
+
+    console.log("Seeding completed successfully!");
+  } catch (err) {
+    console.error("Error seeding default users:", err);
+  }
+};
+
+// Execute if run directly
+if (require.main === module) {
+  seedDefaultUsers().then(() => mongoose.disconnect());
+}
